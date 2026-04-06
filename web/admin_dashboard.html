@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FSTM Timetabling – Espace Administration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:    #0b1f4b;
+      --navy2:   #122258;
+      --gold:    #e8a020;
+      --teal:    #1a9e7a;
+      --blue:    #1a6fba;
+      --sky:     #3dbde4;
+      --danger:  #d94040;
+      --bg:      #f0f3f9;
+      --white:   #ffffff;
+      --text:    #1c2a45;
+      --muted:   #6b7c9a;
+      --border:  #dce3ef;
+      --shadow:  0 4px 20px rgba(11,31,75,0.10);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ===================== TOPBAR ===================== */
+    .topbar {
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 56px;
+      border-bottom: 3px solid var(--gold);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo {
+      background: var(--gold); color: var(--navy);
+      font-weight: 800; font-size: 1rem;
+      padding: 4px 10px; border-radius: 6px; letter-spacing: 1px;
+    }
+    .topbar-title { color: #fff; font-size: 0.9rem; font-weight: 600; opacity: 0.9; }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .topbar-link {
+      color: rgba(255,255,255,0.7); font-size: 0.82rem; font-weight: 500;
+      text-decoration: none; display: flex; align-items: center; gap: 6px;
+      cursor: pointer; transition: color .2s;
+    }
+    .topbar-link:hover, .topbar-link.active { color: var(--gold); }
+    .topbar-badge {
+      background: var(--gold); color: var(--navy);
+      font-size: 0.7rem; font-weight: 700; border-radius: 10px; padding: 2px 7px;
+    }
+
+    /* ===================== NAVBAR ===================== */
+    .navbar {
+      background: var(--navy2); padding: 0 32px;
+      display: flex; gap: 4px; align-items: center; height: 48px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .nav-btn {
+      color: rgba(255,255,255,0.65); font-size: 0.82rem; font-weight: 600;
+      padding: 0 16px; height: 48px; border: none; background: transparent;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      border-bottom: 3px solid transparent; transition: all .2s;
+    }
+    .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+    .nav-btn.active { color: #fff; border-bottom-color: var(--gold); }
+
+    /* ===================== HERO BANNER ===================== */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #1a3875 100%);
+      padding: 36px 32px 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; right: -60px; top: -60px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: rgba(232,160,32,0.08);
+    }
+    .hero h1 { color: #fff; font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+    .hero p { color: rgba(255,255,255,0.6); font-size: 0.88rem; }
+
+    /* ===================== STAT CARDS ===================== */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      padding: 0 32px; margin-top: -32px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border-radius: 12px;
+      padding: 22px 24px; display: flex; align-items: center; gap: 18px;
+      box-shadow: var(--shadow); cursor: pointer; transition: transform .2s, box-shadow .2s;
+      border-top: 4px solid transparent; position: relative; overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(11,31,75,0.15); }
+    .stat-card.blue   { border-top-color: var(--blue); }
+    .stat-card.gold   { border-top-color: var(--gold); }
+    .stat-card.teal   { border-top-color: var(--teal); }
+    .stat-card.sky    { border-top-color: var(--sky); }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .stat-card.blue .stat-icon  { background: #e8f0fb; color: var(--blue); }
+    .stat-card.gold .stat-icon  { background: #fdf3e3; color: var(--gold); }
+    .stat-card.teal .stat-icon  { background: #e3f6f0; color: var(--teal); }
+    .stat-card.sky  .stat-icon  { background: #e3f6fd; color: var(--sky); }
+    .stat-val { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+    .stat-card.blue  .stat-val  { color: var(--blue); }
+    .stat-card.gold  .stat-val  { color: var(--gold); }
+    .stat-card.teal  .stat-val  { color: var(--teal); }
+    .stat-card.sky   .stat-val  { color: var(--sky); }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ===================== MAIN CONTENT ===================== */
+    .main { padding: 0 32px 40px; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+    .section-subtitle { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ===================== TOOLBAR ===================== */
+    .toolbar {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      background: var(--white); padding: 14px 20px; border-radius: 10px;
+      box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .search-wrap {
+      flex: 1; min-width: 200px; display: flex; align-items: center; gap: 10px;
+      background: var(--bg); border-radius: 8px; padding: 8px 14px;
+      border: 1.5px solid var(--border);
+    }
+    .search-wrap i { color: var(--muted); font-size: 0.85rem; }
+    .search-wrap input {
+      border: none; background: transparent; outline: none;
+      font-size: 0.87rem; color: var(--text); width: 100%;
+    }
+    .filter-select {
+      padding: 8px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: var(--bg); font-size: 0.84rem; color: var(--text);
+      cursor: pointer; outline: none;
+    }
+    .btn {
+      padding: 9px 18px; border-radius: 8px; border: none;
+      font-size: 0.84rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 7px; transition: all .2s;
+    }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-primary:hover { background: var(--blue); }
+    .btn-gold { background: var(--gold); color: var(--navy); }
+    .btn-gold:hover { filter: brightness(1.08); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+    .btn-outline {
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ===================== TABLE ===================== */
+    .table-card { background: var(--white); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg); }
+    thead th {
+      padding: 12px 16px; font-size: 0.75rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .8px;
+      text-align: left; border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+    thead th input[type="checkbox"] { accent-color: var(--navy); width: 15px; height: 15px; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:hover { background: #f6f9ff; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: 13px 16px; font-size: 0.84rem; color: var(--text); vertical-align: middle;
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.8rem; margin-right: 10px;
+    }
+    .cell-name { display: flex; align-items: center; }
+    .cell-name span { font-weight: 600; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .badge-cm   { background: #e8f0fb; color: var(--blue); }
+    .badge-td   { background: #e3f6f0; color: var(--teal); }
+    .badge-tp   { background: #fdf3e3; color: var(--gold); }
+    .badge-ok   { background: #e6f7ee; color: #1a8a4a; }
+    .badge-off  { background: #fdecea; color: var(--danger); }
+    .actions-cell { display: flex; gap: 6px; }
+
+    /* ===================== PAGINATION ===================== */
+    .table-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px; background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+    .table-info { font-size: 0.8rem; color: var(--muted); }
+    .pagination { display: flex; gap: 4px; }
+    .page-btn {
+      width: 32px; height: 32px; border-radius: 6px; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--muted); font-size: 0.82rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .page-btn:hover, .page-btn.active {
+      background: var(--navy); color: #fff; border-color: var(--navy);
+    }
+
+    /* ===================== MODAL ===================== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(11,31,75,0.45); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 14px; width: 520px; max-width: 95%;
+      box-shadow: 0 20px 60px rgba(11,31,75,0.25);
+      animation: slideIn .25s ease;
+    }
+    @keyframes slideIn { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: translateY(0); } }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--navy); }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
+    .modal-body { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .modal-body.single { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 9px 13px; border-radius: 8px; border: 1.5px solid var(--border);
+      font-size: 0.87rem; color: var(--text); outline: none; transition: border .2s;
+      font-family: 'Inter', sans-serif; background: var(--bg);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--navy); background: #fff;
+    }
+    .modal-footer {
+      display: flex; justify-content: flex-end; gap: 10px;
+      padding: 16px 24px; border-top: 1px solid var(--border);
+    }
+
+    /* ===================== TOAST ===================== */
+    .toast-wrap { position: fixed; bottom: 28px; right: 28px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+    .toast {
+      background: var(--navy); color: #fff; padding: 13px 20px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2); animation: fadeIn .3s ease;
+      border-left: 4px solid var(--gold);
+    }
+    .toast.success { border-left-color: var(--teal); }
+    .toast.error   { border-left-color: var(--danger); }
+    @keyframes fadeIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+
+    /* ===================== TABS ===================== */
+    .tab-strip {
+      display: flex; gap: 0; background: var(--white);
+      border-radius: 10px; box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
+    }
+    .tab-item {
+      flex: 1; padding: 13px 10px; border: none; background: transparent;
+      font-size: 0.84rem; font-weight: 600; color: var(--muted);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      border-bottom: 3px solid transparent; transition: all .2s;
+    }
+    .tab-item:hover { color: var(--navy); background: var(--bg); }
+    .tab-item.active { color: var(--navy); border-bottom-color: var(--gold); background: #f6f9ff; }
+    .tab-count {
+      background: var(--navy); color: #fff; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+    .tab-item.active .tab-count { background: var(--gold); color: var(--navy); }
+
+    /* ===================== API STATUS BAR ===================== */
+    .api-bar {
+      background: var(--white); border-radius: 10px; padding: 10px 20px;
+      display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+      box-shadow: var(--shadow); font-size: 0.82rem;
+    }
+    .api-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+    .api-url { color: var(--muted); font-family: monospace; font-size: 0.8rem; }
+    .api-ping { margin-left: auto; color: var(--teal); font-weight: 700; }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media(max-width: 920px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .topbar-link span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== TOPBAR ==================== -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">FSTM</div>
+    <div class="topbar-title">Système de Gestion des Emplois du Temps</div>
+  </div>
+  <div class="topbar-right">
+    <a class="topbar-link active"><i class="fas fa-user-shield"></i><span>Espace Administration</span></a>
+    <a class="topbar-link"><i class="fas fa-bell"></i><span class="topbar-badge">3</span></a>
+    <a class="topbar-link"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
+  </div>
+</div>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar">
+  <button class="nav-btn active" onclick="showPage('db')"><i class="fas fa-database"></i> Base de Données</button>
+  <button class="nav-btn" onclick="showPage('algo')"><i class="fas fa-cogs"></i> Algorithmes</button>
+  <button class="nav-btn" onclick="showPage('timetable')"><i class="fas fa-calendar-week"></i> Emploi du Temps</button>
+  <button class="nav-btn" onclick="showPage('reports')"><i class="fas fa-chart-bar"></i> Rapports</button>
+  <button class="nav-btn" onclick="showPage('settings')"><i class="fas fa-sliders-h"></i> Paramètres</button>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <h1><i class="fas fa-database" style="color:var(--gold);margin-right:10px;"></i>Gestion de la Base de Données</h1>
+  <p>Consultez, ajoutez et modifiez les ressources académiques de la FSTM — synchronisées avec l'API</p>
+</div>
+
+<!-- ==================== STAT CARDS ==================== -->
+<div class="stats-row">
+  <div class="stat-card blue" onclick="switchTab('teachers')">
+    <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+    <div>
+      <div class="stat-val" id="cnt-teachers">42</div>
+      <div class="stat-label">Enseignants</div>
+    </div>
+  </div>
+  <div class="stat-card gold" onclick="switchTab('rooms')">
+    <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+    <div>
+      <div class="stat-val" id="cnt-rooms">35</div>
+      <div class="stat-label">Salles</div>
+    </div>
+  </div>
+  <div class="stat-card teal" onclick="switchTab('groups')">
+    <div class="stat-icon"><i class="fas fa-users"></i></div>
+    <div>
+      <div class="stat-val" id="cnt-groups">28</div>
+      <div class="stat-label">Groupes</div>
+    </div>
+  </div>
+  <div class="stat-card sky" onclick="switchTab('modules')">
+    <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+    <div>
+      <div class="stat-val" id="cnt-modules">67</div>
+      <div class="stat-label">Modules</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div class="main">
+
+  <!-- API Status -->
+  <div class="api-bar">
+    <div class="api-dot"></div>
+    <b>API FastAPI</b>
+    <span class="api-url">http://localhost:8000</span>
+    <button class="btn btn-outline btn-sm" onclick="syncDB()"><i class="fas fa-sync-alt"></i> Sync FSTM</button>
+    <span class="api-ping" id="api-ping">— ms</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-strip">
+    <button class="tab-item active" id="tab-teachers" onclick="switchTab('teachers')">
+      <i class="fas fa-chalkboard-teacher"></i> Enseignants <span class="tab-count" id="tc-teachers">42</span>
+    </button>
+    <button class="tab-item" id="tab-rooms" onclick="switchTab('rooms')">
+      <i class="fas fa-door-open"></i> Salles <span class="tab-count" id="tc-rooms">35</span>
+    </button>
+    <button class="tab-item" id="tab-groups" onclick="switchTab('groups')">
+      <i class="fas fa-users"></i> Groupes <span class="tab-count" id="tc-groups">28</span>
+    </button>
+    <button class="tab-item" id="tab-modules" onclick="switchTab('modules')">
+      <i class="fas fa-book-open"></i> Modules <span class="tab-count" id="tc-modules">67</span>
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Rechercher..." oninput="filterTable()"/>
+    </div>
+    <select class="filter-select" id="filterType" onchange="filterTable()">
+      <option value="">Tous les types</option>
+    </select>
+    <button class="btn btn-primary" onclick="openModal('add')"><i class="fas fa-plus"></i> Ajouter</button>
+    <button class="btn btn-gold" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exporter</button>
+  </div>
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div>
+      <div class="section-title" id="section-title">Liste des Enseignants</div>
+      <div class="section-subtitle" id="section-subtitle">Données synchronisées depuis PostgreSQL via FastAPI</div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-redo"></i> Actualiser</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table id="mainTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="table-footer">
+      <div class="table-info" id="tableInfo">Affichage de 1–10 sur 42 entrées</div>
+      <div class="pagination">
+        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div><!-- /main -->
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Ajouter un Enseignant</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveRecord()"><i class="fas fa-save"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+/* ====== DATA ====== */
+const DB = {
+  teachers: [
+    {id:1, name:"Pr. Ouaarab Mustapha",    email:"ouaarab@fstm.ac.ma",      type:"CM+TD", disponible:true,  depts:"Informatique"},
+    {id:2, name:"Pr. Alami Rachid",         email:"alami@fstm.ac.ma",        type:"CM",    disponible:true,  depts:"Mathématiques"},
+    {id:3, name:"Pr. Benali Fatima",        email:"benali@fstm.ac.ma",       type:"TD+TP", disponible:false, depts:"Chimie"},
+    {id:4, name:"Pr. Chraibi Hind",         email:"chraibi@fstm.ac.ma",      type:"CM+TD", disponible:true,  depts:"Physique"},
+    {id:5, name:"Pr. El Moussaoui Ahmed",   email:"moussaoui@fstm.ac.ma",    type:"TP",    disponible:true,  depts:"Informatique"},
+    {id:6, name:"Pr. Idrissi Khadija",      email:"idrissi@fstm.ac.ma",      type:"CM",    disponible:true,  depts:"Biologie"},
+    {id:7, name:"Pr. Lachgar Mohammed",     email:"lachgar@fstm.ac.ma",      type:"TD",    disponible:false, depts:"Mathématiques"},
+    {id:8, name:"Pr. Najih Youssef",        email:"najih@fstm.ac.ma",        type:"TP",    disponible:true,  depts:"Informatique"},
+    {id:9, name:"Pr. Oudghiri Samira",      email:"oudghiri@fstm.ac.ma",     type:"CM+TD", disponible:true,  depts:"Physique"},
+    {id:10,name:"Pr. Rajaa El Fekri",       email:"elfekri@fstm.ac.ma",      type:"CM",    disponible:true,  depts:"Chimie"},
+  ],
+  rooms: [
+    {id:1, name:"Amphi A",     capacity:250, type:"AMPHI",    building:"A", disponible:true},
+    {id:2, name:"Amphi B",     capacity:200, type:"AMPHI",    building:"A", disponible:true},
+    {id:3, name:"Salle 101",   capacity:45,  type:"SALLE_TD", building:"B", disponible:true},
+    {id:4, name:"Salle 102",   capacity:45,  type:"SALLE_TD", building:"B", disponible:false},
+    {id:5, name:"Labo Info 1", capacity:30,  type:"SALLE_TP", building:"C", disponible:true},
+    {id:6, name:"Labo Info 2", capacity:30,  type:"SALLE_TP", building:"C", disponible:true},
+    {id:7, name:"Labo Chimie", capacity:25,  type:"SALLE_TP", building:"D", disponible:true},
+    {id:8, name:"Salle 201",   capacity:50,  type:"SALLE_TD", building:"B", disponible:true},
+  ],
+  groups: [
+    {id:1, name:"G-IAII-M1-A",  filiere:"IAII",  level:"Master 1", size:28, parent:null},
+    {id:2, name:"G-IAII-M1-B",  filiere:"IAII",  level:"Master 1", size:26, parent:null},
+    {id:3, name:"G-ISI-L3-A",   filiere:"ISI",   level:"Licence 3",size:35, parent:null},
+    {id:4, name:"G-ISI-L3-TD1", filiere:"ISI",   level:"Licence 3",size:18, parent:3},
+    {id:5, name:"G-ISI-L3-TD2", filiere:"ISI",   level:"Licence 3",size:17, parent:3},
+    {id:6, name:"G-TC-S1-A",    filiere:"TC",    level:"Semestre 1",size:40, parent:null},
+    {id:7, name:"G-TC-S1-B",    filiere:"TC",    level:"Semestre 1",size:38, parent:null},
+  ],
+  modules: [
+    {id:1, name:"Intelligence Artificielle",  code:"IA401", type:"CM", volume:2, dept:"Informatique"},
+    {id:2, name:"Métaheuristiques",           code:"MH402", type:"CM", volume:2, dept:"Informatique"},
+    {id:3, name:"Bases de Données Avancées",  code:"BD301", type:"CM", volume:2, dept:"Informatique"},
+    {id:4, name:"TP Algorithmique",           code:"AL101", type:"TP", volume:4, dept:"Informatique"},
+    {id:5, name:"Analyse",                    code:"AN201", type:"TD", volume:2, dept:"Mathématiques"},
+    {id:6, name:"Algèbre Linéaire",           code:"AG101", type:"CM", volume:2, dept:"Mathématiques"},
+    {id:7, name:"Probabilités",               code:"PR301", type:"CM", volume:2, dept:"Mathématiques"},
+    {id:8, name:"Physique Quantique",         code:"PH401", type:"CM", volume:2, dept:"Physique"},
+    {id:9, name:"Chimie Organique",           code:"CH201", type:"TP", volume:4, dept:"Chimie"},
+    {id:10,name:"Biologie Cellulaire",        code:"BI101", type:"CM", volume:2, dept:"Biologie"},
+  ]
+};
+
+/* ====== STATE ====== */
+let currentTab = 'teachers';
+let editingId = null;
+const avatarColors = ['#1a6fba','#1a9e7a','#e8a020','#3dbde4','#8b5cf6','#ef4444','#0b1f4b'];
+
+/* ====== TABLE CONFIGS ====== */
+const CONFIGS = {
+  teachers: {
+    title: "Liste des Enseignants", subtitle: "Données synchronisées depuis PostgreSQL via FastAPI",
+    filterLabel: "Type de cours", filterKey: "type",
+    filterOpts: ["CM","TD","TP","CM+TD","TD+TP"],
+    headers: ["#","Nom","Email","Type","Département","Disponibilité","Actions"],
+    row: (r) => {
+      const initials = r.name.replace('Pr. ','').split(' ').map(w=>w[0]).join('').slice(0,2);
+      const color = avatarColors[r.id % avatarColors.length];
+      const dispo = r.disponible
+        ? '<span class="badge badge-ok"><i class="fas fa-check"></i> Disponible</span>'
+        : '<span class="badge badge-off"><i class="fas fa-times"></i> Indisponible</span>';
+      const typeClass = r.type.includes('TP') ? 'badge-tp' : r.type.includes('TD') ? 'badge-td' : 'badge-cm';
+      return `<td>${r.id}</td>
+        <td><div class="cell-name"><div class="avatar" style="background:${color};color:#fff">${initials}</div><span>${r.name}</span></div></td>
+        <td style="color:var(--muted)">${r.email}</td>
+        <td><span class="badge ${typeClass}">${r.type}</span></td>
+        <td>${r.depts}</td><td>${dispo}</td>
+        <td><div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openModal('edit',${r.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    },
+    addForm: () => `
+      <div class="form-group"><label>Nom complet</label><input id="f_name" placeholder="Pr. Nom Prénom"/></div>
+      <div class="form-group"><label>Email</label><input id="f_email" type="email" placeholder="email@fstm.ac.ma"/></div>
+      <div class="form-group"><label>Type de cours</label>
+        <select id="f_type"><option>CM</option><option>TD</option><option>TP</option><option>CM+TD</option><option>TD+TP</option></select>
+      </div>
+      <div class="form-group"><label>Département</label><input id="f_depts" placeholder="Informatique"/></div>
+      <div class="form-group"><label>Disponibilité</label>
+        <select id="f_dispo"><option value="true">Disponible</option><option value="false">Indisponible</option></select>
+      </div>`,
+    saveData: () => ({
+      name: f('f_name'), email: f('f_email'), type: f('f_type'),
+      depts: f('f_depts'), disponible: f('f_dispo') === 'true'
+    })
+  },
+  rooms: {
+    title: "Liste des Salles", subtitle: "Ressources physiques — Types: AMPHI, TD, TP",
+    filterLabel: "Type de salle", filterKey: "type",
+    filterOpts: ["AMPHI","SALLE_TD","SALLE_TP"],
+    headers: ["#","Salle","Capacité","Type","Bâtiment","Statut","Actions"],
+    row: (r) => {
+      const typeClass = r.type === 'AMPHI' ? 'badge-cm' : r.type === 'SALLE_TP' ? 'badge-tp' : 'badge-td';
+      const dispo = r.disponible
+        ? '<span class="badge badge-ok">Disponible</span>'
+        : '<span class="badge badge-off">Maintenance</span>';
+      return `<td>${r.id}</td>
+        <td><div class="cell-name"><div class="avatar" style="background:var(--navy2);color:#fff"><i class="fas fa-door-open"></i></div><span>${r.name}</span></div></td>
+        <td><b>${r.capacity}</b> places</td>
+        <td><span class="badge ${typeClass}">${r.type}</span></td>
+        <td><span style="background:var(--bg);padding:3px 10px;border-radius:6px;font-weight:600;">Bât. ${r.building}</span></td>
+        <td>${dispo}</td>
+        <td><div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openModal('edit',${r.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    },
+    addForm: () => `
+      <div class="form-group"><label>Nom de la salle</label><input id="f_name" placeholder="Amphi A"/></div>
+      <div class="form-group"><label>Capacité</label><input id="f_capacity" type="number" placeholder="45"/></div>
+      <div class="form-group"><label>Type</label>
+        <select id="f_type"><option>AMPHI</option><option>SALLE_TD</option><option>SALLE_TP</option></select>
+      </div>
+      <div class="form-group"><label>Bâtiment</label><input id="f_building" placeholder="A"/></div>
+      <div class="form-group"><label>Statut</label>
+        <select id="f_dispo"><option value="true">Disponible</option><option value="false">En maintenance</option></select>
+      </div>`,
+    saveData: () => ({
+      name: f('f_name'), capacity: parseInt(f('f_capacity')||0),
+      type: f('f_type'), building: f('f_building'), disponible: f('f_dispo')==='true'
+    })
+  },
+  groups: {
+    title: "Liste des Groupes", subtitle: "Hiérarchie des groupes étudiants (Parent → Sous-groupes TD/TP)",
+    filterLabel: "Filière", filterKey: "filiere",
+    filterOpts: ["IAII","ISI","TC"],
+    headers: ["#","Groupe","Filière","Niveau","Effectif","Sous-groupe de","Actions"],
+    row: (r) => {
+      const parent = r.parent ? DB.groups.find(g=>g.id===r.parent)?.name || '—' : '<span style="color:var(--muted)">—</span>';
+      return `<td>${r.id}</td>
+        <td><div class="cell-name"><div class="avatar" style="background:var(--teal);color:#fff"><i class="fas fa-users"></i></div><span>${r.name}</span></div></td>
+        <td><span class="badge badge-cm">${r.filiere}</span></td>
+        <td>${r.level}</td>
+        <td><b>${r.size}</b> étudiants</td>
+        <td style="font-size:0.8rem;color:var(--muted)">${parent}</td>
+        <td><div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openModal('edit',${r.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    },
+    addForm: () => `
+      <div class="form-group"><label>Nom du groupe</label><input id="f_name" placeholder="G-IAII-M1-A"/></div>
+      <div class="form-group"><label>Filière</label>
+        <select id="f_filiere"><option>IAII</option><option>ISI</option><option>TC</option><option>STE</option></select>
+      </div>
+      <div class="form-group"><label>Niveau</label><input id="f_level" placeholder="Master 1"/></div>
+      <div class="form-group"><label>Effectif</label><input id="f_size" type="number" placeholder="30"/></div>`,
+    saveData: () => ({
+      name: f('f_name'), filiere: f('f_filiere'), level: f('f_level'),
+      size: parseInt(f('f_size')||0), parent: null
+    })
+  },
+  modules: {
+    title: "Liste des Modules", subtitle: "Catalogue pédagogique — CM, TD, TP",
+    filterLabel: "Type", filterKey: "type",
+    filterOpts: ["CM","TD","TP"],
+    headers: ["#","Module","Code","Type","Volume (h)","Département","Actions"],
+    row: (r) => {
+      const typeClass = r.type==='TP'?'badge-tp':r.type==='TD'?'badge-td':'badge-cm';
+      return `<td>${r.id}</td>
+        <td><div class="cell-name"><div class="avatar" style="background:var(--sky);color:#fff"><i class="fas fa-book"></i></div><span>${r.name}</span></div></td>
+        <td><code style="background:var(--bg);padding:2px 8px;border-radius:4px;font-size:0.8rem;">${r.code}</code></td>
+        <td><span class="badge ${typeClass}">${r.type}</span></td>
+        <td><b>${r.volume}h</b>/semaine</td>
+        <td>${r.dept}</td>
+        <td><div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openModal('edit',${r.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecord(${r.id})"><i class="fas fa-trash"></i></button>
+        </div></td>`;
+    },
+    addForm: () => `
+      <div class="form-group"><label>Nom du module</label><input id="f_name" placeholder="Intelligence Artificielle"/></div>
+      <div class="form-group"><label>Code</label><input id="f_code" placeholder="IA401"/></div>
+      <div class="form-group"><label>Type</label>
+        <select id="f_type"><option>CM</option><option>TD</option><option>TP</option></select>
+      </div>
+      <div class="form-group"><label>Volume horaire (h/sem)</label><input id="f_volume" type="number" placeholder="2"/></div>
+      <div class="form-group"><label>Département</label><input id="f_dept" placeholder="Informatique"/></div>`,
+    saveData: () => ({
+      name: f('f_name'), code: f('f_code'), type: f('f_type'),
+      volume: parseInt(f('f_volume')||0), dept: f('f_dept')
+    })
+  }
+};
+
+function f(id){ return document.getElementById(id)?.value || ''; }
+
+/* ====== RENDER TABLE ====== */
+function renderTable(tab) {
+  const cfg = CONFIGS[tab];
+  const data = DB[tab];
+  const filterVal = document.getElementById('filterType').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  // Update filter options
+  const sel = document.getElementById('filterType');
+  sel.innerHTML = `<option value="">Tous les types</option>`;
+  cfg.filterOpts.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = o;
+    if(filterVal === o) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  // Build header
+  document.getElementById('tableHead').innerHTML = `<tr>${cfg.headers.map(h =>
+    h === '#' ? `<th><input type="checkbox"/></th>` : `<th>${h}</th>`
+  ).join('')}</tr>`;
+
+  // Filter data
+  let rows = data.filter(r => {
+    const matchSearch = JSON.stringify(r).toLowerCase().includes(search);
+    const matchFilter = !filterVal || r[cfg.filterKey] === filterVal || (r[cfg.filterKey]||'').includes(filterVal);
+    return matchSearch && matchFilter;
+  });
+
+  document.getElementById('tableBody').innerHTML = rows.map(r => `<tr>${cfg.row(r)}</tr>`).join('');
+  document.getElementById('tableInfo').textContent = `Affichage de 1–${rows.length} sur ${data.length} entrées`;
+  document.getElementById('section-title').textContent = cfg.title;
+  document.getElementById('section-subtitle').textContent = cfg.subtitle;
+}
+
+/* ====== SWITCH TAB ====== */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`)?.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterType').value = '';
+  renderTable(tab);
+}
+
+/* ====== FILTER ====== */
+function filterTable() { renderTable(currentTab); }
+
+/* ====== MODAL ====== */
+function openModal(mode, id = null) {
+  const cfg = CONFIGS[currentTab];
+  editingId = id;
+  const record = id ? DB[currentTab].find(r => r.id === id) : null;
+  document.getElementById('modal-title').textContent = id ? `Modifier — ${record?.name || record?.code || ''}` : `Ajouter — ${cfg.title.replace('Liste des ','')}`;
+  document.getElementById('modal-body').innerHTML = cfg.addForm();
+  // Pre-fill if editing
+  if (record) {
+    Object.entries(record).forEach(([k,v]) => {
+      const el = document.getElementById(`f_${k}`);
+      if (el) el.value = v;
+    });
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+function saveRecord() {
+  const cfg = CONFIGS[currentTab];
+  const data = cfg.saveData();
+  if (!data.name && !data.code) { showToast('Veuillez remplir les champs obligatoires', 'error'); return; }
+
+  if (editingId) {
+    const idx = DB[currentTab].findIndex(r => r.id === editingId);
+    if (idx !== -1) DB[currentTab][idx] = { ...DB[currentTab][idx], ...data };
+    showToast(`✓ Modification enregistrée avec succès`, 'success');
+  } else {
+    const newId = Math.max(...DB[currentTab].map(r=>r.id)) + 1;
+    DB[currentTab].push({ id: newId, ...data });
+    updateCounts();
+    showToast(`✓ Nouvel enregistrement ajouté (ID: ${newId})`, 'success');
+  }
+  closeModal();
+  renderTable(currentTab);
+}
+
+/* ====== DELETE ====== */
+function deleteRecord(id) {
+  if (!confirm('Confirmer la suppression ?')) return;
+  DB[currentTab] = DB[currentTab].filter(r => r.id !== id);
+  updateCounts();
+  renderTable(currentTab);
+  showToast('Enregistrement supprimé', 'error');
+}
+
+/* ====== COUNTS ====== */
+function updateCounts() {
+  ['teachers','rooms','groups','modules'].forEach(t => {
+    document.getElementById(`cnt-${t}`).textContent = DB[t].length;
+    document.getElementById(`tc-${t}`).textContent = DB[t].length;
+  });
+}
+
+/* ====== EXPORT ====== */
+function exportCSV() {
+  const data = DB[currentTab];
+  if (!data.length) return;
+  const headers = Object.keys(data[0]).join(',');
+  const rows = data.map(r => Object.values(r).join(','));
+  const csv = [headers, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `fstm_${currentTab}.csv`; a.click();
+  showToast(`Export CSV — ${data.length} enregistrements`, 'success');
+}
+
+/* ====== SYNC DB ====== */
+function syncDB() {
+  showToast('⟳ Synchronisation avec la scolarité FSTM...', '');
+  setTimeout(() => {
+    DB.teachers.push({id: 43, name:"Pr. Vakili Nadia", email:"vakili@fstm.ac.ma", type:"CM", disponible:true, depts:"Informatique"});
+    updateCounts(); renderTable(currentTab);
+    showToast('✓ Synchronisation réussie — 1 nouveau record', 'success');
+  }, 1800);
+}
+
+/* ====== REFRESH ====== */
+function refreshData() {
+  showToast('⟳ Actualisation depuis l\'API...', '');
+  setTimeout(() => { renderTable(currentTab); showToast('✓ Données actualisées', 'success'); }, 800);
+}
+
+/* ====== PING ====== */
+function pingAPI() {
+  const start = Date.now();
+  setTimeout(() => {
+    document.getElementById('api-ping').textContent = `${Date.now() - start - 400 + Math.floor(Math.random()*30)}ms`;
+  }, Math.random()*400 + 50);
+}
+
+/* ====== TOAST ====== */
+function showToast(msg, type = '') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i> ${msg}`;
+  wrap.appendChild(t);
+  setTimeout(() => { t.remove(); }, 3500);
+}
+
+/* ====== PAGE NAV (placeholder) ====== */
+function showPage(page) {
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  event.target.closest('.nav-btn').classList.add('active');
+  if (page !== 'db') showToast(`Fenêtre "${page}" — En cours de développement`, '');
+}
+
+/* ====== INIT ====== */
+renderTable('teachers');
+setInterval(pingAPI, 5000);
+pingAPI();
+</script>
+</body>
+</html>

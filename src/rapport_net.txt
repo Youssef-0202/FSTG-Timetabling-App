@@ -1,0 +1,36 @@
+==================================================
+PUZZLE TEST : LE DEFI DES DISPONIBILITES
+==================================================
+
+[1] Test SOLVEUR HYBRIDE (Classique)...
+Lancement du GA : Pop=50, Gen=100
+Gen 0 | Best Fitness: 430118.00
+Gen 20 | Best Fitness: 270107.00
+Gen 40 | Best Fitness: 270104.00
+Gen 60 | Best Fitness: 260095.00
+Gen 80 | Best Fitness: 260090.00
+
+Lancement du Recuit Simulé Stratégique (7500 itérations)...
+SA Iter    0 | Fitness:  260090.00 | Temp: 1990.0000
+SA Iter 1500 | Fitness:  230090.00 | Temp:   1.0801
+SA Iter 3000 | Fitness:  230090.00 | Temp:   0.0006
+SA Iter 4500 | Fitness:  230090.00 | Temp:   0.0000
+SA Iter 6000 | Fitness:  230090.00 | Temp:   0.0000
+
+Résolution terminée en 23.43s
+Fitness finale : 230090.0
+
+------------------------------------------------
+[2] Test SOLVEUR SBHH (IA/Apprenant)...
+[SBHH] Lancement de la resolution (30000 iterations)...
+  Iteration     0 | Mode: HC | Fitness: 650148.00
+[SBHH] Resolution terminee | Fitness finale: 250115.00
+
+======================================================================
+ALGO            | VIOLATIONS | TEMPS      | POINT FORT
+----------------------------------------------------------------------
+Hybride         | 23         | 23.43     s | Exploration Standard
+SBHH (IA)       | 25         | 29.29     s | Adaptation Dynamique
+======================================================================
+
+Le probleme reste complexe. Essayez d'augmenter les iterations du SBHH.
