@@ -35,12 +35,23 @@ class DataManager:
             if isinstance(sec_data, list):
                 self.sections = [Section(id=s['id'], name=s['name'], student_count=s.get('student_count', 0), parent_id=s.get('parent_id')) for s in sec_data]
 
-            # 5. Module Parts
-            m_data = requests.get(f"{API_BASE_URL}/module_parts").json()
-            if isinstance(m_data, list):
-                self.module_parts = [ModulePart(id=m['id'], module_id=m['module_id'], teacher_id=m['teacher_id'], section_id=m['section_id'], type=m['type'], group_size=m.get('group_size', 30)) for m in m_data]
+            # 5. Assignments (Les 245 "Affectations" de votre écran)
+            a_data = requests.get(f"{API_BASE_URL}/assignments").json()
+            if isinstance(a_data, list):
+                self.module_parts = []
+                for a in a_data:
+                    # On crée l'objet que l'algorithme va manipuler
+                    mp = ModulePart(
+                        id=a['id'],
+                        module_id=a['module_part_id'],
+                        teacher_id=a['teacher_id'],
+                        section_id=a.get('section_id'),
+                        type=a.get('module_part', {}).get('type', 'TD'),
+                        group_size=30 # Valeur par défaut
+                    )
+                    self.module_parts.append(mp)
 
-            print(f"Salles: {len(self.rooms)} | Profs: {len(self.teachers)} | Créneaux: {len(self.timeslots)} | Séances: {len(self.module_parts)}")
+            print(f"Salles: {len(self.rooms)} | Profs: {len(self.teachers)} | Créneaux: {len(self.timeslots)} | Affectations à placer: {len(self.module_parts)}")
             return True
         except Exception as e:
             print(f"Erreur fatale: {e}")

@@ -45,12 +45,14 @@ class Assignment:
         self.timeslot= timeslot          # The chosen slot
 
 class Schedule :
-    def __init__(self,assignments=None):
-        self.Assignments = assignments or []
-        self.fitness =0.0
+    def __init__(self, data_manager, assignments=None):
+        self.data_manager = data_manager
+        self.assignments = assignments or []
+        self.fitness = 0.0
+        
     def copy(self):
         """Utile pour le Recuit Simulé ou les mutations"""
-        return Schedule(list(self.assignments))
+        return Schedule(self.data_manager, list(self.assignments))
     def __str__(self):
         return f"Schedule: {len(self.assignments)} assignments, Fitness: {self.fitness}"
 

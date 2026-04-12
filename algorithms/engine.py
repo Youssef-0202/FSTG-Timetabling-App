@@ -29,7 +29,7 @@ class HybridEngine:
             assignments = []
             for mp in self.dm.module_parts:
                 assignments.append(Assignment(mp, random.choice(self.dm.rooms), random.choice(self.dm.timeslots)))
-            sch = Schedule(assignments)
+            sch = Schedule(self.dm, assignments)
             self.population.append(sch)
 
     def evolve(self):
@@ -65,7 +65,7 @@ class HybridEngine:
             orig = parent.assignments[i]
             # Create a clean child assignment
             new_as.append(Assignment(orig.module_part, orig.room, orig.timeslot))
-        return Schedule(new_as)
+        return Schedule(self.dm, new_as)
     
     def mutate(self, schedule):
         """Randomly changes a room or timeslot"""
