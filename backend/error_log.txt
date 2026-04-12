@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/app/wrapper.py", line 8, in <module>
+    import_real_data.import_all()
+  File "/app/import_real_data.py", line 47, in import_all
+    for _, row in df_profs.iterrows():
+UnboundLocalError: local variable 'df_profs' referenced before assignment
+--- Démarrage du wrapper de diagnostic ---
+🚀 Début de l'importation des données réelles FSTG...
+❌ Erreur salles : [Errno 2] No such file or directory: 'data/Salles.csv'
+❌ Erreur profs : [Errno 2] No such file or directory: 'data/Modules-Enseignants_Emploi.xlsx'
+   🔗 Liaison en cours...
+
+🔥 ERREUR DÉTECTÉE ! Voici la pile d'appels complète :
+

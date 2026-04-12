@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,15 +18,18 @@ const links = [
 
 export default function Navbar() {
     const pathname = usePathname();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <>
             {/* ── Topbar ── */}
             <div className="topbar">
                 <div className="topbar-left">
                     <span className="topbar-title">FSTG (Marrakech) — Système de Gestion des Emplois du Temps</span>
-                </div>
-                <div className="topbar-right">
-                    {/* Liens supprimés  */}
                 </div>
             </div>
             {/* ── Navbar ── */}
@@ -34,7 +38,7 @@ export default function Navbar() {
                     <Link
                         key={href}
                         href={href}
-                        className={`nav-link ${pathname === href ? "active" : ""}`}
+                        className={`nav-link ${mounted && pathname === href ? "active" : ""}`}
                     >
                         <Icon size={15} /> {label}
                     </Link>

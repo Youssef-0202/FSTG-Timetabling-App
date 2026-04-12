@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = "http://192.168.56.1:8000";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -207,6 +207,12 @@ export const deleteModulePart = (id: number) =>
     apiFetch<void>(`/module-parts/${id}`, { method: "DELETE" });
 
 export const getTimeslots   = () => apiFetch<Timeslot[]>("/timeslots");
+export const createTimeslot = (data: Partial<Timeslot>) =>
+    apiFetch<Timeslot>("/timeslots", { method: "POST", body: JSON.stringify(data) });
+export const updateTimeslot = (id: number, data: Partial<Timeslot>) =>
+    apiFetch<Timeslot>(`/timeslots/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const deleteTimeslot = (id: number) =>
+    apiFetch<void>(`/timeslots/${id}`, { method: "DELETE" });
 
 // ─── Assignments 
 export const getAssignments = () => apiFetch<Assignment[]>("/assignments");

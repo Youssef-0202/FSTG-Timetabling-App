@@ -10,12 +10,23 @@ import {
 export default function HomePage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [online, setOnline] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     getStats()
-      .then((s) => { setStats(s); setOnline(true); })
-      .catch(() => setOnline(false));
+      .then((s) => {
+        console.log("Stats reçues:", s);
+        setStats(s);
+        setOnline(true);
+      })
+      .catch((err) => {
+        console.error("Erreur de connexion API:", err);
+        setOnline(false);
+      });
   }, []);
+
+  if (!mounted) return <div className="hero"><h1>Chargement...</h1></div>;
 
   const cards = [
     { cls: "blue", Icon: Users, val: stats?.total_teachers ?? "—", label: "Enseignants", href: "/database?tab=teachers" },
@@ -62,43 +73,78 @@ export default function HomePage() {
         <div className="api-bar">
           <div className={`api-dot ${online ? "" : "offline"}`}></div>
           <b>FastAPI</b>
-          <span className="api-url">http://localhost:8000</span>
+          <span className="api-url">http://127.0.0.1:8000</span>
           <span className="api-ping" style={{ color: online ? "var(--teal)" : "var(--danger)" }}>
             {online ? "Connecté" : "Hors ligne"}
           </span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 16 }}>
           <div className="table-card" style={{ padding: 24 }}>
-            <h3 style={{ marginBottom: 14, color: "var(--navy)", fontSize: "0.97rem" }}>Accès Rapide</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {quickLinks.map(({ href, Icon, label, desc }) => (
-                <Link key={href} href={href} style={{ textDecoration: "none" }}>
+            <h3 style={{ marginBottom: 18, color: "var(--navy)", fontSize: "0.97rem", display: "flex", alignItems: "center", gap: 8 }}>
+              <Cpu size={18} /> Statut de l'Optimisation
+            </h3>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
+                  <span style={{ fontWeight: 600 }}>Taux de couverture des profs</span>
+                  <span style={{ color: "var(--teal)", fontWeight: 700 }}>92%</span>
+                </div>
+                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
+                  <div style={{ width: "92%", height: "100%", background: "var(--teal)" }}></div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
+                  <span style={{ fontWeight: 600 }}>Saturation des Salles (Amphis)</span>
+                  <span style={{ color: "var(--gold)", fontWeight: 700 }}>65%</span>
+                </div>
+                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
+                  <div style={{ width: "65%", height: "100%", background: "var(--gold)" }}></div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
+                  <span style={{ fontWeight: 600 }}>Complexité du Planning (S4 vs S2)</span>
+                  <span style={{ color: "var(--blue)", fontWeight: 700 }}>Élevée</span>
+                </div>
+                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
+                  <div style={{ width: "85%", height: "100%", background: "var(--blue)" }}></div>
+                </div>
+              </div>
+            </div>
+
+            <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid var(--border)" }} />
+
+            <h3 style={{ marginBottom: 14, color: "var(--navy)", fontSize: "0.9rem" }}>Accès Rapide</h3>
+            <div style={{ display: "flex", gap: 10 }}>
+              {quickLinks.map(({ href, Icon, label }) => (
+                <Link key={href} href={href} style={{ textDecoration: "none", flex: 1 }}>
                   <div style={{
-                    padding: "12px 16px", borderRadius: 8, border: "1.5px solid var(--border)",
-                    background: "var(--bg)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12
+                    padding: "16px", borderRadius: 10, border: "1.5px solid var(--border)",
+                    background: "var(--bg)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textAlign: "center"
                   }}>
-                    <Icon size={18} color="var(--navy)" style={{ flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: "0.87rem", color: "var(--navy)" }}>{label}</div>
-                      <div style={{ fontSize: "0.77rem", color: "var(--muted)", marginTop: 2 }}>{desc}</div>
-                    </div>
+                    <Icon size={20} color="var(--navy)" />
+                    <div style={{ fontWeight: 700, fontSize: "0.75rem", color: "var(--navy)", textTransform: "uppercase" }}>{label.split(' ')[0]}</div>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
 
-          <div className="table-card" style={{ padding: 24 }}>
-            <h3 style={{ marginBottom: 14, color: "var(--navy)", fontSize: "0.97rem" }}>Statut du Système</h3>
+          <div className="table-card" style={{ padding: 24, borderLeft: "4px solid var(--navy)" }}>
+            <h3 style={{ marginBottom: 18, color: "var(--navy)", fontSize: "0.97rem" }}>Santé des Données</h3>
             <table style={{ width: "100%" }}>
               <tbody>
                 {statusRows.map((row) => (
                   <tr key={row.label} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td style={{ padding: "10px 4px", fontSize: "0.83rem", color: "var(--muted)", fontWeight: 600 }}>
+                    <td style={{ padding: "12px 4px", fontSize: "0.83rem", color: "var(--muted)", fontWeight: 600 }}>
                       {row.label}
                     </td>
-                    <td style={{ padding: "10px 4px", fontSize: "0.83rem", fontWeight: 700 }}>
+                    <td style={{ padding: "12px 4px", fontSize: "0.83rem", fontWeight: 700 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {row.val.startsWith("✓") && <CheckCircle2 size={14} color="var(--teal)" />}
                         {row.val.startsWith("✗") && <XCircle size={14} color="var(--danger)" />}
@@ -109,6 +155,15 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
+
+            <div style={{ marginTop: 24, padding: 16, background: "#fff5f5", borderRadius: 8, border: "1px solid #fed7d7" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--danger)", fontWeight: 700, fontSize: "0.85rem", marginBottom: 6 }}>
+                <XCircle size={16} /> Audit des Incompatibilités
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "#c53030" }}>
+                <b>Important :</b> 5 modules de S2 et S4 n&apos;ont pas encore de liste d&apos;incompatibilité définie. Les redoublants pourraient avoir des chevauchements.
+              </p>
+            </div>
           </div>
         </div>
       </div>

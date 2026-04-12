@@ -251,7 +251,55 @@ tbody td { padding: 12px 14px; font-size: 0.83rem; color: var(--text); vertical-
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
 
-/* ── Responsive ── */
-@media(max-width: 900px) {
-  .stats-row { grid-template-columns: 1fr 1fr; }
+/* ── Timetable Grid ── */
+.timetable-container {
+  background: var(--white); border-radius: 12px; box-shadow: var(--shadow);
+  overflow-x: auto; padding: 20px;
+}
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(6, 1fr); /* Heure + 6 jours */
+  border: 1.5px solid var(--border); border-radius: 8px;
+  min-width: 900px;
+}
+.grid-header {
+  background: var(--navy); color: #fff;
+  padding: 12px; text-align: center; font-size: 0.75rem; font-weight: 700;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.grid-time-sidebar {
+  background: #f8fafc; border-right: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.grid-cell {
+  background: var(--white); height: 100px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.grid-cell:nth-child(7n) { border-right: none; }
+
+.course-card {
+  position: absolute; inset: 4px;
+  border-radius: 8px; padding: 8px;
+  font-size: 0.74rem; display: flex; flex-direction: column; gap: 4px;
+  border-left: 4px solid transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform .2s, box-shadow .2s; cursor: pointer;
+  z-index: 10;
+}
+.course-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
+.course-cm { background: #eff6ff; border-left-color: var(--blue); color: #1e40af; }
+.course-td { background: #ecfdf5; border-left-color: var(--teal); color: #065f46; }
+.course-tp { background: #fffbeb; border-left-color: var(--gold); color: #92400e; }
+
+.course-title { font-weight: 800; line-height: 1.2; }
+.course-info  { font-size: 0.68rem; opacity: 0.8; font-weight: 600; }
+.course-room  { 
+  margin-top: auto; align-self: flex-end; 
+  background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; 
 }

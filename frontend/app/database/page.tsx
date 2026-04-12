@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Plus, RefreshCw, Pencil, Trash2,
     Users, DoorOpen, GraduationCap, BookOpen, Building2, ClipboardList,
-    CheckCircle2, XCircle, X, Save, Loader2, Layers, Grid, Users2
+    CheckCircle2, XCircle, X, Save, Loader2, Layers, Grid, Users2, CalendarDays
 } from "lucide-react";
 import {
     getTeachers, createTeacher, updateTeacher, deleteTeacher, Teacher,
@@ -13,7 +13,7 @@ import {
     getDepartments, createDepartment, deleteDepartment, Department,
     getAssignments, Assignment, createAssignment, AssignmentCreate, updateAssignment, deleteAssignment,
     getModuleParts, createModulePart, updateModulePart, deleteModulePart, ModulePart,
-    getTimeslots, Timeslot,
+    getTimeslots, createTimeslot, updateTimeslot, deleteTimeslot, Timeslot,
     getFilieres, createFiliere, deleteFiliere, Filiere,
     getGroupeFilieres, createGroupeFiliere, deleteGroupeFiliere, GroupeFiliere,
     getSections, createSection, deleteSection, Section,
@@ -39,7 +39,7 @@ const avatar = (name: string, idx: number) => ({
     color: COLORS[idx % COLORS.length],
 });
 
-type Tab = "assignments" | "departments" | "teachers" | "rooms" | "filieres" | "cohortes" | "sections" | "td_groups" | "modules" | "module_parts" | "groupe_modules";
+type Tab = "assignments" | "departments" | "teachers" | "rooms" | "filieres" | "cohortes" | "sections" | "td_groups" | "modules" | "module_parts" | "groupe_modules" | "timeslots";
 
 function DatabaseContent() {
     const router = useRouter();
@@ -89,10 +89,10 @@ function DatabaseContent() {
 
     const switchTab = (t: Tab) => { setTab(t); setSearch(""); setFilterVal(""); router.replace(`/database?tab=${t}`); };
 
-    function filtered<T extends Record<string, unknown>>(data: T[], filterKey?: string) {
+    function filtered<T>(data: T[], filterKey?: keyof T) {
         return data.filter((r) => {
             const matchSearch = JSON.stringify(r).toLowerCase().includes(search.toLowerCase());
-            const matchFilter = !filterVal || !filterKey || String(r[filterKey] || "").includes(filterVal);
+            const matchFilter = !filterVal || !filterKey || String((r as any)[filterKey] || "").includes(filterVal);
             return matchSearch && matchFilter;
         });
     }
@@ -182,6 +182,19 @@ function DatabaseContent() {
                         groupe_ids: d.groupe_ids ? (d.groupe_ids as number[]) : []
                     });
                 setGroupeModules(await getGroupeModules());
+            } else if (tab === "timeslots") {
+                modal.mode === "add"
+                    ? await createTimeslot({
+                        day: String(d.day || "Lundi"),
+                        start_time: String(d.start_time || "08:30:00"),
+                        end_time: String(d.end_time || "10:30:00")
+                    })
+                    : await updateTimeslot(Number(d.id), {
+                        day: String(d.day),
+                        start_time: String(d.start_time),
+                        end_time: String(d.end_time)
+                    });
+                setTimeslots(await getTimeslots());
             } else if (tab === "assignments") {
                 const payload: Partial<AssignmentCreate> = {
                     module_part_id: Number(d.module_part_id || 1),
@@ -217,6 +230,7 @@ function DatabaseContent() {
             else if (tab === "td_groups") { await deleteTDGroup(id); setTdGroups(await getTDGroups()); }
             else if (tab === "modules") { await deleteModule(id); setModules(await getModules()); }
             else if (tab === "module_parts") { await deleteModulePart(id); setModuleParts(await getModuleParts()); }
+            else if (tab === "timeslots") { await deleteTimeslot(id); setTimeslots(await getTimeslots()); }
             else if (tab === "groupe_modules") { await deleteGroupeModule(id); setGroupeModules(await getGroupeModules()); }
             else if (tab === "assignments") { await deleteAssignment(id); setAssignments(await getAssignments()); }
             show("Enregistrement supprimé", "error");
@@ -234,6 +248,7 @@ function DatabaseContent() {
         { key: "modules", label: "Modules", count: modules.length, Icon: BookOpen },
         { key: "groupe_modules", label: "Pools Modules", count: groupeModules.length, Icon: Users },
         { key: "module_parts", label: "Composantes", count: moduleParts.length, Icon: Grid },
+        { key: "timeslots", label: "Créneaux Horaires", count: timeslots.length, Icon: CalendarDays },
         { key: "departments", label: "Dépt.", count: departments.length, Icon: Building2 },
     ];
 
@@ -249,6 +264,7 @@ function DatabaseContent() {
         modules: "Catalogue des Modules",
         groupe_modules: "Pools d'Inscrits par Module (GroupeModule)",
         module_parts: "Parties de Modules (CM/TD/TP)",
+        timeslots: "Gestion des Créneaux Horaires (Timeslots)",
     };
 
     return (
@@ -276,7 +292,7 @@ function DatabaseContent() {
                 <div className="api-bar">
                     <div className={`api-dot ${online ? "" : "offline"}`}></div>
                     <b>FastAPI</b>
-                    <span className="api-url">http://localhost:8000</span>
+                    <span className="api-url">http://192.168.56.1:8000</span>
                     <button className="btn btn-outline btn-sm" onClick={loadData}>
                         <RefreshCw size={13} /> Actualiser
                     </button>
@@ -297,13 +313,25 @@ function DatabaseContent() {
                     <button className="btn btn-primary" onClick={openAdd}><Plus size={15} /> Ajouter</button>
                     <div className="search-wrap" style={{ marginLeft: "auto" }}>
                         <Search size={14} color="var(--muted)" />
-                        <input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <input placeholder="Rechercher module ou prof..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                     {tab === "assignments" && (
+                        <>
+                            <select className="filter-select" value={filterVal} onChange={(e) => setFilterVal(e.target.value)}>
+                                <option value="">Toutes les sections</option>
+                                {sections.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                                    <option key={s.id} value={`sec-${s.id}`}>📍 {s.name}</option>
+                                ))}
+                                <option value="locked">🔒 Déjà fixées</option>
+                                <option value="unlocked">⏳ À assigner</option>
+                            </select>
+                        </>
+                    )}
+                    {(tab === "modules" || tab === "sections") && (
                         <select className="filter-select" value={filterVal} onChange={(e) => setFilterVal(e.target.value)}>
-                            <option value="">Toutes les affectations</option>
-                            <option value="locked">🔒 Déjà fixées</option>
-                            <option value="unlocked">⏳ À assigner</option>
+                            <option value="">Tous les semestres</option>
+                            <option value="S2">🎓 Semestre S2</option>
+                            <option value="S4">🎓 Semestre S4</option>
                         </select>
                     )}
                 </div>
@@ -322,9 +350,24 @@ function DatabaseContent() {
                                 {loading && <tr className="loading-row"><td colSpan={7}><Loader2 size={18} style={{ animation: "spin .7s linear infinite" }} /> Chargement...</td></tr>}
                                 {!loading && (assignments as Assignment[])
                                     .filter((a) => {
+                                        // Filtre par statut (Locked/Unlocked)
                                         if (filterVal === "locked" && !a.is_locked) return false;
                                         if (filterVal === "unlocked" && a.is_locked) return false;
-                                        return !search || String(a.id).includes(search);
+                                        // Filtre par Section spécifique
+                                        if (filterVal.startsWith("sec-") && String(a.section_id) !== filterVal.replace("sec-", "")) return false;
+
+                                        // Recherche textuelle
+                                        if (!search) return true;
+                                        const mPart = moduleParts.find(mp => mp.id === a.module_part_id);
+                                        const mod = modules.find(m => m.id === mPart?.module_id);
+                                        const teacher = teachers.find(t => t.id === a.teacher_id);
+                                        return mod?.name.toLowerCase().includes(search.toLowerCase()) ||
+                                            teacher?.name.toLowerCase().includes(search.toLowerCase());
+                                    })
+                                    .sort((a, b) => {
+                                        const sA = sections.find(s => s.id === a.section_id)?.name || "";
+                                        const sB = sections.find(s => s.id === b.section_id)?.name || "";
+                                        return sA.localeCompare(sB);
                                     })
                                     .map((a) => {
                                         const teacher = teachers.find((t) => t.id === a.teacher_id);
@@ -343,14 +386,18 @@ function DatabaseContent() {
                                                 </td>
                                                 <td>{teacher?.name || "?"}</td>
                                                 <td>
-                                                    {sec ? (
-                                                        <span className="badge badge-amphi" style={{ fontSize: "0.7rem" }}>Section: {sec.name}</span>
-                                                    ) : (
-                                                        <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+                                                    {mPart?.type !== "CM" ? (
+                                                        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                                                             {a.td_groups?.length > 0 ? a.td_groups.map(g => (
-                                                                <span key={g.id} className="badge badge-td" style={{ fontSize: "0.65rem" }}>{g.name}</span>
-                                                            )) : <span style={{ color: "var(--danger)", fontSize: "0.7rem" }}>Aucun !</span>}
+                                                                <span key={g.id} className="badge" style={{ backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0", fontSize: "0.7rem" }}>
+                                                                    🟢 {g.name}
+                                                                </span>
+                                                            )) : (
+                                                                <span className="badge badge-amphi" style={{ fontSize: "0.7rem" }}>Section: {sec?.name}</span>
+                                                            )}
                                                         </div>
+                                                    ) : (
+                                                        <span className="badge badge-amphi" style={{ fontSize: "0.7rem" }}>Section: {sec?.name}</span>
                                                     )}
                                                 </td>
                                                 <td>
@@ -379,7 +426,7 @@ function DatabaseContent() {
                         <table>
                             <thead><tr><th>ID</th><th>Nom Section (CM)</th><th>Semestre</th><th>Capacité Active</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {!loading && sections.map((s) => (
+                                {!loading && sections.filter(s => !filterVal || s.semestre.includes(filterVal)).map((s) => (
                                     <tr key={s.id}>
                                         <td><code style={{ fontSize: "0.78rem" }}>#{s.id}</code></td>
                                         <td><b>{s.name}</b></td>
@@ -456,7 +503,7 @@ function DatabaseContent() {
                         <table>
                             <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {!loading && (filtered(teachers as any) as Teacher[]).map((t) => (
+                                {!loading && filtered(teachers).map((t) => (
                                     <tr key={t.id}>
                                         <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
                                         <td><b>{t.name}</b></td>
@@ -520,13 +567,25 @@ function DatabaseContent() {
                                         <td><code style={{ fontSize: "0.78rem" }}>#{gm.id}</code></td>
                                         <td><b>{modules.find(m => m.id === gm.module_id)?.name}</b></td>
                                         <td>
-                                            <div style={{ display: "flex", gap: 3, flexWrap: "wrap", maxWidth: "200px" }}>
-                                                {gm.groupes?.map(gf => (
-                                                    <span key={gf.id} className="badge badge-cm" style={{ fontSize: "0.6rem" }}>#{gf.id} ({gf.academic_year})</span>
-                                                )) || "-"}
+                                            <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", maxWidth: "320px" }}>
+                                                {gm.groupes && gm.groupes.length > 0 ? gm.groupes.map(gf => {
+                                                    const fil = filieres.find(f => f.id === gf.filiere_id);
+                                                    const label = fil ? `${fil.name}-${gf.semestre}` : `#${gf.id}`;
+                                                    return (
+                                                        <span key={gf.id} style={{
+                                                            display: "inline-flex", alignItems: "center", gap: "3px",
+                                                            padding: "2px 7px", borderRadius: "12px",
+                                                            fontSize: "0.7rem", fontWeight: 600,
+                                                            background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
+                                                            color: "white", whiteSpace: "nowrap"
+                                                        }}>
+                                                            {label}
+                                                        </span>
+                                                    );
+                                                }) : <span style={{ fontSize: "0.7rem", color: "var(--muted)", fontStyle: "italic" }}>Aucune filière liée</span>}
                                             </div>
                                         </td>
-                                        <td><span className="badge badge-amphi">{gm.effectif} étudiants</span></td>
+                                        <td><span className="badge badge-amphi" style={{ fontWeight: "bold" }}>{gm.effectif} étudiants</span></td>
                                         <td><div className="actions-cell">
                                             <button className="btn btn-outline btn-sm" onClick={() => openEdit(gm as any)}><Pencil size={13} /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(gm.id)}><Trash2 size={13} /></button>
@@ -551,6 +610,26 @@ function DatabaseContent() {
                                         <td><div className="actions-cell">
                                             <button className="btn btn-outline btn-sm" onClick={() => openEdit(mp as any)}><Pencil size={13} /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(mp.id)}><Trash2 size={13} /></button>
+                                        </div></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+
+                    {tab === "timeslots" && (
+                        <table>
+                            <thead><tr><th>ID</th><th>Jour</th><th>Début</th><th>Fin</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                {!loading && timeslots.map((ts) => (
+                                    <tr key={ts.id}>
+                                        <td><code style={{ fontSize: "0.78rem" }}>#{ts.id}</code></td>
+                                        <td><span className="badge" style={{ background: "var(--light-bg)", color: "var(--navy)" }}>{ts.day}</span></td>
+                                        <td><span style={{ fontWeight: 600 }}>{ts.start_time}</span></td>
+                                        <td><span style={{ fontWeight: 600 }}>{ts.end_time}</span></td>
+                                        <td><div className="actions-cell">
+                                            <button className="btn btn-outline btn-sm" onClick={() => openEdit(ts as any)}><Pencil size={13} /></button>
+                                            <button className="btn btn-danger btn-sm" onClick={() => del(ts.id)}><Trash2 size={13} /></button>
                                         </div></td>
                                     </tr>
                                 ))}

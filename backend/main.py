@@ -16,7 +16,7 @@ app = FastAPI(
 # CORS 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Simplifié pour le dev local
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -316,6 +316,63 @@ def create_timeslot(slot: schemas.TimeslotCreate, db: Session = Depends(get_db))
     db_s = models.Timeslot(**slot.model_dump())
     db.add(db_s); db.commit(); db.refresh(db_s)
     return db_s
+
+
+# ASSIGNMENTS  /assignments
+
+@app.get("/assignments", response_model=List[schemas.Assignment])
+def list_assignments(db: Session = Depends(get_db)):
+    return db.query(models.Assignment).all()
+
+@app.post("/assignments", response_model=schemas.Assignment, status_code=201)
+def create_assignment(data: schemas.AssignmentCreate, db: Session = Depends(get_db)):
+    new_a = models.Assignment(
+        module_part_id=data.module_part_id,
+        teacher_id=data.teacher_id,
+        room_id=data.room_id,
+        slot_id=data.slot_id,
+        section_id=data.section_id,
+        is_locked=data.is_locked
+    )
+    # Ajout des groupes TD si c'est un TD/TP
+    for g_id in data.tdgroup_ids:
+        g = db.query(models.TDGroup).filter(models.TDGroup.id == g_id).first()
+        if g:
+            new_a.td_groups.append(g)
+    
+    db.add(new_a); db.commit(); db.refresh(new_a)
+    return new_a
+
+@app.delete("/assignments/{assignment_id}", status_code=204)
+def delete_assignment(assignment_id: int, db: Session = Depends(get_db)):
+    a = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Affectation introuvable")
+    db.delete(a); db.commit()
+
+@app.put("/assignments/{assignment_id}", response_model=schemas.Assignment)
+def update_assignment(assignment_id: int, data: schemas.AssignmentCreate, db: Session = Depends(get_db)):
+    db_a = db.query(models.Assignment).filter(models.Assignment.id == assignment_id).first()
+    if not db_a:
+        raise HTTPException(status_code=404, detail="Affectation introuvable")
+    
+    db_a.module_part_id = data.module_part_id
+    db_a.teacher_id = data.teacher_id
+    db_a.section_id = data.section_id
+    db_a.is_locked = data.is_locked
+    db_a.room_id = data.room_id
+    db_a.slot_id = data.slot_id
+
+    # Mise à jour des groupes TD
+    db_a.td_groups = []
+    for g_id in data.tdgroup_ids:
+        g = db.query(models.TDGroup).filter(models.TDGroup.id == g_id).first()
+        if g:
+            db_a.td_groups.append(g)
+
+    db.commit()
+    db.refresh(db_a)
+    return db_a
 
 
 # --- API POUR L'ALGORITHME LOCAL ---

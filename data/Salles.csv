@@ -1,0 +1,67 @@
+id_salle;nom_salle;capacité;type_salle;affectation_préférée;équipement_projecteur;équipement_pc_étudiants;équipement_tableau_blanc;équipement_tableau_noir;équipement_climatisation;équipement_son;équipement_écran_interactif;équipement_écran_non_interactif;problème_projecteur;problème_hdmi;problème_vga;problème_éclairage;problème_rideaux;problème_alimentation_électrique;problème_peinture
+A1;Amphi 1;400;amphi;;1;0;0;1;1;1;1;0;0;0;0;0;0;0;0
+A2;Amphi 2;400;amphi;;1;0;0;1;1;1;1;0;0;0;0;0;0;0;0
+A3;Amphi 3;240;amphi;;1;0;0;1;1;1;0;1;0;0;0;0;0;0;0
+A4;Amphi 4;400;amphi;;1;0;0;1;1;1;1;0;0;0;0;0;0;0;0
+S5;Salle 5;48;salle TD/cours filière ing,mst,lst;MIASI;1;0;1;0;0;0;0;0;0;0;0;0;1;0;0
+S6;Salle 6;48;salle TD/TP;TP Info;1;1;1;0;0;0;0;0;0;0;0;0;0;0;0
+S7;Salle 7;48;salle TD/cours filière ing,mst,lst;ISA;0;0;0;1;0;0;0;0;1;1;1;0;0;0;0
+S8;Salle 8;48;salle TD/cours filière ing,mst,lst;ISA;1;0;0;0;0;0;0;0;0;0;0;1;0;0;0
+S9;Salle 9;48;salle TD/cours filière ing,mst,lst;GMP;1;0;0;1;0;0;0;0;0;1;0;1;0;0;0
+S10;Salle 10;48;salle TD/cours filière ing,mst,lst;GMP;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S11;Salle 11;48;salle TD/cours filière ing,mst,lst;ERME;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S12;Salle 12;48;salle TD/cours filière ing,mst,lst;ERME;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S13;Salle 13;48;salle TD/cours filière ing,mst,lst;IFA;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S14;Salle 14;48;salle TD/cours filière ing,mst,lst;IFA;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S15;Salle 15;48;salle TD/cours filière ing,mst,lst;MDSIM;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S16;Salle 16;48;salle TD/cours filière ing,mst,lst;GE;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S17;Salle 17;48;salle TD/cours filière ing,mst,lst;MEA;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S18;Salle 18;48;salle TD/cours filière ing,mst,lst;PCM/GMP;0;0;0;1;0;0;0;0;1;1;1;0;1;1;0
+S19;Salle 19;48;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;0;0;0;1;1;0
+S20;Salle 20;48;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;1;0;0
+S21;Salle 21;48;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S23;Salle 23;90;salle TD;Tronc Commun;1;0;1;0;0;0;0;0;0;1;0;0;0;0;1
+S24;Salle 24;90;salle TD;Tronc Commun;1;0;1;0;0;0;0;0;0;1;0;0;0;0;1
+S25;Salle 25;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;0;0;0
+S26;Salle 26;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;0;1;0
+S27;Salle 27;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;1;0;0;0
+S28;Salle 28;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;1;0;0;0
+S29;Salle 29;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;0;1;0
+S30;Salle 30;90;salle TD;Tronc Commun;1;0;0;1;0;0;0;0;0;1;0;0;0;1;0
+GC2;Salle G.Civil 2;48;salle TD/cours filière ing,mst,lst;G.Civil;1;0;1;0;0;0;0;0;0;0;1;0;0;0;0
+GC3;Salle G.Civil 3;48;salle TD/cours filière ing,mst,lst;G.Civil;1;0;1;0;0;0;0;0;0;0;0;0;0;1;0
+CH1;Salle Chimie 1;48;salle TD/cours filière ing,mst,lst;PNB;1;0;1;0;0;0;0;0;0;0;0;0;0;0;0
+CH2;Salle Chimie 2;48;salle TD/cours filière ing,mst,lst;RD;1;0;1;0;0;0;0;0;0;0;1;0;0;0;0
+G1;Salle géologie 1;48;salle TD/cours filière ing,mst,lst;GARM;1;0;1;0;0;0;0;0;0;0;1;0;0;1;0
+G2;Salle Géologie 2;48;salle TD/cours filière ing,mst,lst;EVG;1;0;1;0;0;0;0;0;0;0;1;0;0;1;0
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
