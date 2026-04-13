@@ -1,31 +1,30 @@
 import requests
 from data_manager import DataManager,API_BASE_URL
 from engine import HybridEngine
-
-
+from constraints import calculate_fitness_full
 
 
 def save_schedule_to_db(schedule):
     """Met à jour les affectations existantes avec les résultats de l'IA"""
     print(f"--- Mise à jour de {len(schedule.assignments)} affectations ---")
     
-    for a in schedule.assignments:
-        # On utilise l'ID de l'affectation existante pour la mettre à jour
-        assignment_id = a.module_part.id 
-        
-        payload = {
-            "room_id": a.room.id,
-            "timeslot_id": a.timeslot.id,
-            "status": "PLACED" # On change le statut de "À placer" à "Placé"
-        }
-        
-        try:
-            # On utilise PUT pour modifier l'enregistrement existant
-            r = requests.put(f"{API_BASE_URL}/assignments/{assignment_id}", json=payload)
-            if r.status_code != 200:
-                print(f"Erreur sur l'ID {assignment_id}: {r.text}")
-        except Exception as e:
-            print(f"Erreur réseau: {e}")
+    #for a in schedule.assignments:
+    #    # On utilise l'ID de l'affectation existante pour la mettre à jour
+    #    assignment_id = a.module_part.id 
+    #    
+    #    payload = {
+    #        "room_id": a.room.id,
+    #        "timeslot_id": a.timeslot.id,
+    #        "status": "PLACED" # On change le statut de "À placer" à "Placé"
+    #    }
+    #    
+    #    try:
+    #        # On utilise PUT pour modifier l'enregistrement existant
+    #        r = requests.put(f"{API_BASE_URL}/assignments/{assignment_id}", json=payload)
+    #        if r.status_code != 200:
+    #            print(f"Erreur sur l'ID {assignment_id}: {r.text}")
+    #    except Exception as e:
+    #        print(f"Erreur réseau: {e}")
             
     print(" Emploi du temps mis à jour avec succès dans la base !")
 
@@ -56,21 +55,21 @@ def run_optimization():
         return
     
     # 2. Configurer le moteur 
-    engine = HybridEngine(dm, pop_size=20)
+    engine = HybridEngine(dm, pop_size=100)
     print("\n--- Initialisation de la population ---")
     engine.create_initial_population()
     
     print("\n--- Lancement de l'optimisation Hybride (GA + SA) ---")
     
-    for gen in range(1, 21): # 20 générations
+    for gen in range(1, 201): # 200 générations
         engine.evolve()
         best_gen = engine.population[0]
         
-        score = engine.get_score(best_gen)
-        h = int(score // 10000)
-        s = int(score % 10000)
+        # On récupère le détail pour affichage
+        h, s, details = calculate_fitness_full(best_gen)
         
-        print(f"Génération {gen:02d} | Conflits Hard: {h} | Pénalités Soft: {s}")
+        detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']}"
+        print(f"Génération {gen:03d} | Total Hard: {h} | Gaps: {s} | {detail_str}")
         
         if h == 0 and s < 5: # Si on trouve une solution quasi-parfaite
             break

@@ -1,5 +1,6 @@
 import random 
 import copy
+import math
 from models import Schedule, Assignment
 from constraints import calculate_fitness_full
 
@@ -13,13 +14,13 @@ class HybridEngine:
         self.elitism = 2
         
         # SA Parameters 
-        self.sa_iterations = 20
+        self.sa_iterations = 50
         self.sa_temp = 50.0
         self.sa_cooling = 0.95
 
     def get_score(self, schedule):
         """Calculates scalar score for comparison"""
-        h, s = calculate_fitness_full(schedule)
+        h, s, details = calculate_fitness_full(schedule)
         M = 10000
         return (M * h) + s
     
