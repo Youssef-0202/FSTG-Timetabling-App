@@ -32,22 +32,26 @@ class DataManager:
 
             # 4. Sections
             sec_data = requests.get(f"{API_BASE_URL}/sections").json()
-            section_caps = {}
+            section_caps = {}  # Pour calculer les contraintes de la capacité de  salles 
             if isinstance(sec_data, list):
                 def get_cap(s):
-                    return s.get('total_capacity') or s.get('student_count') or s.get('capacity') or 0
+                    return s.get('total_capacity')  or 0
                 section_caps = {s['id']: get_cap(s) for s in sec_data}
 
-            # 5. TD Groups (New: needed for group-to-section mapping)
+            # 5. TD Groups (needed for group-to-section mapping)
             tdg_data = requests.get(f"{API_BASE_URL}/td-groups").json()
             group_to_section = {}
             if isinstance(tdg_data, list):
                 group_to_section = {g['id']: g['section_id'] for g in tdg_data}
-            self.group_to_section = group_to_section # Store for constraints
+            self.group_to_section = group_to_section 
 
             # 6. Module Parts
             mp_data = requests.get(f"{API_BASE_URL}/module-parts").json()
-            mp_lookup = {p['id']: p for p in mp_data} if isinstance(mp_data, list) else {}
+            mp_lookup = {} # un dictionnaire d'indexation (lookup table) pour que l'accès aux données des modules se fasse en temps constant O(1)
+            if isinstance(mp_data, list):
+                for p in mp_data:
+                    # On enregistre : p['id'] -> l'objet complet p
+                    mp_lookup[p['id']] = p
 
             # 7. Assignments
             a_data = requests.get(f"{API_BASE_URL}/assignments").json()
@@ -91,7 +95,13 @@ class DataManager:
                     )
                     self.module_parts.append(mp)
 
-            print(f"Salles: {len(self.rooms)} | Sections with caps: {len(section_caps)} | Affectations: {len(self.module_parts)}")
+            print("-" * 50)
+            print("STATISTIQUES DU CHARGEMENT DES DONNÉES")
+            print("-" * 50)
+            print(f"Salles répertoriées      : {len(self.rooms)}")
+            print(f"Sections identifiées     : {len(section_caps)}")
+            print(f"Séances à planifier      : {len(self.module_parts)}")
+            print("-" * 50)            
             return True
         except Exception as e:
             print(f"Erreur fatale: {e}")

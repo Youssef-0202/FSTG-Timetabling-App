@@ -150,7 +150,11 @@ def calculate_fitness_full(schedule):
     schedule.gaps = total_gaps + consec_penalty
     
     M = 10000
-    schedule.fitness = 1 / (1 + (M * h_violations) + schedule.gaps)
+    # Use max(0, ...) to ensure negative gap bonuses don't cause division by zero
+    raw_soft_score = schedule.gaps
+    denominator = 1 + (M * h_violations) + raw_soft_score
+    
+    schedule.fitness = 1 / max(0.0001, denominator)
     
     return h_violations, schedule.gaps, {
         "H1_Teacher": h1_violations,
