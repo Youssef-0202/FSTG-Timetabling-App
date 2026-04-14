@@ -785,22 +785,60 @@ function DatabaseContent() {
                                         <div style={{ padding: "10px", border: "1px dashed var(--border)", borderRadius: "6px", fontSize: "0.85rem" }}>
                                             <i>Si c'est un CM : choisissez la Section (tout l'Amphi). Si c'est un TD/TP, tapez les ID(s) de GroupeTD séparés par virgule. (Simplification UI pour PFE).</i><br /><br />
                                             <div className="form-group"><label>1. Cible Section (Pour CM)</label>
-                                                <select value={String(modal.data.section_id || "")} onChange={(e) => setField("section_id", e.target.value)}>
-                                                    <option value="">(Aucune - c'est un TD/TP)</option>
+                                                <select value={String(modal.data.section_id || "")} onChange={(e) => {
+                                                    setField("section_id", e.target.value);
+                                                    setField("tdgroup_ids", []); // Reset groups when section changes
+                                                }}>
+                                                    <option value="">Sélectionner une section</option>
                                                     {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="form-group"><label>2. Cible Groupes TD (Pour TD/TP)</label>
-                                                <input placeholder="Exemple IDs: 1, 2" onChange={(e) => setField("tdgroup_ids", e.target.value.split(',').map(n => parseInt(n.trim())).filter(x => !isNaN(x)))} />
+                                            <div className="form-group">
+                                                <label>2. Cible Groupe TD (Pour TD/TP)</label>
+                                                <select
+                                                    disabled={!modal.data.section_id}
+                                                    value={Array.isArray(modal.data.tdgroup_ids) && modal.data.tdgroup_ids.length > 0 ? modal.data.tdgroup_ids[0] : ""}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value ? [parseInt(e.target.value)] : [];
+                                                        setField("tdgroup_ids", val);
+                                                    }}
+                                                >
+                                                    <option value="">-- {modal.data.section_id ? "Choisir le groupe" : "Choisissez d'abord une section"} --</option>
+                                                    {tdGroups
+                                                        .filter(g => Number(g.section_id) === Number(modal.data.section_id))
+                                                        .map(g => (
+                                                            <option key={g.id} value={g.id}>{g.name} (Cap: {g.size})</option>
+                                                        ))
+                                                    }
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="form-group full">
                                         <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                             <input type="checkbox" checked={!!modal.data.is_locked} onChange={(e) => setField("is_locked", e.target.checked)} />
-                                            Type 1 (Fixée manuellement)
+                                            TYPE 1 (FIXÉE MANUELLEMENT)
                                         </label>
                                     </div>
+
+                                    {modal.data.is_locked && (
+                                        <div style={{ padding: "12px", background: "#f1f5f9", borderRadius: "8px", border: "1px solid #cbd5e1", marginTop: "-10px", marginBottom: "15px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                                            <div className="form-group">
+                                                <label style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>Salle Imposée</label>
+                                                <select value={String(modal.data.room_id || "")} onChange={(e) => setField("room_id", e.target.value)}>
+                                                    <option value="">-- Choisir --</option>
+                                                    {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.type})</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>Créneau Imposé</label>
+                                                <select value={String(modal.data.slot_id || "")} onChange={(e) => setField("slot_id", e.target.value)}>
+                                                    <option value="">-- Choisir --</option>
+                                                    {timeslots.map(ts => <option key={ts.id} value={ts.id}>{ts.day} {ts.start_time.substring(0, 5)}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
                                 </>
                             )}
                             {tab === "modules" && (
