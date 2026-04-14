@@ -78,11 +78,13 @@ def calculate_fitness_full(schedule):
                 h4_violations += 5
 
 
-    # LEVEL 2: QUALITY (Soft Constraints - Compactness)
+    # LEVEL 2: QUALITY (Soft Constraints - Semi-Day Blocks)
     total_gaps = 0
     consec_penalty = 0
     
-    section_day_slots = {} # (section_id, day) -> list of (slot_id, type, module_id)
+    # (section_id, day, semi_day) -> list of sessions
+    # semi_day: 0 for Morning (Slots 1,2), 1 for Afternoon (Slots 3,4)
+    section_semiday_blocks = {}
     
     for a in assignments:
         day = a.timeslot.day
@@ -91,51 +93,60 @@ def calculate_fitness_full(schedule):
         m_type = a.module_part.type
         mod_id = a.module_part.module_id
 
-        # Track for specific section logic
-        k_s = (sec_id, day)
-        if k_s not in section_day_slots: section_day_slots[k_s] = []
-        section_day_slots[k_s].append({
+        # Determine semi-day: 1,2 -> 0 | 3,4 -> 1
+        semi_day = 0 if sid <= 2 else 1
+        
+        k = (sec_id, day, semi_day)
+        if k not in section_semiday_blocks: section_semiday_blocks[k] = []
+        section_semiday_blocks[k].append({
             'slot': sid,
             'type': m_type,
             'mod': mod_id
         })
 
-    # 1. Section Logic (Multi-Module)
-    for k, sessions in section_day_slots.items():
+    # 1. Processing Semi-Day Consistency
+    for k, sessions in section_semiday_blocks.items():
         sessions.sort(key=lambda x: x['slot'])
         
-        # A. Global Gaps (Empty slots between any classes of the section)
-        for i in range(len(sessions)-1):
-            gap = sessions[i+1]['slot'] - sessions[i]['slot'] - 1
-            if gap > 0: 
-                total_gaps += gap * 2
-        
-        # B. Module Stability (CRITICAL: All groups of SAME module must be together)
-        # Group by module for this specific day
-        mods_today = {}
-        for s in sessions:
-            if s['mod'] not in mods_today: mods_today[s['mod']] = []
-            mods_today[s['mod']].append(s['slot'])
-            
-        for mod_id, slots in mods_today.items():
-            if len(slots) > 1:
-                slots.sort()
-                for i in range(len(slots)-1):
-                    gap = slots[i+1] - slots[i] - 1
-                    if gap > 0:
-                        # Heavy penalty if Grupe 1 is morning and Groupe 2 is afternoon for same module
-                        consec_penalty += 15
-                    else:
-                        # Bonus for perfect consecutiveness
-                        consec_penalty -= 5
+        # A. Module Homogeneity within Semi-Day
+        # If we have 2 slots in a semi-day, they SHOULD be the same module (for TD)
+        if len(sessions) > 1:
+            mods_in_block = set(s['mod'] for s in sessions)
+            if len(mods_in_block) > 1:
+                # Mixing modules in the same morning/afternoon is BAD
+                consec_penalty += 30 
+            else:
+                # Bonus for keeping the same module for the whole block
+                consec_penalty -= 10
 
-        # C. CM Consecutiveness
-        cm_slots = [s['slot'] for s in sessions if s['type'] == "CM"]
-        if len(cm_slots) > 1:
-            cm_slots.sort()
-            for i in range(len(cm_slots)-1):
-                if (cm_slots[i+1] - cm_slots[i]) > 1:
-                    consec_penalty += 10 # Penalty for non-consecutive CMs
+        # B. CM Continuity (Within semi-day)
+        cm_in_block = [s for s in sessions if s['type'] == "CM"]
+        if len(cm_in_block) == 1:
+            # If there's only 1 CM in this block, but another CM for the same section exists on the SAME DAY
+            # (We check this by looking at the day-level dispersion later)
+            pass
+
+    # 2. Daily Level Logic (CM Dispersion)
+    # Group by (section, day) to see if CMs are split between Morning & Afternoon
+    section_day_cm = {}
+    for (sec_id, day, sd), sessions in section_semiday_blocks.items():
+        k_day = (sec_id, day)
+        if k_day not in section_day_cm: section_day_cm[k_day] = set()
+        if any(s['type'] == "CM" for s in sessions):
+            section_day_cm[k_day].add(sd)
+
+    for semi_days in section_day_cm.values():
+        if len(semi_days) > 1:
+            # CMs of same section on same day but different semi-days (one morning, one afternoon)
+            consec_penalty += 40 # Heavy penalty for dispersion
+
+    # 3. Traditional Gaps (Still important but secondary)
+    # (Existing gap logic simplified)
+    for (sec_id, day, sd), sessions in section_semiday_blocks.items():
+        if len(sessions) > 1:
+            sessions.sort(key=lambda x: x['slot'])
+            gap = sessions[1]['slot'] - sessions[0]['slot'] - 1
+            if gap > 0: total_gaps += gap * 5
 
     # FINAL CALCULATION
     h_violations = h1_violations + h2_violations + h3_violations + h4_violations

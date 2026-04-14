@@ -134,7 +134,7 @@ export default function TimetablePage() {
                                                                             <div className="c-name">{mod?.name}</div>
                                                                             <div className="c-info-row">
                                                                                 <div className="c-room"><MapPin size={10} /> {room?.name}</div>
-                                                                                {teacher && (
+                                                                                {teacher && mp?.type === "CM" && (
                                                                                     <div className="c-teacher"><UserIcon size={10} /> {teacher.name}</div>
                                                                                 )}
                                                                                 {c.td_groups && c.td_groups.length > 0 && (
