@@ -16,6 +16,7 @@ def calculate_fitness_full(schedule):
     busy_teachers = {} # (slot_id, teacher_id)
     busy_rooms = {}    # (slot_id, room_id)
     busy_groups = {}   # (slot_id) -> set of busy group_ids
+    busy_sections = {} # (slot_id) -> {section_id: [types]}
     
     # Mapping rapide des parents (H3)
     parent_map = {s.id: s.parent_id for s in dm.sections} 
@@ -35,92 +36,128 @@ def calculate_fitness_full(schedule):
         if (sid, rid) in busy_rooms: h2_violations += 1
         busy_rooms[(sid, rid)] = True
 
-        # H3: Structure Conflict (Section vs Group)
-        m_type = a.module_part.type.upper() if a.module_part.type else "TD"
-        
-        if gid is not None:
-            if sid not in busy_groups:
-                busy_groups[sid] = {}
-            
-            # --- 1. Regarder qui de la "famille" a déjà cours à ce créneau ---
-            family_types = []
-            
-            # Le groupe lui-même
-            if gid in busy_groups[sid]:
-                family_types.extend(busy_groups[sid][gid])
-                
-            # Son parent
-            parent = parent_map.get(gid)
-            if parent and parent in busy_groups[sid]:
-                family_types.extend(busy_groups[sid][parent])
-                
-            # Ses enfants
-            for already_busy_id, types_list in busy_groups[sid].items():
-                if parent_map.get(already_busy_id) == gid:
-                    family_types.extend(types_list)
-                    
-            # --- 2. Règle du conflit ---
-            # Si la famille a déjà un CM -> conflit
-            # Si NOUS sommes un CM et la famille a DÉJÀ n'importe quel cours -> conflit
-            if "CM" in family_types or (m_type == "CM" and len(family_types) > 0):
+        # H3: Section & Group Conflicts (The 4 Rules)
+        sec_id = a.module_part.section_id
+        sid = a.timeslot.id
+        m_type = a.module_part.type
+        my_groups = a.module_part.td_group_ids
+
+        if sec_id:
+            # RULE 1 & 2: CM occupation
+            # If there's a CM in this section, nobody else can have class
+            if sid in busy_sections and sec_id in busy_sections[sid] and "CM" in busy_sections[sid][sec_id]:
                 h3_violations += 1
+            
+            # If WE are a CM, check if anyone in the section is already busy
+            if m_type == "CM" and sid in busy_sections and sec_id in busy_sections[sid]:
+                if len(busy_sections[sid][sec_id]) > 0:
+                    h3_violations += 1
+            
+            # RULE 3: Same group overlap
+            for gid in my_groups:
+                if sid in busy_groups and gid in busy_groups[sid]:
+                    h3_violations += 1
+            
+            # Record our usage
+            if sid not in busy_sections: busy_sections[sid] = {}
+            if sec_id not in busy_sections[sid]: busy_sections[sid][sec_id] = []
+            busy_sections[sid][sec_id].append(m_type)
+            
+            if sid not in busy_groups: busy_groups[sid] = set()
+            for gid in my_groups:
+                busy_groups[sid].add(gid)
 
-            # --- 3. Enregistrer ---
-            if gid not in busy_groups[sid]:
-                busy_groups[sid][gid] = []
-            busy_groups[sid][gid].append(m_type)
-
-        # H4: Capacity
+        # H4: Capacity & Suitability
         if a.module_part.group_size > a.room.capacity:
-            h4_violations += 1
+            # Weighted penalty: large violations count more
+            h4_violations += 5
+        
+        # Enforce AMPHI for large CM
+        if a.module_part.type == "CM" and a.module_part.group_size > 50:
+            if a.room.type != "AMPHI":
+                h4_violations += 5
 
-    # LEVEL 2: QUALITY (f2 - Soft Constraints)
+
+    # LEVEL 2: QUALITY (Soft Constraints - Compactness)
     total_gaps = 0
+    consec_penalty = 0
     
-    group_days = {} # (gid, day) -> list of slot_ids
-    teacher_days = {} # (tid, day) -> list of slot_ids
+    section_day_slots = {} # (section_id, day) -> list of (slot_id, type, module_id)
     
     for a in assignments:
         day = a.timeslot.day
         sid = a.timeslot.id
-        gid = a.module_part.section_id
-        tid = a.module_part.teacher_id
-        
-        k_g = (gid, day)
-        if k_g not in group_days: group_days[k_g] = []
-        group_days[k_g].append(sid)
-        
-        k_t = (tid, day)
-        if k_t not in teacher_days: teacher_days[k_t] = []
-        teacher_days[k_t].append(sid)
+        sec_id = a.module_part.section_id
+        m_type = a.module_part.type
+        mod_id = a.module_part.module_id
 
-    # Calcul des trous (S1 & S5)
-    for slots in group_days.values():
-        slots.sort()
-        for i in range(len(slots)-1):
-            gap = slots[i+1] - slots[i] - 1
-            if gap > 0: total_gaps += gap
+        # Track for specific section logic
+        k_s = (sec_id, day)
+        if k_s not in section_day_slots: section_day_slots[k_s] = []
+        section_day_slots[k_s].append({
+            'slot': sid,
+            'type': m_type,
+            'mod': mod_id
+        })
 
-    for slots in teacher_days.values():
-        slots.sort()
-        for i in range(len(slots)-1):
-            gap = slots[i+1] - slots[i] - 1
-            if gap > 0: total_gaps += gap
+    # 1. Section Logic (Multi-Module)
+    for k, sessions in section_day_slots.items():
+        sessions.sort(key=lambda x: x['slot'])
+        
+        # A. Global Gaps (Empty slots between any classes of the section)
+        for i in range(len(sessions)-1):
+            gap = sessions[i+1]['slot'] - sessions[i]['slot'] - 1
+            if gap > 0: 
+                total_gaps += gap * 2
+        
+        # B. Module Stability (CRITICAL: All groups of SAME module must be together)
+        # Group by module for this specific day
+        mods_today = {}
+        for s in sessions:
+            if s['mod'] not in mods_today: mods_today[s['mod']] = []
+            mods_today[s['mod']].append(s['slot'])
+            
+        for mod_id, slots in mods_today.items():
+            if len(slots) > 1:
+                slots.sort()
+                for i in range(len(slots)-1):
+                    gap = slots[i+1] - slots[i] - 1
+                    if gap > 0:
+                        # Heavy penalty if Grupe 1 is morning and Groupe 2 is afternoon for same module
+                        consec_penalty += 15
+                    else:
+                        # Bonus for perfect consecutiveness
+                        consec_penalty -= 5
+
+        # C. CM Consecutiveness
+        cm_slots = [s['slot'] for s in sessions if s['type'] == "CM"]
+        if len(cm_slots) > 1:
+            cm_slots.sort()
+            for i in range(len(cm_slots)-1):
+                if (cm_slots[i+1] - cm_slots[i]) > 1:
+                    consec_penalty += 10 # Penalty for non-consecutive CMs
 
     # FINAL CALCULATION
     h_violations = h1_violations + h2_violations + h3_violations + h4_violations
+    soft_violations = total_gaps + consec_penalty
     
-    details = {
+    # Store for UI display in main_solver
+    schedule.h_violations = h_violations
+    schedule.h1 = h1_violations
+    schedule.h2 = h2_violations
+    schedule.h3 = h3_violations
+    schedule.h4 = h4_violations
+    schedule.gaps = total_gaps + consec_penalty
+    
+    M = 10000
+    schedule.fitness = 1 / (1 + (M * h_violations) + schedule.gaps)
+    
+    return h_violations, schedule.gaps, {
         "H1_Teacher": h1_violations,
         "H2_Room": h2_violations,
         "H3_Section": h3_violations,
         "H4_Capacity": h4_violations
     }
-    
-    M = 10000
-    schedule.fitness = 1 / (1 + (M * h_violations) + total_gaps)
-    
-    return h_violations, total_gaps, details
 
 if __name__ == "__main__":
     from models import Schedule

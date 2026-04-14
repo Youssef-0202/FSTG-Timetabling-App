@@ -32,43 +32,66 @@ class DataManager:
 
             # 4. Sections
             sec_data = requests.get(f"{API_BASE_URL}/sections").json()
+            section_caps = {}
             if isinstance(sec_data, list):
-                self.sections = [Section(id=s['id'], name=s['name'], student_count=s.get('total_capacity', 0), parent_id=s.get('parent_id')) for s in sec_data]
-            
-            # Create a lookup map for section capacities
-            section_caps = {s.id: s.student_count for s in self.sections}
+                def get_cap(s):
+                    return s.get('total_capacity') or s.get('student_count') or s.get('capacity') or 0
+                section_caps = {s['id']: get_cap(s) for s in sec_data}
 
-            # 5. Assignments
+            # 5. TD Groups (New: needed for group-to-section mapping)
+            tdg_data = requests.get(f"{API_BASE_URL}/td-groups").json()
+            group_to_section = {}
+            if isinstance(tdg_data, list):
+                group_to_section = {g['id']: g['section_id'] for g in tdg_data}
+            self.group_to_section = group_to_section # Store for constraints
+
+            # 6. Module Parts
+            mp_data = requests.get(f"{API_BASE_URL}/module-parts").json()
+            mp_lookup = {p['id']: p for p in mp_data} if isinstance(mp_data, list) else {}
+
+            # 7. Assignments
             a_data = requests.get(f"{API_BASE_URL}/assignments").json()
             if isinstance(a_data, list):
                 self.module_parts = []
                 for a in a_data:
-                    m_type = a.get('module_part', {}).get('type', 'TD').upper()
+                    mp_id = a.get('module_part_id')
+                    mp_info = mp_lookup.get(mp_id, {})
+                    m_type = mp_info.get('type', 'TD').upper()
                     
                     # Logic for Teacher identification
                     t_id = a['teacher_id'] if m_type == "CM" else None
                     
                     # Determine real size for capacity constraint
-                    # If it's a CM, use section capacity. If TD/TP, use group size.
                     sid = a.get('section_id')
+                    
+                    # Target real groups for TD conflict logic
+                    td_group_ids = [g['id'] for g in a.get('td_groups', [])]
+                    
+                    # If it's a TD and has no section_id but has groups, find parent section
+                    if m_type != "CM" and not sid and td_group_ids:
+                        sid = group_to_section.get(td_group_ids[0])
+                    
                     real_size = 30 # Default
-                    if m_type == "CM" and sid in section_caps:
-                        real_size = section_caps[sid]
+                    
+                    if m_type == "CM":
+                        real_size = section_caps.get(sid, 90)
+                        if real_size == 0: real_size = 90
                     elif a.get('td_groups'):
-                        # Summer of group sizes for TD
                         real_size = sum(g.get('size', 0) for g in a['td_groups'])
+                        if real_size == 0: real_size = 30
                     
                     mp = ModulePart(
                         id=a['id'],
-                        module_id=a['module_part_id'],
+                        module_id=mp_id,
                         teacher_id=t_id,
                         section_id=sid,
                         type=m_type,
-                        group_size=real_size
+                        group_size=real_size,
+                        td_group_ids=td_group_ids
                     )
                     self.module_parts.append(mp)
 
-            print(f"Salles: {len(self.rooms)} | Profs: {len(self.teachers)} | Créneaux: {len(self.timeslots)} | Affectations: {len(self.module_parts)}")
+            print(f"Salles: {len(self.rooms)} | Sections with caps: {len(section_caps)} | Affectations: {len(self.module_parts)}")
             return True
         except Exception as e:
             print(f"Erreur fatale: {e}")

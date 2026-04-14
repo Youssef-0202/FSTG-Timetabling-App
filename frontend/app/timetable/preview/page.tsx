@@ -53,8 +53,8 @@ export default function TimetablePage() {
     // Lignes pour les vues Section/Enseignant
     const uniqueHours = Array.from(new Set(timeslots.map(t => t.start_time.substring(0, 5)))).sort();
 
-    const getCourseAt = (day: string, startTime: string) => {
-        return assignments.find(a => {
+    const getCoursesAt = (day: string, startTime: string) => {
+        return assignments.filter(a => {
             // Find timeslot 
             const ts = timeslots.find(t => t.id === a.slot_id);
             if (!ts) return false;
@@ -118,25 +118,36 @@ export default function TimetablePage() {
                                             <tr key={time}>
                                                 <td className="time-header"><Clock size={12} /> {time}</td>
                                                 {DAYS_ORDER.map(day => {
-                                                    const c = getCourseAt(day, time);
-                                                    if (!c) return <td key={day} className="cell-empty" />;
-                                                    const mp = moduleParts.find(p => p.id === c.module_part_id);
-                                                    const mod = modules.find(m => m.id === mp?.module_id);
-                                                    const room = rooms.find(r => r.id === c.room_id);
+                                                    const dayCourses = getCoursesAt(day, time);
+                                                    if (dayCourses.length === 0) return <td key={day} className="cell-empty" />;
+
                                                     return (
                                                         <td key={day} className="cell-filled">
-                                                            <div className={`course-box ${mp?.type.toLowerCase()}`}>
-                                                                <div className="c-name">{mod?.name}</div>
-                                                                <div className="c-info-row">
-                                                                    <div className="c-room"><MapPin size={10} /> {room?.name}</div>
-                                                                    {c.td_groups && c.td_groups.length > 0 && (
-                                                                        <div className="c-groups">
-                                                                            {c.td_groups.map(g => (
-                                                                                <span key={g.id} className="group-tag">{g.name}</span>
-                                                                            ))}
+                                                            <div className="courses-stack">
+                                                                {dayCourses.map(c => {
+                                                                    const mp = moduleParts.find(p => p.id === c.module_part_id);
+                                                                    const mod = modules.find(m => m.id === mp?.module_id);
+                                                                    const room = rooms.find(r => r.id === c.room_id);
+                                                                    const teacher = teachers.find(t => t.id === c.teacher_id);
+                                                                    return (
+                                                                        <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`}>
+                                                                            <div className="c-name">{mod?.name}</div>
+                                                                            <div className="c-info-row">
+                                                                                <div className="c-room"><MapPin size={10} /> {room?.name}</div>
+                                                                                {teacher && (
+                                                                                    <div className="c-teacher"><UserIcon size={10} /> {teacher.name}</div>
+                                                                                )}
+                                                                                {c.td_groups && c.td_groups.length > 0 && (
+                                                                                    <div className="c-groups">
+                                                                                        {c.td_groups.map(g => (
+                                                                                            <span key={g.id} className="group-tag">{g.name}</span>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
-                                                                    )}
-                                                                </div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         </td>
                                                     );

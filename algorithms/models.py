@@ -29,13 +29,14 @@ class Section:
         self.parent_id = parent_id
 
 class ModulePart:
-    def __init__(self, id, module_id, teacher_id, section_id, type, group_size):
+    def __init__(self, id, module_id, teacher_id, section_id, type="TD", group_size=30, td_group_ids=None):
         self.id = id
         self.module_id = module_id
         self.teacher_id = teacher_id
-        self.section_id = section_id
+        self.section_id = section_id  # Parent section or target section for CM
         self.type = type
         self.group_size = group_size
+        self.td_group_ids = td_group_ids or []  # Real individual group IDs
 
 
 class Assignment:
@@ -54,7 +55,7 @@ class Schedule :
         """Crée une copie profonde manuelle pour éviter les conflits de mémoire"""
         new_assignments = []
         for a in self.assignments:
-            # On crée un NOUVEL objet Assignment avec les mêmes attributs
+            # On garde la même instance de module_part pour conserver ses attributs (type, group_size)
             new_as = Assignment(a.module_part, a.room, a.timeslot)
             new_assignments.append(new_as)
             

@@ -60,8 +60,9 @@ def print_solution_summary(schedule):
     sorted_as = sorted(schedule.assignments, key=lambda a: (a.timeslot.day, a.timeslot.start_time))
     
     for a in sorted_as:
-        print(f"[{a.timeslot.day}] {a.timeslot.start_time} -> {a.module_part.type} | "
-              f"Salle: {a.room.name} | Section: {a.module_part.section_id}")
+        m_type = getattr(a.module_part, 'type', '??')
+        print(f"[{a.timeslot.day}] {a.timeslot.start_time} -> {m_type} | "
+              f"Salle: {a.room.name} ({a.room.capacity}) | Section: {a.module_part.section_id}")
     
     print("="*50)
 
@@ -83,18 +84,29 @@ def run_optimization():
     print("\n--- Lancement de l'optimisation Hybride (GA + SA) ---")
     
     best_overall = None
-    for gen in range(1, 201):
+    h_zero_since = 0
+    MAX_GEN_AFTER_H0 = 30  # Polishing phase
+
+    for gen in range(1, 401): # Increased total max generations
         engine.evolve()
         best_gen = engine.population[0]
         
         h, s, details = calculate_fitness_full(best_gen)
         detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']}"
-        print(f"Génération {gen:03d} | Total Hard: {h} | Gaps: {s} | {detail_str}")
+        
+        # UI: Add a tag if we are in polishing phase
+        status = ""
+        if h == 0:
+            h_zero_since += 1
+            status = f" [POLISSAGE {h_zero_since}/{MAX_GEN_AFTER_H0}]"
+        
+        print(f"Génération {gen:03d} | Total Hard: {h} | Gaps: {s} | {detail_str}{status}")
         
         best_overall = best_gen
         
-        if h == 0 and s < 5:  # Solution quasi-parfaite trouvée !
-            print(f"\n🎉 Solution parfaite trouvée à la génération {gen} !")
+        # Stop condition: H=0 found AND we spent enough time polishing OR we hit very low gaps
+        if h == 0 and (h_zero_since >= MAX_GEN_AFTER_H0 or s <= 1):
+            print(f"\n✨ Optimisation terminée avec succès !")
             break
     
     # 3. Afficher le résumé en console
