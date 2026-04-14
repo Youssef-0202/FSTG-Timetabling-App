@@ -4,7 +4,7 @@ import {
     Calendar, Users, Download, Clock, MapPin, User as UserIcon
 } from "lucide-react";
 import {
-    getAssignments, Assignment,
+    getAssignments, Assignment, getPreviewSchedule,
     getTeachers, Teacher,
     getRooms, Room,
     getModules, Module,
@@ -31,12 +31,18 @@ export default function TimetablePage() {
         setLoading(true);
         try {
             const [a, t, r, m, mp, ts, sec] = await Promise.all([
-                getAssignments(), getTeachers(), getRooms(), getModules(),
+                getPreviewSchedule(), getTeachers(), getRooms(), getModules(),
                 getModuleParts(), getTimeslots(), getSections()
             ]);
+            console.log("Assignments loaded:", a.length);
             setAssignments(a); setTeachers(t); setRooms(r); setModules(m);
             setModuleParts(mp); setTimeslots(ts); setSections(sec);
-            if (sec.length > 0) setSelectedId(String(sec[0].id));
+
+            if (sec.length > 0) {
+                const firstId = String(sec[0].id);
+                setSelectedId(firstId);
+                console.log("Setting default section ID:", firstId);
+            }
         } catch (e) {
             console.error(e);
         } finally { setLoading(false); }
@@ -49,17 +55,33 @@ export default function TimetablePage() {
 
     const getCourseAt = (day: string, startTime: string) => {
         return assignments.find(a => {
+            // Find timeslot 
             const ts = timeslots.find(t => t.id === a.slot_id);
-            if (!ts || ts.day.toLowerCase() !== day.toLowerCase() || !ts.start_time.startsWith(startTime)) return false;
-            return viewMode === "section" ? String(a.section_id) === selectedId : String(a.teacher_id) === selectedId;
+            if (!ts) return false;
+
+            // Day matching (case insensitive)
+            const dayMatch = ts.day.toLowerCase().trim() === day.toLowerCase().trim();
+            if (!dayMatch) return false;
+
+            // Time matching (starts with HH:MM)
+            const timeMatch = ts.start_time.startsWith(startTime);
+            if (!timeMatch) return false;
+
+            // Selected filter matching (Section or Teacher)
+            if (viewMode === "section") {
+                return String(a.section_id) === String(selectedId);
+            } else if (viewMode === "teacher") {
+                return String(a.teacher_id) === String(selectedId);
+            }
+            return false;
         });
     };
 
     return (
         <div className="page-container">
-            <div className="hero-section">
-                <h1>Explorateur de Planning</h1>
-                <p>Consultez l'emploi du temps généré par l'IA de la FSTM Marrakech.</p>
+            <div className="hero-section" style={{ background: "linear-gradient(90deg, #1e3a8a, #0f172a)" }}>
+                <h1>IA Preview : Emploi du Temps</h1>
+                <p>Aperçu en direct du résultat de l'Algorithme Hybride GA+SA (Non enregistré en base de données).</p>
             </div>
 
             <div className="content-wrapper">
@@ -105,7 +127,16 @@ export default function TimetablePage() {
                                                         <td key={day} className="cell-filled">
                                                             <div className={`course-box ${mp?.type.toLowerCase()}`}>
                                                                 <div className="c-name">{mod?.name}</div>
-                                                                <div className="c-room"><MapPin size={10} /> {room?.name}</div>
+                                                                <div className="c-info-row">
+                                                                    <div className="c-room"><MapPin size={10} /> {room?.name}</div>
+                                                                    {c.td_groups && c.td_groups.length > 0 && (
+                                                                        <div className="c-groups">
+                                                                            {c.td_groups.map(g => (
+                                                                                <span key={g.id} className="group-tag">{g.name}</span>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </td>
                                                     );
@@ -239,6 +270,13 @@ export default function TimetablePage() {
                 .day-separator td { padding: 8px 15px; font-weight: 900; color: #475569; font-size: 0.75rem; letter-spacing: 1.5px; position: sticky; left: 0; }
                 
                 .time-label { text-align: center; min-width: 110px; font-size: 0.8rem; color: #0f172a; }
+
+                .c-info-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; flex-wrap: wrap; gap: 4px; }
+                .c-groups { display: flex; gap: 4px; flex-wrap: wrap; }
+                .group-tag { background: rgba(0,0,0,0.05); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+                .td .group-tag { background: rgba(22, 101, 52, 0.1); color: #166534; border: 1px solid rgba(22, 101, 52, 0.2); }
+                .tp .group-tag { background: rgba(157, 23, 77, 0.1); color: #9d174d; border: 1px solid rgba(157, 23, 77, 0.2); }
+
             `}</style>
         </div>
     );
