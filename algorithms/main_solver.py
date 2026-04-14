@@ -1,32 +1,55 @@
 import requests
-from data_manager import DataManager,API_BASE_URL
+from data_manager import DataManager, API_BASE_URL
 from engine import HybridEngine
 from constraints import calculate_fitness_full
 
 
-def save_schedule_to_db(schedule):
-    """Met à jour les affectations existantes avec les résultats de l'IA"""
-    print(f"--- Mise à jour de {len(schedule.assignments)} affectations ---")
+import json
+import os
+
+def export_schedule_to_json(schedule, filename="../backend/generated_timetable.json"):
+    """Exporte le résultat de l'IA dans un fichier JSON pour l'interface sans toucher à la BDD"""
+    print(f"\n--- 💾 Exportation de {len(schedule.assignments)} affectations vers {filename} ---")
     
-    #for a in schedule.assignments:
-    #    # On utilise l'ID de l'affectation existante pour la mettre à jour
-    #    assignment_id = a.module_part.id 
-    #    
-    #    payload = {
-    #        "room_id": a.room.id,
-    #        "timeslot_id": a.timeslot.id,
-    #        "status": "PLACED" # On change le statut de "À placer" à "Placé"
-    #    }
-    #    
-    #    try:
-    #        # On utilise PUT pour modifier l'enregistrement existant
-    #        r = requests.put(f"{API_BASE_URL}/assignments/{assignment_id}", json=payload)
-    #        if r.status_code != 200:
-    #            print(f"Erreur sur l'ID {assignment_id}: {r.text}")
-    #    except Exception as e:
-    #        print(f"Erreur réseau: {e}")
-            
-    print(" Emploi du temps mis à jour avec succès dans la base !")
+    # 1. On récupère la base actuelle pour garder les infos (td_groups, is_locked...)
+    try:
+        current_db = requests.get(f"{API_BASE_URL}/assignments").json()
+        db_map = {a['id']: a for a in current_db}
+    except Exception as e:
+        print("❌ Erreur de connexion au backend pour la récupération des données.")
+        return
+        
+    export_data = []
+    
+    for a in schedule.assignments:
+        assignment_id = a.module_part.id
+        orig = db_map.get(assignment_id, {})
+        
+        # On formatte tel que l'interface frontend l'attend (comme l'API /assignments)
+        export_item = {
+            "id": assignment_id,
+            "module_part_id": orig.get("module_part_id", getattr(a.module_part, 'module_id', 0)),
+            "teacher_id": orig.get("teacher_id", getattr(a.module_part, 'teacher_id', 0)),
+            "section_id": orig.get("section_id"),
+            "room_id": a.room.id,
+            "slot_id": a.timeslot.id,
+            "is_locked": orig.get("is_locked", False),
+            "td_groups": orig.get("td_groups", []),
+            "module_part": orig.get("module_part", {}),
+            "teacher": orig.get("teacher", {}),
+            "room": {"id": a.room.id, "name": a.room.name},
+            "timeslot": {"id": a.timeslot.id, "day": a.timeslot.day, "start_time": a.timeslot.start_time, "end_time": a.timeslot.end_time},
+        }
+        export_data.append(export_item)
+        
+    # On sauvegarde dans le fichier
+    filepath = os.path.join(os.path.dirname(__file__), filename)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(export_data, f, indent=4, ensure_ascii=False)
+        
+    print(f"  ✅ Planning sauvegardé avec succès dans {filepath}")
+    print("  🌐 Allez sur localhost:3000/timetable-preview pour voir l'aperçu !\n")
+
 
 def print_solution_summary(schedule):
     """Affiche un résumé lisible du meilleur planning trouvé"""
@@ -34,7 +57,6 @@ def print_solution_summary(schedule):
     print(" MEILLEURE SOLUTION TROUVÉE")
     print("="*50)
     
-    # On trie par jour et par heure pour la lecture
     sorted_as = sorted(schedule.assignments, key=lambda a: (a.timeslot.day, a.timeslot.start_time))
     
     for a in sorted_as:
@@ -43,15 +65,14 @@ def print_solution_summary(schedule):
     
     print("="*50)
 
+
 def run_optimization():
     # 1. Charger les données
     dm = DataManager()
     if not dm.fetch_all_data():
         return
-    #  Vérification si des séances existent
     if not dm.module_parts:
         print("\n AUCUNE AFFECTATION À PLACER DANS LA BASE !")
-        print("Ajoutez des séances via l'interface (Statut: À placer) avant de lancer.")
         return
     
     # 2. Configurer le moteur 
@@ -61,23 +82,27 @@ def run_optimization():
     
     print("\n--- Lancement de l'optimisation Hybride (GA + SA) ---")
     
-    for gen in range(1, 201): # 200 générations
+    best_overall = None
+    for gen in range(1, 201):
         engine.evolve()
         best_gen = engine.population[0]
         
-        # On récupère le détail pour affichage
         h, s, details = calculate_fitness_full(best_gen)
-        
         detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']}"
         print(f"Génération {gen:03d} | Total Hard: {h} | Gaps: {s} | {detail_str}")
         
-        if h == 0 and s < 5: # Si on trouve une solution quasi-parfaite
+        best_overall = best_gen
+        
+        if h == 0 and s < 5:  # Solution quasi-parfaite trouvée !
+            print(f"\n🎉 Solution parfaite trouvée à la génération {gen} !")
             break
     
-    # 3. Résultat final
-    best_overall = engine.population[0]
+    # 3. Afficher le résumé en console
     print_solution_summary(best_overall)
     
+    # 4. Synchroniser vers le fichier JSON → Frontend aperçu
+    export_schedule_to_json(best_overall)
+
 
 if __name__ == "__main__":
     run_optimization()

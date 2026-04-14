@@ -14,7 +14,7 @@ class HybridEngine:
         self.elitism = 2
         
         # SA Parameters 
-        self.sa_iterations = 50
+        self.sa_iterations = 400
         self.sa_temp = 50.0
         self.sa_cooling = 0.95
 
@@ -45,14 +45,13 @@ class HybridEngine:
             # 1. Crossover
             child = self.crossover(p1, p2)
             
-            # 2. Local Search 
-            child = self.simulated_annealing_search(child)
-            
-            # 3. Mutation
+            # 2. Mutation (Exploration pure)
             if random.random() < self.mutation_rate:
                 self.mutate(child)
-                # 2nd Local Search to repair/optimize after mutation
-                child = self.simulated_annealing_search(child)
+                
+            # 3. Local Search (Exploitation finale)
+            # On applique le recuit simulé une seule fois pour lisser l'enfant avant de l'ajouter
+            child = self.simulated_annealing_search(child)
                 
             new_gen.append(child)
         
@@ -89,17 +88,22 @@ class HybridEngine:
             neighbor = schedule.copy()
             r = random.random()
             
-            # --- MOVE: SHIFT (Room/Time change) ---
-            if r < 0.6:
+            if r < 0.33:
+                # --- MOVE 1: SHIFT BOTH ---
                 idx = random.randint(0, len(neighbor.assignments)-1)
                 neighbor.assignments[idx].room = random.choice(self.dm.rooms)
                 neighbor.assignments[idx].timeslot = random.choice(self.dm.timeslots)
             
-            # --- MOVE: SWAP (Exchange two sessions) ---
-            else:
+            elif r < 0.66:
+                # --- MOVE 2: SWAP (Exchange two sessions) ---
                 idx1, idx2 = random.sample(range(len(neighbor.assignments)), 2)
                 neighbor.assignments[idx1].timeslot, neighbor.assignments[idx2].timeslot = \
                     neighbor.assignments[idx2].timeslot, neighbor.assignments[idx1].timeslot
+            
+            else:
+                # --- MOVE 3: SHIFT ROOM ONLY ---
+                idx = random.randint(0, len(neighbor.assignments)-1)
+                neighbor.assignments[idx].room = random.choice(self.dm.rooms)
             neighbor_fit = self.get_score(neighbor)
             delta = neighbor_fit - current_fit
             

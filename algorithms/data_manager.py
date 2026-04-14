@@ -40,13 +40,19 @@ class DataManager:
             if isinstance(a_data, list):
                 self.module_parts = []
                 for a in a_data:
+                    m_type = a.get('module_part', {}).get('type', 'TD').upper()
+                    
+                    # ASTUCE POUR LA RÉUNION : On ne garde le prof que si c'est un CM
+                    # Les TD/TP auront un prof "vide" (None) pour ne plus surcharger H1 artificiellement.
+                    t_id = a['teacher_id'] if m_type == "CM" else None
+                    
                     # On crée l'objet que l'algorithme va manipuler
                     mp = ModulePart(
                         id=a['id'],
                         module_id=a['module_part_id'],
-                        teacher_id=a['teacher_id'],
+                        teacher_id=t_id,
                         section_id=a.get('section_id'),
-                        type=a.get('module_part', {}).get('type', 'TD'),
+                        type=m_type,
                         group_size=30 # Valeur par défaut
                     )
                     self.module_parts.append(mp)

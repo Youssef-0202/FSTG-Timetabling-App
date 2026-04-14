@@ -51,8 +51,16 @@ class Schedule :
         self.fitness = 0.0
         
     def copy(self):
-        """Utile pour le Recuit Simulé ou les mutations"""
-        return Schedule(self.data_manager, list(self.assignments))
+        """Crée une copie profonde manuelle pour éviter les conflits de mémoire"""
+        new_assignments = []
+        for a in self.assignments:
+            # On crée un NOUVEL objet Assignment avec les mêmes attributs
+            new_as = Assignment(a.module_part, a.room, a.timeslot)
+            new_assignments.append(new_as)
+            
+        new_sched = Schedule(self.data_manager, new_assignments)
+        new_sched.fitness = self.fitness
+        return new_sched
     def __str__(self):
         return f"Schedule: {len(self.assignments)} assignments, Fitness: {self.fitness}"
 

@@ -408,3 +408,19 @@ def save_assignments(assignments: List[schemas.AssignmentCreate], db: Session = 
         db.add(new_a)
     db.commit()
     return {"message": "Planning sauvegardé en base de données."}
+
+import os
+import json
+
+@app.get("/preview-schedule")
+def get_preview_schedule():
+    """
+    Renvoie le dernier emploi du temps généré par l'IA stocké dans le fichier JSON,
+    sans toucher à la base de données SQL.
+    """
+    file_path = os.path.join(os.path.dirname(__file__), "generated_timetable.json")
+    if not os.path.exists(file_path):
+        return []
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+

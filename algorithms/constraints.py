@@ -27,30 +27,48 @@ def calculate_fitness_full(schedule):
         gid = a.module_part.section_id
 
         # H1: Teacher Conflict
-        if (sid, tid) in busy_teachers: h1_violations += 1
-        busy_teachers[(sid, tid)] = True
+        if tid is not None:
+            if (sid, tid) in busy_teachers: h1_violations += 1
+            busy_teachers[(sid, tid)] = True
         
         # H2: Room Conflict
         if (sid, rid) in busy_rooms: h2_violations += 1
         busy_rooms[(sid, rid)] = True
 
         # H3: Structure Conflict (Section vs Group)
-        if sid not in busy_groups: busy_groups[sid] = set()
+        m_type = a.module_part.type.upper() if a.module_part.type else "TD"
         
-        # On ignore les vérifications de section si le cours n'a pas de section_id (ex: TD/TP qui utilisent td_groups)
         if gid is not None:
-            if gid in busy_groups[sid]:
-                h3_violations += 1
+            if sid not in busy_groups:
+                busy_groups[sid] = {}
             
+            # --- 1. Regarder qui de la "famille" a déjà cours à ce créneau ---
+            family_types = []
+            
+            # Le groupe lui-même
+            if gid in busy_groups[sid]:
+                family_types.extend(busy_groups[sid][gid])
+                
+            # Son parent
             parent = parent_map.get(gid)
             if parent and parent in busy_groups[sid]:
-                h3_violations += 1
+                family_types.extend(busy_groups[sid][parent])
                 
-            for already_busy_id in busy_groups[sid]:
+            # Ses enfants
+            for already_busy_id, types_list in busy_groups[sid].items():
                 if parent_map.get(already_busy_id) == gid:
-                    h3_violations += 1
+                    family_types.extend(types_list)
+                    
+            # --- 2. Règle du conflit ---
+            # Si la famille a déjà un CM -> conflit
+            # Si NOUS sommes un CM et la famille a DÉJÀ n'importe quel cours -> conflit
+            if "CM" in family_types or (m_type == "CM" and len(family_types) > 0):
+                h3_violations += 1
 
-            busy_groups[sid].add(gid)
+            # --- 3. Enregistrer ---
+            if gid not in busy_groups[sid]:
+                busy_groups[sid][gid] = []
+            busy_groups[sid][gid].append(m_type)
 
         # H4: Capacity
         if a.module_part.group_size > a.room.capacity:
