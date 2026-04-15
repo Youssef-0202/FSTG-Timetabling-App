@@ -80,45 +80,8 @@ export default function HomePage() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 16 }}>
+          {/* Accès Rapide */}
           <div className="table-card" style={{ padding: 24 }}>
-            <h3 style={{ marginBottom: 18, color: "var(--navy)", fontSize: "0.97rem", display: "flex", alignItems: "center", gap: 8 }}>
-              <Cpu size={18} /> Statut de l'Optimisation
-            </h3>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
-                  <span style={{ fontWeight: 600 }}>Taux de couverture des profs</span>
-                  <span style={{ color: "var(--teal)", fontWeight: 700 }}>92%</span>
-                </div>
-                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ width: "92%", height: "100%", background: "var(--teal)" }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
-                  <span style={{ fontWeight: 600 }}>Saturation des Salles (Amphis)</span>
-                  <span style={{ color: "var(--gold)", fontWeight: 700 }}>65%</span>
-                </div>
-                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ width: "65%", height: "100%", background: "var(--gold)" }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: "0.83rem" }}>
-                  <span style={{ fontWeight: 600 }}>Complexité du Planning (S4 vs S2)</span>
-                  <span style={{ color: "var(--blue)", fontWeight: 700 }}>Élevée</span>
-                </div>
-                <div style={{ height: 8, background: "var(--bg)", borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ width: "85%", height: "100%", background: "var(--blue)" }}></div>
-                </div>
-              </div>
-            </div>
-
-            <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid var(--border)" }} />
-
             <h3 style={{ marginBottom: 14, color: "var(--navy)", fontSize: "0.9rem" }}>Accès Rapide</h3>
             <div style={{ display: "flex", gap: 10 }}>
               {quickLinks.map(({ href, Icon, label }) => (
@@ -135,6 +98,7 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Santé des données */}
           <div className="table-card" style={{ padding: 24, borderLeft: "4px solid var(--navy)" }}>
             <h3 style={{ marginBottom: 18, color: "var(--navy)", fontSize: "0.97rem" }}>Santé des Données</h3>
             <table style={{ width: "100%" }}>
@@ -155,15 +119,6 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
-
-            <div style={{ marginTop: 24, padding: 16, background: "#fff5f5", borderRadius: 8, border: "1px solid #fed7d7" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--danger)", fontWeight: 700, fontSize: "0.85rem", marginBottom: 6 }}>
-                <XCircle size={16} /> Audit des Incompatibilités
-              </div>
-              <p style={{ fontSize: "0.75rem", color: "#c53030" }}>
-                <b>Important :</b> 5 modules de S2 et S4 n&apos;ont pas encore de liste d&apos;incompatibilité définie. Les redoublants pourraient avoir des chevauchements.
-              </p>
-            </div>
           </div>
         </div>
       </div>

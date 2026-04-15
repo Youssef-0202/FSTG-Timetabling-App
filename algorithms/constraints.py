@@ -104,30 +104,25 @@ def calculate_fitness_full(schedule):
             'mod': mod_id
         })
 
+    # Counters for detailed soft reporting
+    mixing_count = 0      # Demi-journées avec mélange de modules
+    cm_dispersion_count = 0  # CMs d'une section dispersés matin/après-midi
+    gap_count = 0         # Blocs avec créneaux non consécutifs
+
     # 1. Processing Semi-Day Consistency
     for k, sessions in section_semiday_blocks.items():
         sessions.sort(key=lambda x: x['slot'])
         
         # A. Module Homogeneity within Semi-Day
-        # If we have 2 slots in a semi-day, they SHOULD be the same module (for TD)
         if len(sessions) > 1:
             mods_in_block = set(s['mod'] for s in sessions)
             if len(mods_in_block) > 1:
-                # Mixing modules in the same morning/afternoon is BAD
-                consec_penalty += 30 
+                consec_penalty += 30
+                mixing_count += 1
             else:
-                # Bonus for keeping the same module for the whole block
                 consec_penalty -= 10
 
-        # B. CM Continuity (Within semi-day)
-        cm_in_block = [s for s in sessions if s['type'] == "CM"]
-        if len(cm_in_block) == 1:
-            # If there's only 1 CM in this block, but another CM for the same section exists on the SAME DAY
-            # (We check this by looking at the day-level dispersion later)
-            pass
-
     # 2. Daily Level Logic (CM Dispersion)
-    # Group by (section, day) to see if CMs are split between Morning & Afternoon
     section_day_cm = {}
     for (sec_id, day, sd), sessions in section_semiday_blocks.items():
         k_day = (sec_id, day)
@@ -137,16 +132,17 @@ def calculate_fitness_full(schedule):
 
     for semi_days in section_day_cm.values():
         if len(semi_days) > 1:
-            # CMs of same section on same day but different semi-days (one morning, one afternoon)
-            consec_penalty += 40 # Heavy penalty for dispersion
+            consec_penalty += 40
+            cm_dispersion_count += 1
 
-    # 3. Traditional Gaps (Still important but secondary)
-    # (Existing gap logic simplified)
+    # 3. Traditional Gaps
     for (sec_id, day, sd), sessions in section_semiday_blocks.items():
         if len(sessions) > 1:
             sessions.sort(key=lambda x: x['slot'])
             gap = sessions[1]['slot'] - sessions[0]['slot'] - 1
-            if gap > 0: total_gaps += gap * 5
+            if gap > 0:
+                total_gaps += gap * 5
+                gap_count += 1
 
     # FINAL CALCULATION
     h_violations = h1_violations + h2_violations + h3_violations + h4_violations
@@ -171,7 +167,10 @@ def calculate_fitness_full(schedule):
         "H1_Teacher": h1_violations,
         "H2_Room": h2_violations,
         "H3_Section": h3_violations,
-        "H4_Capacity": h4_violations
+        "H4_Capacity": h4_violations,
+        "S1_Mixing": mixing_count,
+        "S2_CM_Dispersion": cm_dispersion_count,
+        "S3_Gaps": gap_count,
     }
 
 if __name__ == "__main__":

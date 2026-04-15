@@ -106,7 +106,16 @@ def run_optimization():
         
         # Stop condition: H=0 found AND we spent enough time polishing OR we hit very low gaps
         if h == 0 and (h_zero_since >= MAX_GEN_AFTER_H0 or s <= 1):
-            print(f"\n✨ Optimisation terminée avec succès !")
+            print(f"\n{'='*55}")
+            print(f"  OPTIMISATION TERMINEE AVEC SUCCES")
+            print(f"{'='*55}")
+            print(f"  Hard Violations  : {h} (Parfait)")
+            print(f"  Score Soft Total : {s}")
+            print(f"  --- Detail Contraintes Soft ---")
+            print(f"  S1 Melanges modules/demi-jour : {details.get('S1_Mixing', '?')} occurrences (+30pts chacun)")
+            print(f"  S2 Dispersion CMs matin/aprem : {details.get('S2_CM_Dispersion', '?')} occurrences (+40pts chacun)")
+            print(f"  S3 Creneaux non-consecutifs   : {details.get('S3_Gaps', '?')} blocs (+5pts chacun)")
+            print(f"{'='*55}")
             break
     
     # 3. Afficher le résumé en console
