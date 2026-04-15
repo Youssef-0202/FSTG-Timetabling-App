@@ -41,21 +41,20 @@ class ModulePart:
 
 class Assignment:
     def __init__(self,module_part,room,timeslot) :
-        self.module_part = module_part  # The session (links to teacher, section, etc.)
+        self.module_part = module_part  # The session 
         self.room = room                # The chosen room
         self.timeslot= timeslot          # The chosen slot
 
-class Schedule :
+class Schedule : # un emploi du temps complet proposé par l'algo 
     def __init__(self, data_manager, assignments=None):
         self.data_manager = data_manager
         self.assignments = assignments or []
         self.fitness = 0.0
         
     def copy(self):
-        """Crée une copie profonde manuelle pour éviter les conflits de mémoire"""
+        # Crée une copie profonde manuelle pour éviter les conflits de mémoire
         new_assignments = []
         for a in self.assignments:
-            # On garde la même instance de module_part pour conserver ses attributs (type, group_size)
             new_as = Assignment(a.module_part, a.room, a.timeslot)
             new_assignments.append(new_as)
             

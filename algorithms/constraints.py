@@ -1,6 +1,6 @@
 def calculate_fitness_full(schedule):
     """
-    Calcule la fitness totale en utilisant l'approche lexicographique de votre rapport.
+    Calcule la fitness totale en utilisant l'approche lexicographique rapport
     F(x) = M * f1 + f2 + alpha * f3
     """
     dm = schedule.data_manager
@@ -157,7 +157,7 @@ def calculate_fitness_full(schedule):
     schedule.gaps = total_gaps + consec_penalty
     
     M = 10000
-    # Use max(0, ...) to ensure negative gap bonuses don't cause division by zero
+    # Use max(0, ...) to ensure don't cause division by zero
     raw_soft_score = schedule.gaps
     denominator = 1 + (M * h_violations) + raw_soft_score
     
