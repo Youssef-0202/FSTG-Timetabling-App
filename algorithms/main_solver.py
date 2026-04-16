@@ -97,7 +97,8 @@ def run_optimization():
         best_gen = engine.population[0]
         
         h, s, details = calculate_fitness_full(best_gen)
-        detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']}"
+        # Detailed stats with H9 isolated
+        detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']} H9(A):{details.get('H9_Availability', 0)}"
         
         # UI: Add a tag if we are in polishing phase
         status = ""

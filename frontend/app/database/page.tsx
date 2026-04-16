@@ -503,30 +503,32 @@ function DatabaseContent() {
                         <table>
                             <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Indisponibilités</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {!loading && filtered(teachers).map((t) => {
-                                    const unSlots = t.availabilities?.unavailable_slots || [];
-                                    const count = Array.isArray(unSlots) ? unSlots.length : 0;
-                                    return (
-                                        <tr key={t.id}>
-                                            <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
-                                            <td><b>{t.name}</b></td>
-                                            <td style={{ color: "var(--muted)" }}>{t.email}</td>
-                                            <td>
-                                                {count > 0 ? (
-                                                    <span className="badge" style={{ backgroundColor: "#fef2f2", color: "#ef4444", border: "1px solid #fee2e2", fontSize: "0.75rem" }}>
-                                                        🚫 {count} créneau{count > 1 ? 'x' : ''} bloqué{count > 1 ? 's' : ''}
-                                                    </span>
-                                                ) : (
-                                                    <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>✅ Disponible</span>
-                                                )}
-                                            </td>
-                                            <td><div className="actions-cell">
-                                                <button className="btn btn-outline btn-sm" onClick={() => openEdit(t as any)}><Pencil size={13} /></button>
-                                                <button className="btn btn-danger btn-sm" onClick={() => del(t.id)}><Trash2 size={13} /></button>
-                                            </div></td>
-                                        </tr>
-                                    );
-                                })}
+                                {!loading && (teachers as Teacher[])
+                                    .filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()))
+                                    .map((t) => {
+                                        const unSlots = t.availabilities?.unavailable_slots || [];
+                                        const count = Array.isArray(unSlots) ? unSlots.length : 0;
+                                        return (
+                                            <tr key={t.id}>
+                                                <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
+                                                <td><b>{t.name}</b></td>
+                                                <td style={{ color: "var(--muted)" }}>{t.email}</td>
+                                                <td>
+                                                    {count > 0 ? (
+                                                        <span className="badge" style={{ backgroundColor: "#fef2f2", color: "#ef4444", border: "1px solid #fee2e2", fontSize: "0.75rem" }}>
+                                                            🚫 {count} créneau{count > 1 ? 'x' : ''} bloqué{count > 1 ? 's' : ''}
+                                                        </span>
+                                                    ) : (
+                                                        <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>✅ Disponible</span>
+                                                    )}
+                                                </td>
+                                                <td><div className="actions-cell">
+                                                    <button className="btn btn-outline btn-sm" onClick={() => openEdit(t as any)}><Pencil size={13} /></button>
+                                                    <button className="btn btn-danger btn-sm" onClick={() => del(t.id)}><Trash2 size={13} /></button>
+                                                </div></td>
+                                            </tr>
+                                        );
+                                    })}
                             </tbody>
                         </table>
                     )}

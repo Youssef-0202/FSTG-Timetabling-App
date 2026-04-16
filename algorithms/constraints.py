@@ -19,6 +19,7 @@ def calculate_fitness_full(schedule, mask=None):
     h2_violations = 0
     h3_violations = 0
     h4_violations = 0
+    h9_violations = 0
     
     # Dictionnaires pour détection rapide des conflits
     busy_teachers = {} # (slot_id, teacher_id)
@@ -41,7 +42,7 @@ def calculate_fitness_full(schedule, mask=None):
             # H9 (Inverse): Teacher Availability
             prof = next((t for t in dm.teachers if t.id == tid), None)
             if prof and sid in prof.unavailable_slots:
-                if mask.get("H1", True): h1_violations += 1 
+                if mask.get("H1", True): h9_violations += 1 
         
         # H2: Room Conflict
         if (sid, rid) in busy_rooms: 
@@ -157,7 +158,7 @@ def calculate_fitness_full(schedule, mask=None):
                 gap_count += 1
 
     # FINAL CALCULATION
-    h_violations = h1_violations + h2_violations + h3_violations + h4_violations
+    h_violations = h1_violations + h2_violations + h3_violations + h4_violations + h9_violations
     soft_violations = total_gaps + consec_penalty
     
     # Store for UI display in main_solver
@@ -166,6 +167,7 @@ def calculate_fitness_full(schedule, mask=None):
     schedule.h2 = h2_violations
     schedule.h3 = h3_violations
     schedule.h4 = h4_violations
+    schedule.h9 = h9_violations
     schedule.gaps = total_gaps + consec_penalty
     
     M = 10000
@@ -180,6 +182,7 @@ def calculate_fitness_full(schedule, mask=None):
         "H2_Room": h2_violations,
         "H3_Section": h3_violations,
         "H4_Capacity": h4_violations,
+        "H9_Availability": h9_violations,
         "S1_Mixing": mixing_count,
         "S2_CM_Dispersion": cm_dispersion_count,
         "S3_Gaps": gap_count,
