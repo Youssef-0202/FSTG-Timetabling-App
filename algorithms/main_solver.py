@@ -77,7 +77,6 @@ def run_optimization():
         return
     
     # 2. Configurer le moteur 
-    # MASK SMART : Mettre False pour ignorer une contrainte lors des tests 
     test_mask = {
         "H1": True, "H2": True, "H3": True, "H4": True,
         "S_MIXING": False, "S_CM_DISPERSION": False, "S_GAPS": False

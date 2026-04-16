@@ -8,10 +8,11 @@ class Room:
         self.type = type
 
 class Teacher:
-    def __init__(self, id, name, email=None, forbidden_slots=None):
+    def __init__(self, id, name, email="", unavailable_slots=None):
         self.id = id
         self.name = name
-        self.forbidden_slots = forbidden_slots or []
+        self.email = email
+        self.unavailable_slots = set(unavailable_slots or [])
 
 
 class Timeslot:

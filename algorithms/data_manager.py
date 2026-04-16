@@ -20,10 +20,18 @@ class DataManager:
             if isinstance(r_data, list):
                 self.rooms = [Room(id=r['id'], name=r['name'], capacity=r.get('capacity', 0), type=r.get('type', 'TD')) for r in r_data]
             
-            # 2. Teachers
-            t_data = requests.get(f"{API_BASE_URL}/teachers").json()
-            if isinstance(t_data, list):
-                self.teachers = [Teacher(id=t['id'], name=t['name']) for t in t_data]
+            # 1. Teachers
+            resp_t = requests.get(f"{API_BASE_URL}/teachers")
+            for t in resp_t.json():
+                # Extraire les indisponibilités depuis le JSONB
+                avail = t.get("availabilities") or {}
+                un_slots = avail.get("unavailable_slots", [])
+                self.teachers.append(Teacher(
+                    t['id'], 
+                    t['name'], 
+                    t['email'], 
+                    unavailable_slots=un_slots
+                ))
 
             # 3. Timeslots
             ts_data = requests.get(f"{API_BASE_URL}/timeslots").json()

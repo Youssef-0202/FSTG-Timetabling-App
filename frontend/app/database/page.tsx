@@ -501,19 +501,32 @@ function DatabaseContent() {
 
                     {tab === "teachers" && (
                         <table>
-                            <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Indisponibilités</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {!loading && filtered(teachers).map((t) => (
-                                    <tr key={t.id}>
-                                        <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
-                                        <td><b>{t.name}</b></td>
-                                        <td style={{ color: "var(--muted)" }}>{t.email}</td>
-                                        <td><div className="actions-cell">
-                                            <button className="btn btn-outline btn-sm" onClick={() => openEdit(t as any)}><Pencil size={13} /></button>
-                                            <button className="btn btn-danger btn-sm" onClick={() => del(t.id)}><Trash2 size={13} /></button>
-                                        </div></td>
-                                    </tr>
-                                ))}
+                                {!loading && filtered(teachers).map((t) => {
+                                    const unSlots = t.availabilities?.unavailable_slots || [];
+                                    const count = Array.isArray(unSlots) ? unSlots.length : 0;
+                                    return (
+                                        <tr key={t.id}>
+                                            <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
+                                            <td><b>{t.name}</b></td>
+                                            <td style={{ color: "var(--muted)" }}>{t.email}</td>
+                                            <td>
+                                                {count > 0 ? (
+                                                    <span className="badge" style={{ backgroundColor: "#fef2f2", color: "#ef4444", border: "1px solid #fee2e2", fontSize: "0.75rem" }}>
+                                                        🚫 {count} créneau{count > 1 ? 'x' : ''} bloqué{count > 1 ? 's' : ''}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>✅ Disponible</span>
+                                                )}
+                                            </td>
+                                            <td><div className="actions-cell">
+                                                <button className="btn btn-outline btn-sm" onClick={() => openEdit(t as any)}><Pencil size={13} /></button>
+                                                <button className="btn btn-danger btn-sm" onClick={() => del(t.id)}><Trash2 size={13} /></button>
+                                            </div></td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
@@ -675,6 +688,43 @@ function DatabaseContent() {
                                     </div>
                                     <div className="form-group full"><label>Email</label>
                                         <input type="email" value={String(modal.data.email || "")} onChange={(e) => setField("email", e.target.value)} placeholder="email@fstg-marrakech.ac.ma" />
+                                    </div>
+                                    <div className="form-group full">
+                                        <label>Indisponibilités (Cliquez pour bloquer)</label>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '10px', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
+                                            {timeslots.sort((a, b) => (a.id - b.id)).map(ts => {
+                                                const currentAvail = modal.data.availabilities || {};
+                                                const unSlots = Array.isArray(currentAvail.unavailable_slots) ? currentAvail.unavailable_slots : [];
+                                                const isBlocked = unSlots.includes(ts.id);
+
+                                                return (
+                                                    <button
+                                                        key={ts.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            let newSlots = [...unSlots];
+                                                            if (isBlocked) newSlots = newSlots.filter(id => id !== ts.id);
+                                                            else newSlots.push(ts.id);
+                                                            setField("availabilities", { ...currentAvail, unavailable_slots: newSlots });
+                                                        }}
+                                                        style={{
+                                                            padding: '8px',
+                                                            fontSize: '0.75rem',
+                                                            borderRadius: '6px',
+                                                            border: '1px solid',
+                                                            borderColor: isBlocked ? '#ef4444' : 'var(--border)',
+                                                            backgroundColor: isBlocked ? '#fef2f2' : 'var(--card-bg)',
+                                                            color: isBlocked ? '#ef4444' : 'var(--text-primary)',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s',
+                                                            fontWeight: isBlocked ? 600 : 400
+                                                        }}
+                                                    >
+                                                        {ts.day} - {ts.start_time.substring(0, 5)}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </>
                             )}

@@ -37,6 +37,11 @@ def calculate_fitness_full(schedule, mask=None):
             if (sid, tid) in busy_teachers: 
                 if mask.get("H1", True): h1_violations += 1
             busy_teachers[(sid, tid)] = True
+            
+            # H9 (Inverse): Teacher Availability
+            prof = next((t for t in dm.teachers if t.id == tid), None)
+            if prof and sid in prof.unavailable_slots:
+                if mask.get("H1", True): h1_violations += 1 
         
         # H2: Room Conflict
         if (sid, rid) in busy_rooms: 
