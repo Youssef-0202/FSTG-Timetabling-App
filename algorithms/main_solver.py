@@ -118,9 +118,12 @@ def run_optimization():
             print(f"  Hard Violations  : {h} (Parfait)")
             print(f"  Score Soft Total : {s}")
             print(f"  --- Detail Contraintes Soft ---")
-            print(f"  S1 Melanges modules/demi-jour : {details.get('S1_Mixing', '?')} occurrences (+30pts chacun)")
-            print(f"  S2 Dispersion CMs matin/aprem : {details.get('S2_CM_Dispersion', '?')} occurrences (+40pts chacun)")
-            print(f"  S3 Creneaux non-consecutifs   : {details.get('S3_Gaps', '?')} blocs (+5pts chacun)")
+            print(f"  S1 Melanges modules/demi-jour : {details.get('S1_Mixing', 0)} occurrences (+30pts)")
+            print(f"  S2 Dispersion CMs matin/aprem : {details.get('S2_CM_Dispersion', 0)} occurrences (+40pts)")
+            print(f"  S3 Creneaux non-consecutifs   : {details.get('S3_Gaps', 0)} blocs (+5pts)")
+            print(f"  S5 Equilibre hebdo (Balance)  : {details.get('S5_Balance', 0)} points de penalite")
+            print(f"  S6 Instabilite des salles     : {details.get('S6_Stability', 0)} points (ideal=0)")
+            print(f"  S7 Journees a cours unique    : {details.get('S7_EmptyDays', 0)} points (+100pts/jour)")
             print(f"{'='*55}")
             break
     

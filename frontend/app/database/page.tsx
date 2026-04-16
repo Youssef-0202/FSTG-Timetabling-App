@@ -108,9 +108,14 @@ function DatabaseContent() {
         try {
             const d = modal.data;
             if (tab === "teachers") {
+                const teacherPayload: any = {
+                    name: String(d.name || ""),
+                    email: String(d.email || ""),
+                    availabilities: d.availabilities || { unavailable_slots: [] }
+                };
                 modal.mode === "add"
-                    ? await createTeacher({ name: String(d.name || ""), email: String(d.email || ""), availabilities: {} })
-                    : await updateTeacher(Number(d.id), { name: String(d.name || ""), email: String(d.email || "") });
+                    ? await createTeacher(teacherPayload)
+                    : await updateTeacher(Number(d.id), teacherPayload);
                 setTeachers(await getTeachers());
             } else if (tab === "rooms") {
                 modal.mode === "add"
@@ -506,7 +511,8 @@ function DatabaseContent() {
                                 {!loading && (teachers as Teacher[])
                                     .filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()))
                                     .map((t) => {
-                                        const unSlots = t.availabilities?.unavailable_slots || [];
+                                        const avail = (t.availabilities as any) || {};
+                                        const unSlots = avail.unavailable_slots || [];
                                         const count = Array.isArray(unSlots) ? unSlots.length : 0;
                                         return (
                                             <tr key={t.id}>
@@ -695,7 +701,7 @@ function DatabaseContent() {
                                         <label>Indisponibilités (Cliquez pour bloquer)</label>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '10px', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
                                             {timeslots.sort((a, b) => (a.id - b.id)).map(ts => {
-                                                const currentAvail = modal.data.availabilities || {};
+                                                const currentAvail = (modal.data.availabilities as any) || {};
                                                 const unSlots = Array.isArray(currentAvail.unavailable_slots) ? currentAvail.unavailable_slots : [];
                                                 const isBlocked = unSlots.includes(ts.id);
 

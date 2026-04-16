@@ -148,8 +148,19 @@ def calculate_fitness_full(schedule, mask=None):
             if mask.get("S_CM_DISPERSION", True): consec_penalty += 40
             cm_dispersion_count += 1
 
-    # 3. Traditional Gaps
+    # 3. Traditional Gaps & Sensitive Slots (S4)
+    sensitive_penalty = 0
     for (sec_id, day, sd), sessions in section_semiday_blocks.items():
+        for s in sessions:
+            slot_id = s['slot']
+            # S4: Sensitive Slots (Samedi ou fin de journée)
+            # Supposons que IDs 5, 10, 15, 20... sont les slots de fin de journée ou Samedi
+            # Adapté selon tes IDs de timeslots. Si Samedi est le jour 6:
+            if day == "Samedi":
+                if mask.get("S_PREFERENCES", True): sensitive_penalty += 30
+            # Si c'est le dernier créneau de la journée (ex: 4ème séance)
+            if slot_id % 4 == 0: 
+                if mask.get("S_PREFERENCES", True): sensitive_penalty += 10
         if len(sessions) > 1:
             sessions.sort(key=lambda x: x['slot'])
             gap = sessions[1]['slot'] - sessions[0]['slot'] - 1
@@ -173,11 +184,70 @@ def calculate_fitness_full(schedule, mask=None):
     M = 10000
     # Use max(0, ...) to ensure don't cause division by zero
     raw_soft_score = schedule.gaps
-    denominator = 1 + (M * h_violations) + raw_soft_score
     
+    # --- SOURCED SOFT CONSTRAINTS (S5, S6, S7) ---
+    s5_balance_penalty = 0
+    s6_stability_penalty = 0
+    s7_empty_day_penalty = 0
+
+    # S6: Room Stability (Un module doit rester dans la même salle)
+    # mod_id -> set of room_ids
+    mod_rooms = {}
+    for a in assignments:
+        mid = a.module_part.module_id
+        rid = a.room.id
+        if mid not in mod_rooms: mod_rooms[mid] = set()
+        mod_rooms[mid].add(rid)
+
+    for rooms_set in mod_rooms.values():
+        if len(rooms_set) > 1:
+            if mask.get("S_STABILITY", True): 
+                s6_stability_penalty += (len(rooms_set) - 1) * 50
+
+    # S5 & S7: Daily Balancing (Groups)
+    # group_id -> day -> hours
+    group_daily_load = {}
+    for a in assignments:
+        # On utilise les groupes TD pour le calcul de charge (plus fin que la section)
+        gids = a.module_part.td_group_ids or [f"sec-{a.module_part.section_id}"]
+        day = a.timeslot.day
+        for gid in gids:
+            if gid not in group_daily_load: group_daily_load[gid] = {}
+            group_daily_load[gid][day] = group_daily_load[gid].get(day, 0) + 1.5
+
+    for gid, days in group_daily_load.items():
+        daily_hours = list(days.values())
+        if not daily_hours: continue
+        
+        # S7: Évitement des journées "1 séance seulement" (1.5h)
+        for h in daily_hours:
+            if h == 1.5:
+                if mask.get("S_EMPTY_DAYS", True): s7_empty_day_penalty += 100
+
+        # S5: Équilibre (Balance) - Éviter les jours à 6h+ si d'autres jours ont 1.5h
+        if len(daily_hours) > 1:
+            avg = sum(daily_hours) / 5 # Sur 5 jours ouvrés
+            for h in daily_hours:
+                if mask.get("S_BALANCE", True):
+                    s5_balance_penalty += abs(h - avg) * 10
+
+    # FINAL CALCULATION
+    total_soft = raw_soft_score + s5_balance_penalty + s6_stability_penalty + s7_empty_day_penalty + sensitive_penalty
+    h_violations = h1_violations + h2_violations + h3_violations + h4_violations + h9_violations
+    
+    # Store for UI display in main_solver
+    schedule.h_violations = h_violations
+    schedule.h1 = h1_violations
+    schedule.h2 = h2_violations
+    schedule.h3 = h3_violations
+    schedule.h4 = h4_violations
+    schedule.h9 = h9_violations
+    schedule.gaps = total_soft
+    
+    denominator = 1 + (M * h_violations) + total_soft
     schedule.fitness = 1 / max(0.0001, denominator)
     
-    return h_violations, schedule.gaps, {
+    return h_violations, total_soft, {
         "H1_Teacher": h1_violations,
         "H2_Room": h2_violations,
         "H3_Section": h3_violations,
@@ -186,6 +256,10 @@ def calculate_fitness_full(schedule, mask=None):
         "S1_Mixing": mixing_count,
         "S2_CM_Dispersion": cm_dispersion_count,
         "S3_Gaps": gap_count,
+        "S4_Preferences": sensitive_penalty,
+        "S5_Balance": int(s5_balance_penalty),
+        "S6_Stability": s6_stability_penalty,
+        "S7_EmptyDays": s7_empty_day_penalty,
     }
 
 if __name__ == "__main__":
