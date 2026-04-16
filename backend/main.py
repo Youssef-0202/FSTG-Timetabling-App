@@ -316,6 +316,23 @@ def create_timeslot(slot: schemas.TimeslotCreate, db: Session = Depends(get_db))
     db.add(db_s); db.commit(); db.refresh(db_s)
     return db_s
 
+@app.put("/timeslots/{slot_id}", response_model=schemas.Timeslot)
+def update_timeslot(slot_id: int, data: schemas.TimeslotUpdate, db: Session = Depends(get_db)):
+    s = db.query(models.Timeslot).filter(models.Timeslot.id == slot_id).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="Créneau introuvable")
+    for k, v in data.model_dump(exclude_unset=True).items():
+        setattr(s, k, v)
+    db.commit(); db.refresh(s)
+    return s
+
+@app.delete("/timeslots/{slot_id}", status_code=204)
+def delete_timeslot(slot_id: int, db: Session = Depends(get_db)):
+    s = db.query(models.Timeslot).filter(models.Timeslot.id == slot_id).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="Créneau introuvable")
+    db.delete(s); db.commit()
+
 
 # ASSIGNMENTS  /assignments
 

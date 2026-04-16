@@ -5,9 +5,13 @@ from models import Schedule, Assignment
 from constraints import calculate_fitness_full
 
 class HybridEngine:
-    def __init__(self, data_manager, pop_size=30):
+    def __init__(self, data_manager, pop_size=30, constraints_mask=None):
         self.dm = data_manager
         self.pop_size = pop_size
+        self.constraints_mask = constraints_mask or {
+            "H1": True, "H2": True, "H3": True, "H4": True,
+            "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
+        }
         
         # GA Parameters
         self.mutation_rate = 0.15
@@ -20,7 +24,7 @@ class HybridEngine:
 
     def get_score(self, schedule):
         """Calculates scalar score for comparison"""
-        h, s, details = calculate_fitness_full(schedule)
+        h, s, details = calculate_fitness_full(schedule, mask=self.constraints_mask)
         M = 10000
         return (M * h) + s
     

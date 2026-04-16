@@ -1,8 +1,16 @@
-def calculate_fitness_full(schedule):
+def calculate_fitness_full(schedule, mask=None):
     """
     Calcule la fitness totale en utilisant l'approche lexicographique rapport
     F(x) = M * f1 + f2 + alpha * f3
+    
+    mask: dict of bool to enabled/disable constraints (e.g. {'H1': False})
     """
+    if mask is None:
+        mask = {
+            "H1": True, "H2": True, "H3": True, "H4": True,
+            "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
+        }
+
     dm = schedule.data_manager
     assignments = schedule.assignments
     
@@ -18,9 +26,6 @@ def calculate_fitness_full(schedule):
     busy_groups = {}   # (slot_id) -> set of busy group_ids
     busy_sections = {} # (slot_id) -> {section_id: [types]}
     
-    # Mapping rapide des parents (H3)
-    parent_map = {s.id: s.parent_id for s in dm.sections} 
-
     for a in assignments:
         sid = a.timeslot.id
         tid = a.module_part.teacher_id
@@ -29,11 +34,13 @@ def calculate_fitness_full(schedule):
 
         # H1: Teacher Conflict
         if tid is not None:
-            if (sid, tid) in busy_teachers: h1_violations += 1
+            if (sid, tid) in busy_teachers: 
+                if mask.get("H1", True): h1_violations += 1
             busy_teachers[(sid, tid)] = True
         
         # H2: Room Conflict
-        if (sid, rid) in busy_rooms: h2_violations += 1
+        if (sid, rid) in busy_rooms: 
+            if mask.get("H2", True): h2_violations += 1
         busy_rooms[(sid, rid)] = True
 
         # H3: Section & Group Conflicts (The 4 Rules)
@@ -46,17 +53,17 @@ def calculate_fitness_full(schedule):
             # RULE 1 & 2: CM occupation
             # If there's a CM in this section, nobody else can have class
             if sid in busy_sections and sec_id in busy_sections[sid] and "CM" in busy_sections[sid][sec_id]:
-                h3_violations += 1
+                if mask.get("H3", True): h3_violations += 1
             
             # If WE are a CM, check if anyone in the section is already busy
             if m_type == "CM" and sid in busy_sections and sec_id in busy_sections[sid]:
                 if len(busy_sections[sid][sec_id]) > 0:
-                    h3_violations += 1
+                    if mask.get("H3", True): h3_violations += 1
             
             # RULE 3: Same group overlap
             for gid in my_groups:
                 if sid in busy_groups and gid in busy_groups[sid]:
-                    h3_violations += 1
+                    if mask.get("H3", True): h3_violations += 1
             
             # Record our usage
             if sid not in busy_sections: busy_sections[sid] = {}
@@ -70,12 +77,12 @@ def calculate_fitness_full(schedule):
         # H4: Capacity & Suitability
         if a.module_part.group_size > a.room.capacity:
             # Weighted penalty: large violations count more
-            h4_violations += 5
+            if mask.get("H4", True): h4_violations += 5
         
         # Enforce AMPHI for large CM
         if a.module_part.type == "CM" and a.module_part.group_size > 50:
             if a.room.type != "AMPHI":
-                h4_violations += 5
+                if mask.get("H4", True): h4_violations += 5
 
 
     # LEVEL 2: QUALITY (Soft Constraints - Semi-Day Blocks)
@@ -117,10 +124,10 @@ def calculate_fitness_full(schedule):
         if len(sessions) > 1:
             mods_in_block = set(s['mod'] for s in sessions)
             if len(mods_in_block) > 1:
-                consec_penalty += 30
+                if mask.get("S_MIXING", True): consec_penalty += 30
                 mixing_count += 1
             else:
-                consec_penalty -= 10
+                if mask.get("S_MIXING", True): consec_penalty -= 10
 
     # 2. Daily Level Logic (CM Dispersion)
     section_day_cm = {}
@@ -132,7 +139,7 @@ def calculate_fitness_full(schedule):
 
     for semi_days in section_day_cm.values():
         if len(semi_days) > 1:
-            consec_penalty += 40
+            if mask.get("S_CM_DISPERSION", True): consec_penalty += 40
             cm_dispersion_count += 1
 
     # 3. Traditional Gaps
@@ -141,7 +148,7 @@ def calculate_fitness_full(schedule):
             sessions.sort(key=lambda x: x['slot'])
             gap = sessions[1]['slot'] - sessions[0]['slot'] - 1
             if gap > 0:
-                total_gaps += gap * 5
+                if mask.get("S_GAPS", True): total_gaps += gap * 5
                 gap_count += 1
 
     # FINAL CALCULATION

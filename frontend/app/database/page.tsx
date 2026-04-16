@@ -923,6 +923,27 @@ function DatabaseContent() {
                                     </div>
                                 </>
                             )}
+                            {tab === "timeslots" && (
+                                <>
+                                    <div className="form-group full"><label>Jour de la semaine</label>
+                                        <select value={String(modal.data.day || "")} onChange={(e) => setField("day", e.target.value)}>
+                                            <option value="">Sélectionner</option>
+                                            <option value="Lundi">Lundi</option>
+                                            <option value="Mardi">Mardi</option>
+                                            <option value="Mercredi">Mercredi</option>
+                                            <option value="Jeudi">Jeudi</option>
+                                            <option value="Vendredi">Vendredi</option>
+                                            <option value="Samedi">Samedi</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group"><label>Heure de début</label>
+                                        <input type="time" value={String(modal.data.start_time || "08:30")} onChange={(e) => setField("start_time", e.target.value)} />
+                                    </div>
+                                    <div className="form-group"><label>Heure de fin</label>
+                                        <input type="time" value={String(modal.data.end_time || "10:25")} onChange={(e) => setField("end_time", e.target.value)} />
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button className="btn btn-outline" onClick={closeModal}>Annuler</button>

@@ -178,6 +178,11 @@ class TimeslotBase(BaseModel):
 class TimeslotCreate(TimeslotBase):
     pass
 
+class TimeslotUpdate(BaseModel):
+    day: Optional[str] = None
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+
 class Timeslot(TimeslotBase):
     id: int
     class Config:

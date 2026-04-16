@@ -77,7 +77,13 @@ def run_optimization():
         return
     
     # 2. Configurer le moteur 
-    engine = HybridEngine(dm, pop_size=100)
+    # MASK SMART : Mettre False pour ignorer une contrainte lors des tests 
+    test_mask = {
+        "H1": True, "H2": True, "H3": True, "H4": True,
+        "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
+    }
+
+    engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
     print("\n--- Initialisation de la population ---")
     engine.create_initial_population()
     
