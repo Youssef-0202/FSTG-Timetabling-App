@@ -80,7 +80,7 @@ def run_optimization():
     # MASK SMART : Mettre False pour ignorer une contrainte lors des tests 
     test_mask = {
         "H1": True, "H2": True, "H3": True, "H4": True,
-        "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
+        "S_MIXING": False, "S_CM_DISPERSION": False, "S_GAPS": False
     }
 
     engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
