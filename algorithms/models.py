@@ -29,7 +29,7 @@ class Section:
         self.parent_id = parent_id
 
 class ModulePart:
-    def __init__(self, id, module_id, teacher_id, section_id, type="TD", group_size=30, td_group_ids=None):
+    def __init__(self, id, module_id, teacher_id, section_id, type="TD", group_size=30, td_group_ids=None, is_locked=False, fixed_room_id=None, fixed_slot_id=None):
         self.id = id
         self.module_id = module_id
         self.teacher_id = teacher_id
@@ -37,6 +37,10 @@ class ModulePart:
         self.type = type
         self.group_size = group_size
         self.td_group_ids = td_group_ids or []  # Real individual group IDs
+        # Verrouillage pour les Affectations de Type 1 (Fixées par l'admin)
+        self.is_locked = is_locked
+        self.fixed_room_id = fixed_room_id
+        self.fixed_slot_id = fixed_slot_id
 
 
 class Assignment:

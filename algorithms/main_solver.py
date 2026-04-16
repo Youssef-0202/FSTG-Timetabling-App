@@ -9,14 +9,14 @@ import os
 
 def export_schedule_to_json(schedule, filename="../backend/generated_timetable.json"):
     """Exporte le résultat de l'IA dans un fichier JSON pour l'interface sans toucher à la BDD"""
-    print(f"\n--- 💾 Exportation de {len(schedule.assignments)} affectations vers {filename} ---")
+    print(f"\n---  Exportation de {len(schedule.assignments)} affectations vers {filename} ---")
     
     # 1. On récupère la base actuelle pour garder les infos (td_groups, is_locked...)
     try:
         current_db = requests.get(f"{API_BASE_URL}/assignments").json()
         db_map = {a['id']: a for a in current_db}
     except Exception as e:
-        print("❌ Erreur de connexion au backend pour la récupération des données.")
+        print(" Erreur de connexion au backend pour la récupération des données.")
         return
         
     export_data = []
@@ -47,8 +47,8 @@ def export_schedule_to_json(schedule, filename="../backend/generated_timetable.j
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(export_data, f, indent=4, ensure_ascii=False)
         
-    print(f"  ✅ Planning sauvegardé avec succès dans {filepath}")
-    print("  🌐 Allez sur localhost:3000/timetable-preview pour voir l'aperçu !\n")
+    print(f"   Planning sauvegardé avec succès dans {filepath}")
+    print("   Allez sur localhost:3000/timetable-preview pour voir l'aperçu !\n")
 
 
 def print_solution_summary(schedule):
@@ -87,7 +87,7 @@ def run_optimization():
     h_zero_since = 0
     MAX_GEN_AFTER_H0 = 30  # Polishing phase
 
-    for gen in range(1, 401): # Increased total max generations
+    for gen in range(1, 102): # Increased total max generations
         engine.evolve()
         best_gen = engine.population[0]
         

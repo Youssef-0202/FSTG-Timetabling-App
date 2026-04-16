@@ -91,7 +91,10 @@ class DataManager:
                         section_id=sid,
                         type=m_type,
                         group_size=real_size,
-                        td_group_ids=td_group_ids
+                        td_group_ids=td_group_ids,
+                        is_locked=a.get('is_locked', False),
+                        fixed_room_id=a.get('room_id'),
+                        fixed_slot_id=a.get('slot_id')
                     )
                     self.module_parts.append(mp)
 

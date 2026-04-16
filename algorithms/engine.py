@@ -29,7 +29,13 @@ class HybridEngine:
         for _ in range(self.pop_size):
             assignments = []
             for mp in self.dm.module_parts:
-                assignments.append(Assignment(mp, random.choice(self.dm.rooms), random.choice(self.dm.timeslots)))
+                if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
+                    # Trouver les objets réels à partir des IDs
+                    room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
+                    slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id), random.choice(self.dm.timeslots))
+                    assignments.append(Assignment(mp, room, slot))
+                else:
+                    assignments.append(Assignment(mp, random.choice(self.dm.rooms), random.choice(self.dm.timeslots)))
             sch = Schedule(self.dm, assignments)
             self.population.append(sch)
 
@@ -68,9 +74,12 @@ class HybridEngine:
         return Schedule(self.dm, new_as)
     
     def mutate(self, schedule):
-        """Randomly changes a room or timeslot"""
+        """Randomly changes a room or timeslot (only for non-locked sessions)"""
         if not schedule.assignments: return
-        idx = random.randint(0, len(schedule.assignments) - 1)
+        unlocked_indices = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
+        if not unlocked_indices: return
+        
+        idx = random.choice(unlocked_indices)
         schedule.assignments[idx].room = random.choice(self.dm.rooms)
         schedule.assignments[idx].timeslot = random.choice(self.dm.timeslots)
     
@@ -88,21 +97,25 @@ class HybridEngine:
             neighbor = schedule.copy()
             r = random.random()
             
+            unlocked_indices = [i for i, a in enumerate(neighbor.assignments) if not a.module_part.is_locked]
+            if not unlocked_indices: break
+
             if r < 0.33:
                 # --- MOVE 1: SHIFT BOTH ---
-                idx = random.randint(0, len(neighbor.assignments)-1)
+                idx = random.choice(unlocked_indices)
                 neighbor.assignments[idx].room = random.choice(self.dm.rooms)
                 neighbor.assignments[idx].timeslot = random.choice(self.dm.timeslots)
             
             elif r < 0.66:
                 # --- MOVE 2: SWAP (Exchange two sessions) ---
-                idx1, idx2 = random.sample(range(len(neighbor.assignments)), 2)
-                neighbor.assignments[idx1].timeslot, neighbor.assignments[idx2].timeslot = \
-                    neighbor.assignments[idx2].timeslot, neighbor.assignments[idx1].timeslot
+                if len(unlocked_indices) >= 2:
+                    idx1, idx2 = random.sample(unlocked_indices, 2)
+                    neighbor.assignments[idx1].timeslot, neighbor.assignments[idx2].timeslot = \
+                        neighbor.assignments[idx2].timeslot, neighbor.assignments[idx1].timeslot
             
             else:
                 # --- MOVE 3: SHIFT ROOM ONLY ---
-                idx = random.randint(0, len(neighbor.assignments)-1)
+                idx = random.choice(unlocked_indices)
                 neighbor.assignments[idx].room = random.choice(self.dm.rooms)
             neighbor_fit = self.get_score(neighbor)
             delta = neighbor_fit - current_fit
