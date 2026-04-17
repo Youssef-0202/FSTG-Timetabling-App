@@ -98,7 +98,15 @@ function DatabaseContent() {
     }
 
     const openAdd = () => setModal({ open: true, mode: "add", data: {} });
-    const openEdit = (data: Record<string, unknown>) => setModal({ open: true, mode: "edit", data });
+    const openEdit = (item: any) => {
+        let editData = { ...item };
+        // Si c'est un assignment, on doit extraire les IDs des groupes TD (qui sont des objets dans 'td_groups') 
+        // vers la liste d'IDs 'tdgroup_ids' que le Select du modal attend.
+        if (tab === "assignments" && item.td_groups && Array.isArray(item.td_groups)) {
+            editData.tdgroup_ids = item.td_groups.map((g: any) => g.id);
+        }
+        setModal({ open: true, mode: "edit", data: editData });
+    };
     const closeModal = () => setModal({ open: false, mode: "add", data: {} });
     const setField = (k: string, v: unknown) => setModal((m) => ({ ...m, data: { ...m.data, [k]: v } }));
 
