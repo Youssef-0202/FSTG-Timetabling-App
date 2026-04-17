@@ -76,10 +76,18 @@ def run_optimization():
         print("\n AUCUNE AFFECTATION À PLACER DANS LA BASE !")
         return
     
-    # 2. Configurer le moteur 
+    # Configuration des tests
     test_mask = {
-        "H1": True, "H2": True, "H3": True, "H4": True,
-        "S_MIXING": False, "S_CM_DISPERSION": False, "S_GAPS": False
+        # Hard Constraints (Actives)
+        "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
+        # Soft Constraints (Désactivées pour tests rapides)
+        "S_MIXING": False,
+        "S_CM_DISPERSION": False,
+        "S_GAPS": False,
+        "S_BALANCE": False,
+        "S_STABILITY": False,
+        "S_EMPTY_DAYS": False,
+        "S_PREFERENCES": False
     }
 
     engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)

@@ -8,6 +8,7 @@ class DataManager:
     def __init__(self):
         self.rooms = []
         self.teachers = []
+        self.teacher_map = {} # Direct access for performance
         self.timeslots = []
         self.sections = []
         self.module_parts = []
@@ -26,12 +27,14 @@ class DataManager:
                 # Extraire les indisponibilités depuis le JSONB
                 avail = t.get("availabilities") or {}
                 un_slots = avail.get("unavailable_slots", [])
-                self.teachers.append(Teacher(
+                prof = Teacher(
                     t['id'], 
                     t['name'], 
                     t['email'], 
                     unavailable_slots=un_slots
-                ))
+                )
+                self.teachers.append(prof)
+                self.teacher_map[t['id']] = prof
 
             # 3. Timeslots
             ts_data = requests.get(f"{API_BASE_URL}/timeslots").json()

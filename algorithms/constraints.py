@@ -40,7 +40,7 @@ def calculate_fitness_full(schedule, mask=None):
             busy_teachers[(sid, tid)] = True
             
             # H9 (Inverse): Teacher Availability
-            prof = next((t for t in dm.teachers if t.id == tid), None)
+            prof = dm.teacher_map.get(tid)
             if prof and sid in prof.unavailable_slots:
                 if mask.get("H1", True): h9_violations += 1 
         
