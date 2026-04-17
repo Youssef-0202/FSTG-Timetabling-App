@@ -89,11 +89,14 @@ class DataManager:
                     real_size = 30 # Default
                     
                     if m_type == "CM":
-                        real_size = section_caps.get(sid, 90)
-                        if real_size == 0: real_size = 90
-                    elif a.get('td_groups'):
-                        real_size = sum(g.get('size', 0) for g in a['td_groups'])
-                        if real_size == 0: real_size = 30
+                        # Pour un CM, l'effectif est celui de la section parente (Amphi)
+                        real_size = section_caps.get(sid, 200)
+                        if real_size == 0: real_size = 200
+                    else:
+                        # Pour un TD/TP, l'effectif est la somme des groupes rattachés à cette séance
+                        # (Généralement 1 groupe, mais supporte les fusions de groupes)
+                        real_size = sum(g.get('size', 40) for g in a.get('td_groups', []))
+                        if real_size == 0: real_size = 40
                     
                     mp = ModulePart(
                         id=a['id'],

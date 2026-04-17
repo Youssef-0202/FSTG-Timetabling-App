@@ -61,8 +61,15 @@ def print_solution_summary(schedule):
     
     for a in sorted_as:
         m_type = getattr(a.module_part, 'type', '??')
-        print(f"[{a.timeslot.day}] {a.timeslot.start_time} -> {m_type} | "
-              f"Salle: {a.room.name} ({a.room.capacity}) | Section: {a.module_part.section_id}")
+        # On essaie de récupérer le nom du module si possible
+        m_name = getattr(a.module_part, 'name', f"Mod#{a.module_part.module_id}")
+        t_name = a.teacher.name if a.teacher else "AUCUN"
+        
+        # Formatage propre
+        day_str = f"{a.timeslot.day[:3]}".upper()
+        time_str = f"{a.timeslot.start_time.strftime('%H:%M')}"
+        
+        print(f"[{day_str} {time_str}] {m_type:2} | {m_name:30} | Prof: {t_name:15} | Salle: {a.room.name:10} ({a.room.capacity} pl.)")
     print("="*50)
 
 
@@ -134,7 +141,27 @@ def run_optimization():
     # 3. Afficher le résumé en console
     print_solution_summary(best_overall)
     
-    # 4. Synchroniser vers le fichier JSON → Frontend aperçu
+    # 4. Calcul de métriques avancées pour le rapport de test
+    total_assignments = len(best_overall.assignments)
+    used_rooms = set(a.room.id for a in best_overall.assignments)
+    occupancy_rate = (len(used_rooms) / len(dm.rooms)) * 100 if dm.rooms else 0
+    
+    h_final, s_final, det = calculate_fitness_full(best_overall, test_mask)
+    
+    print("\n" + "!"*60)
+    print(" RAPPORT DE TEST GLOBAL POUR LE JURY")
+    print("!"*60)
+    print(f"  Statut Final       : {'VALIDE (H=0)' if h_final == 0 else 'NON-VALIDE (H>0)'}")
+    print(f"  Total Affectations : {total_assignments}")
+    print(f"  Hard Violations    : {h_final}")
+    print(f"  Score de Qualité   : {s_final}")
+    print(f"  Taux d'occupation  : {occupancy_rate:.2f}% des salles utilisées")
+    print(f"  Conformité H4 (Cap): {'100%' if det.get('H4_Capacity', 0) == 0 else 'Ajustement requis'}")
+    print("!"*60)
+    print("\n   => Utilisez les valeurs ci-dessus pour remplir votre tableau de synthèse.")
+    print("!"*60 + "\n")
+
+    # 5. Synchroniser vers le fichier JSON → Frontend aperçu
     export_schedule_to_json(best_overall)
 
 
