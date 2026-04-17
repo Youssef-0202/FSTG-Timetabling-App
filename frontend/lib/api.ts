@@ -168,6 +168,8 @@ export const deleteSection = (id: number) =>
 export const getTDGroups = () => apiFetch<TDGroup[]>("/td-groups");
 export const createTDGroup = (data: Omit<TDGroup, "id">) =>
   apiFetch<TDGroup>("/td-groups", { method: "POST", body: JSON.stringify(data) });
+export const updateTDGroup = (id: number, data: Partial<TDGroup>) =>
+  apiFetch<TDGroup>(`/td-groups/${id}`, { method: "PUT", body: JSON.stringify(data) });
 export const deleteTDGroup = (id: number) =>
   apiFetch<null>(`/td-groups/${id}`, { method: "DELETE" });
 

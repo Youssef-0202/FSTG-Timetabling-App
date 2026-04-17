@@ -17,7 +17,7 @@ import {
     getFilieres, createFiliere, deleteFiliere, Filiere,
     getGroupeFilieres, createGroupeFiliere, deleteGroupeFiliere, GroupeFiliere,
     getSections, createSection, deleteSection, Section,
-    getTDGroups, createTDGroup, deleteTDGroup, TDGroup,
+    getTDGroups, createTDGroup, updateTDGroup, deleteTDGroup, TDGroup,
     getGroupeModules, createGroupeModule, updateGroupeModule, deleteGroupeModule, GroupeModule
 } from "@/lib/api";
 
@@ -157,11 +157,17 @@ function DatabaseContent() {
                 });
                 setSections(await getSections());
             } else if (tab === "td_groups") {
-                await createTDGroup({
-                    name: String(d.name || ""),
-                    section_id: Number(d.section_id || 1),
-                    size: Number(d.size || 30)
-                });
+                modal.mode === "add"
+                    ? await createTDGroup({
+                        name: String(d.name || ""),
+                        section_id: Number(d.section_id || 1),
+                        size: Number(d.size || 30)
+                    })
+                    : await updateTDGroup(Number(d.id), {
+                        name: String(d.name || ""),
+                        section_id: Number(d.section_id || 1),
+                        size: Number(d.size)
+                    });
                 setTdGroups(await getTDGroups());
             } else if (tab === "modules") {
                 modal.mode === "add"
@@ -492,6 +498,7 @@ function DatabaseContent() {
                                         <td>{g.size} étudiants</td>
                                         <td><span className="badge badge-amphi">{sections.find(s => s.id === g.section_id)?.name || "?"}</span></td>
                                         <td><div className="actions-cell">
+                                            <button className="btn btn-outline btn-sm" onClick={() => openEdit(g as any)}><Pencil size={13} /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(g.id)}><Trash2 size={13} /></button>
                                         </div></td>
                                     </tr>

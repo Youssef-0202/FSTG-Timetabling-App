@@ -75,51 +75,59 @@ def run_optimization():
         print("\n AUCUNE AFFECTATION À PLACER DANS LA BASE !")
         return
     
-    # Configuration des tests
+    # 2. Configurer le moteur 
     test_mask = {
-        # Hard Constraints (Actives)
         "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
-        # Soft Constraints (Désactivées pour tests rapides)
-        "S_MIXING": False,
-        "S_CM_DISPERSION": False,
-        "S_GAPS": False,
-        "S_BALANCE": False,
-        "S_STABILITY": False,
-        "S_EMPTY_DAYS": False,
-        "S_PREFERENCES": False
+        "S_MIXING": True,
+        "S_CM_DISPERSION": True,
+        "S_GAPS": True,
+        "S_BALANCE": True,
+        "S_STABILITY": True,
+        "S_EMPTY_DAYS": True,
+        "S_PREFERENCES": True
     }
 
     engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
     print("\n--- Initialisation de la population ---")
     engine.create_initial_population()
     
-    print("\n--- Lancement de l'optimisation Hybride (GA + SA) ---")
+    print("\n--- Lancement de l'optimisation Hybride  ---")
     
     best_overall = None
     h_zero_since = 0
-    MAX_GEN_AFTER_H0 = 30  # Polishing phase
+    MAX_GEN_AFTER_H0 = 50  # On polit plus longtemps pour la qualité
 
-    for gen in range(1, 102): # Increased total max generations
+    for gen in range(1, 250): 
         engine.evolve()
         best_gen = engine.population[0]
         
-        h, s, details = calculate_fitness_full(best_gen)
-        # Detailed stats with H9 isolated
+        h, s, details = calculate_fitness_full(best_gen, test_mask)
         detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']} H9(A):{details.get('H9_Availability', 0)}"
         
-        # UI: Add a tag if we are in polishing phase
         status = ""
         if h == 0:
             h_zero_since += 1
             status = f" [POLISSAGE {h_zero_since}/{MAX_GEN_AFTER_H0}]"
         
-        print(f"Génération {gen:03d} | Total Hard: {h} | Gaps: {s} | {detail_str}{status}")
+        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | {detail_str}{status}")
         
         best_overall = best_gen
         
-        if h == 0:
+        # Stop condition: Valid solution AND enough polishing
+        if h == 0 and h_zero_since >= MAX_GEN_AFTER_H0:
             print(f"\n{'='*55}")
-            print(f"  TEST REUSSI : Solution valide trouvee en {gen} generations")
+            print(f"  OPTIMISATION REUSSIE AVEC QUALITE MAX")
+            print(f"{'='*55}")
+            print(f"  Hard Violations  : {h} (Parfait)")
+            print(f"  Score Soft Total : {s}")
+            print(f"  --- Detail Contraintes Soft ---")
+            print(f"  S1 Mixing        : {details.get('S1_Mixing', 0)}")
+            print(f"  S2 CM Dispersion : {details.get('S2_CM_Dispersion', 0)}")
+            print(f"  S3 Gaps (Trous)  : {details.get('S3_Gaps', 0)}")
+            print(f"  S4 Prefs Slots   : {details.get('S4_Preferences', 0)}")
+            print(f"  S5 Balance       : {details.get('S5_Balance', 0)}")
+            print(f"  S6 Stability     : {details.get('S6_Stability', 0)}")
+            print(f"  S7 Short Days    : {details.get('S7_EmptyDays', 0)}")
             print(f"{'='*55}")
             break
     

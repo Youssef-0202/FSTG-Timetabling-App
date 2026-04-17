@@ -171,6 +171,26 @@ def delete_section(section_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Section introuvable")
     db.delete(s); db.commit()
 
+@app.put("/sections/{section_id}", response_model=schemas.Section)
+def update_section(section_id: int, data: schemas.SectionCreate, db: Session = Depends(get_db)):
+    s = db.query(models.Section).filter(models.Section.id == section_id).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="Section introuvable")
+    
+    s.name = data.name
+    s.semestre = data.semestre
+    s.total_capacity = data.total_capacity
+    
+    # Mise à jour des groupes associés (pour les sections c'est souvent les cohortes parentes)
+    s.groupes = []
+    for g_id in data.groupe_ids:
+        g = db.query(models.GroupeFiliere).filter(models.GroupeFiliere.id == g_id).first()
+        if g:
+            s.groupes.append(g)
+            
+    db.commit(); db.refresh(s)
+    return s
+
 
 # TD GROUPS  /td-groups
 
@@ -190,6 +210,16 @@ def delete_td_group(tdgroup_id: int, db: Session = Depends(get_db)):
     if not g:
         raise HTTPException(status_code=404, detail="TDGroup introuvable")
     db.delete(g); db.commit()
+
+@app.put("/td-groups/{tdgroup_id}", response_model=schemas.TDGroup)
+def update_td_group(tdgroup_id: int, data: schemas.TDGroupCreate, db: Session = Depends(get_db)):
+    g = db.query(models.TDGroup).filter(models.TDGroup.id == tdgroup_id).first()
+    if not g:
+        raise HTTPException(status_code=404, detail="TDGroup introuvable")
+    for k, v in data.model_dump(exclude_unset=True).items():
+        setattr(g, k, v)
+    db.commit(); db.refresh(g)
+    return g
 
 
 # MODULES  /modules
