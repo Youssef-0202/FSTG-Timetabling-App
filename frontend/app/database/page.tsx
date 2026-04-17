@@ -389,7 +389,15 @@ function DatabaseContent() {
                                                         <span className={`badge ${mPart?.type === "CM" ? "badge-amphi" : "badge-td"}`}>{mPart?.type}</span> ({mPart?.weekly_hours}h)
                                                     </div>
                                                 </td>
-                                                <td>{teacher?.name || "?"}</td>
+                                                <td>
+                                                    {teacher?.name === "PROF" ? (
+                                                        <span style={{ fontStyle: "italic", color: "var(--navy)", fontWeight: 500 }}>
+                                                            Pr. {mod?.name?.split(' ').slice(0, 2).join(' ')} {a.td_groups?.length > 0 ? a.td_groups[0].name : (sec?.name || "")}
+                                                        </span>
+                                                    ) : (
+                                                        teacher?.name || "?"
+                                                    )}
+                                                </td>
                                                 <td>
                                                     {mPart?.type !== "CM" ? (
                                                         <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
@@ -835,7 +843,14 @@ function DatabaseContent() {
                                     <div className="form-group full"><label>Enseignant</label>
                                         <select value={String(modal.data.teacher_id || "")} onChange={(e) => setField("teacher_id", e.target.value)}>
                                             <option value="">-- Choisir --</option>
-                                            {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                            {[...teachers]
+                                                .sort((a, b) => {
+                                                    if (a.name === "PROF") return -1;
+                                                    if (b.name === "PROF") return 1;
+                                                    return a.name.localeCompare(b.name);
+                                                })
+                                                .map(t => <option key={t.id} value={t.id}>{t.name}</option>)
+                                            }
                                         </select>
                                     </div>
                                     <div className="form-group full">

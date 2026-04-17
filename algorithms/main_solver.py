@@ -63,7 +63,6 @@ def print_solution_summary(schedule):
         m_type = getattr(a.module_part, 'type', '??')
         print(f"[{a.timeslot.day}] {a.timeslot.start_time} -> {m_type} | "
               f"Salle: {a.room.name} ({a.room.capacity}) | Section: {a.module_part.section_id}")
-    
     print("="*50)
 
 

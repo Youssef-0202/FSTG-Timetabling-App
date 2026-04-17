@@ -34,7 +34,7 @@ def calculate_fitness_full(schedule, mask=None):
         gid = a.module_part.section_id
 
         # H1: Teacher Conflict
-        if tid is not None:
+        if tid is not None and tid != 231: # 231 est l'ID du prof générique "PROF"
             if (sid, tid) in busy_teachers: 
                 if mask.get("H1", True): h1_violations += 1
             busy_teachers[(sid, tid)] = True
