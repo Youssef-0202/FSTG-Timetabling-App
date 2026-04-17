@@ -118,20 +118,9 @@ def run_optimization():
         
         best_overall = best_gen
         
-        # Stop condition: H=0 found AND we spent enough time polishing OR we hit very low gaps
-        if h == 0 and (h_zero_since >= MAX_GEN_AFTER_H0 or s <= 1):
+        if h == 0:
             print(f"\n{'='*55}")
-            print(f"  OPTIMISATION TERMINEE AVEC SUCCES")
-            print(f"{'='*55}")
-            print(f"  Hard Violations  : {h} (Parfait)")
-            print(f"  Score Soft Total : {s}")
-            print(f"  --- Detail Contraintes Soft ---")
-            print(f"  S1 Melanges modules/demi-jour : {details.get('S1_Mixing', 0)} occurrences (+30pts)")
-            print(f"  S2 Dispersion CMs matin/aprem : {details.get('S2_CM_Dispersion', 0)} occurrences (+40pts)")
-            print(f"  S3 Creneaux non-consecutifs   : {details.get('S3_Gaps', 0)} blocs (+5pts)")
-            print(f"  S5 Equilibre hebdo (Balance)  : {details.get('S5_Balance', 0)} points de penalite")
-            print(f"  S6 Instabilite des salles     : {details.get('S6_Stability', 0)} points (ideal=0)")
-            print(f"  S7 Journees a cours unique    : {details.get('S7_EmptyDays', 0)} points (+100pts/jour)")
+            print(f"  TEST REUSSI : Solution valide trouvee en {gen} generations")
             print(f"{'='*55}")
             break
     
