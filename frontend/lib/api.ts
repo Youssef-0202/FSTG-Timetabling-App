@@ -156,6 +156,8 @@ export const createGroupeFiliere = (data: Omit<GroupeFiliere, "id">) =>
   apiFetch<GroupeFiliere>("/groupe-filieres", { method: "POST", body: JSON.stringify(data) });
 export const deleteGroupeFiliere = (id: number) =>
   apiFetch<null>(`/groupe-filieres/${id}`, { method: "DELETE" });
+export const updateGroupeFiliere = (id: number, data: Partial<GroupeFiliere>) =>
+  apiFetch<GroupeFiliere>(`/groupe-filieres/${id}`, { method: "PUT", body: JSON.stringify(data) });
 
 // ─── Sections 
 export const getSections = () => apiFetch<Section[]>("/sections");

@@ -51,118 +51,77 @@ def export_schedule_to_json(schedule, filename="../backend/generated_timetable.j
     print("   Allez sur localhost:3000/timetable-preview pour voir l'aperçu !\n")
 
 
-def print_solution_summary(schedule):
-    """Affiche un résumé lisible du meilleur planning trouvé"""
+from datetime import datetime
+
+def print_solution_summary(schedule, dm):
+    """Affiche un résumé lisible avec conversion sécurisée des dates"""
     print("\n" + "="*50)
     print(" MEILLEURE SOLUTION TROUVÉE")
     print("="*50)
     
-    sorted_as = sorted(schedule.assignments, key=lambda a: (a.timeslot.day, a.timeslot.start_time))
-    
-    for a in sorted_as:
-        m_type = getattr(a.module_part, 'type', '??')
-        # On essaie de récupérer le nom du module si possible
-        m_name = getattr(a.module_part, 'name', f"Mod#{a.module_part.module_id}")
-        t_name = a.teacher.name if a.teacher else "AUCUN"
+    try:
+        sorted_as = sorted(schedule.assignments, key=lambda a: (a.timeslot.day, str(a.timeslot.start_time)))
         
-        # Formatage propre
-        day_str = f"{a.timeslot.day[:3]}".upper()
-        time_str = f"{a.timeslot.start_time.strftime('%H:%M')}"
-        
-        print(f"[{day_str} {time_str}] {m_type:2} | {m_name:30} | Prof: {t_name:15} | Salle: {a.room.name:10} ({a.room.capacity} pl.)")
-    print("="*50)
+        for a in sorted_as:
+            m_type = getattr(a.module_part, 'type', '??')
+            m_name = getattr(a.module_part, 'name', f"Mod#{a.module_part.module_id}")
+            
+            t_id = getattr(a.module_part, 'teacher_id', None)
+            t_obj = dm.teacher_map.get(t_id) if t_id else None
+            t_name = t_obj.name if t_obj else "SANS PROF"
 
+            day_str = f"{str(a.timeslot.day)[:3]}".upper()
+            
+            # Sécurité sur le format de l'heure
+            raw_time = a.timeslot.start_time
+            if hasattr(raw_time, 'strftime'):
+                time_str = raw_time.strftime('%H:%M')
+            else:
+                time_str = str(raw_time)[:5] # Prend "HH:MM" de "HH:MM:SS"
+            
+            print(f"[{day_str} {time_str}] {m_type:2} | {m_name:30} | Prof: {t_name:15} | Salle: {a.room.name:10}")
+        print("="*50)
+    except Exception as e:
+        print(f" (Note: Erreur mineure d'affichage console : {e})")
 
 def run_optimization():
-    # 1. Charger les données
+    # ... (reste du code identique jusqu'à l'affichage)
     dm = DataManager()
-    if not dm.fetch_all_data():
-        return
-    if not dm.module_parts:
-        print("\n AUCUNE AFFECTATION À PLACER DANS LA BASE !")
-        return
+    if not dm.fetch_all_data(): return
     
-    # 2. Configurer le moteur 
     test_mask = {
         "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
-        "S_MIXING": True,
-        "S_CM_DISPERSION": True,
-        "S_GAPS": True,
-        "S_BALANCE": True,
-        "S_STABILITY": True,
-        "S_EMPTY_DAYS": True,
-        "S_PREFERENCES": True
+        "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True,
+        "S_BALANCE": True, "S_STABILITY": True, "S_EMPTY_DAYS": True, "S_PREFERENCES": True
     }
 
     engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
-    print("\n--- Initialisation de la population ---")
     engine.create_initial_population()
-    
-    print("\n--- Lancement de l'optimisation Hybride  ---")
     
     best_overall = None
     h_zero_since = 0
-    MAX_GEN_AFTER_H0 = 50  # On polit plus longtemps pour la qualité
+    MAX_GEN_AFTER_H0 = 30 # Réduit un peu pour gagner du temps
 
-    for gen in range(1, 250): 
+    for gen in range(1, 180): # Limite raisonnable
         engine.evolve()
         best_gen = engine.population[0]
-        
         h, s, details = calculate_fitness_full(best_gen, test_mask)
-        detail_str = f"H1(P):{details['H1_Teacher']} H2(S):{details['H2_Room']} H3(G):{details['H3_Section']} H4(C):{details['H4_Capacity']} H9(A):{details.get('H9_Availability', 0)}"
         
-        status = ""
-        if h == 0:
-            h_zero_since += 1
-            status = f" [POLISSAGE {h_zero_since}/{MAX_GEN_AFTER_H0}]"
-        
-        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | {detail_str}{status}")
+        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | H4(Cap):{details.get('H4_Capacity', 0)}")
         
         best_overall = best_gen
-        
-        # Stop condition: Valid solution AND enough polishing
-        if h == 0 and h_zero_since >= MAX_GEN_AFTER_H0:
-            print(f"\n{'='*55}")
-            print(f"  OPTIMISATION REUSSIE AVEC QUALITE MAX")
-            print(f"{'='*55}")
-            print(f"  Hard Violations  : {h} (Parfait)")
-            print(f"  Score Soft Total : {s}")
-            print(f"  --- Detail Contraintes Soft ---")
-            print(f"  S1 Mixing        : {details.get('S1_Mixing', 0)}")
-            print(f"  S2 CM Dispersion : {details.get('S2_CM_Dispersion', 0)}")
-            print(f"  S3 Gaps (Trous)  : {details.get('S3_Gaps', 0)}")
-            print(f"  S4 Prefs Slots   : {details.get('S4_Preferences', 0)}")
-            print(f"  S5 Balance       : {details.get('S5_Balance', 0)}")
-            print(f"  S6 Stability     : {details.get('S6_Stability', 0)}")
-            print(f"  S7 Short Days    : {details.get('S7_EmptyDays', 0)}")
-            print(f"{'='*55}")
-            break
-    
-    # 3. Afficher le résumé en console
-    print_solution_summary(best_overall)
-    
-    # 4. Calcul de métriques avancées pour le rapport de test
-    total_assignments = len(best_overall.assignments)
-    used_rooms = set(a.room.id for a in best_overall.assignments)
-    occupancy_rate = (len(used_rooms) / len(dm.rooms)) * 100 if dm.rooms else 0
-    
-    h_final, s_final, det = calculate_fitness_full(best_overall, test_mask)
-    
-    print("\n" + "!"*60)
-    print(" RAPPORT DE TEST GLOBAL POUR LE JURY")
-    print("!"*60)
-    print(f"  Statut Final       : {'VALIDE (H=0)' if h_final == 0 else 'NON-VALIDE (H>0)'}")
-    print(f"  Total Affectations : {total_assignments}")
-    print(f"  Hard Violations    : {h_final}")
-    print(f"  Score de Qualité   : {s_final}")
-    print(f"  Taux d'occupation  : {occupancy_rate:.2f}% des salles utilisées")
-    print(f"  Conformité H4 (Cap): {'100%' if det.get('H4_Capacity', 0) == 0 else 'Ajustement requis'}")
-    print("!"*60)
-    print("\n   => Utilisez les valeurs ci-dessus pour remplir votre tableau de synthèse.")
-    print("!"*60 + "\n")
+        if h == 0:
+            h_zero_since += 1
+            if h_zero_since >= MAX_GEN_AFTER_H0: break
 
-    # 5. Synchroniser vers le fichier JSON → Frontend aperçu
+    # FAILSAVE : On sauvegarde AVANT tout affichage console risqué
     export_schedule_to_json(best_overall)
+    
+    # Puis affichage
+    try:
+        print_solution_summary(best_overall, dm)
+    except:
+        pass
 
 
 if __name__ == "__main__":

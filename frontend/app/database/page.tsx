@@ -6,6 +6,7 @@ import {
     Users, DoorOpen, GraduationCap, BookOpen, Building2, ClipboardList,
     CheckCircle2, XCircle, X, Save, Loader2, Layers, Grid, Users2, CalendarDays
 } from "lucide-react";
+import Select from "react-select";
 import {
     getTeachers, createTeacher, updateTeacher, deleteTeacher, Teacher,
     getRooms, createRoom, updateRoom, deleteRoom, Room,
@@ -15,7 +16,7 @@ import {
     getModuleParts, createModulePart, updateModulePart, deleteModulePart, ModulePart,
     getTimeslots, createTimeslot, updateTimeslot, deleteTimeslot, Timeslot,
     getFilieres, createFiliere, deleteFiliere, Filiere,
-    getGroupeFilieres, createGroupeFiliere, deleteGroupeFiliere, GroupeFiliere,
+    getGroupeFilieres, createGroupeFiliere, deleteGroupeFiliere, updateGroupeFiliere, GroupeFiliere,
     getSections, createSection, deleteSection, Section,
     getTDGroups, createTDGroup, updateTDGroup, deleteTDGroup, TDGroup,
     getGroupeModules, createGroupeModule, updateGroupeModule, deleteGroupeModule, GroupeModule
@@ -140,14 +141,6 @@ function DatabaseContent() {
                     dept_id: Number(d.dept_id || 1)
                 });
                 setFilieres(await getFilieres());
-            } else if (tab === "cohortes") {
-                await createGroupeFiliere({
-                    filiere_id: Number(d.filiere_id || 1),
-                    semestre: String(d.semestre || "S1"),
-                    academic_year: String(d.academic_year || "2025-2026"),
-                    total_students: Number(d.total_students || 30)
-                });
-                setCohortes(await getGroupeFilieres());
             } else if (tab === "sections") {
                 await createSection({
                     name: String(d.name || ""),
@@ -228,6 +221,21 @@ function DatabaseContent() {
                     ? await createAssignment(payload as AssignmentCreate)
                     : await updateAssignment(Number(d.id), payload);
                 setAssignments(await getAssignments());
+            } else if (tab === "cohortes") {
+                modal.mode === "add"
+                    ? await createGroupeFiliere({
+                        filiere_id: Number(d.filiere_id),
+                        semestre: String(d.semestre),
+                        academic_year: String(d.academic_year),
+                        total_students: Number(d.total_students)
+                    })
+                    : await updateGroupeFiliere(Number(d.id), {
+                        filiere_id: Number(d.filiere_id),
+                        semestre: String(d.semestre),
+                        academic_year: String(d.academic_year),
+                        total_students: Number(d.total_students)
+                    });
+                setCohortes(await getGroupeFilieres());
             }
             show(`${modal.mode === "add" ? "Ajouté" : "Modifié"} avec succès`, "success");
             closeModal();
@@ -519,6 +527,7 @@ function DatabaseContent() {
                                         <td>{c.academic_year}</td>
                                         <td>{c.total_students} inscrits</td>
                                         <td><div className="actions-cell">
+                                            <button className="btn btn-outline btn-sm" onClick={() => openEdit(c as any)}><Pencil size={13} /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(c.id)}><Trash2 size={13} /></button>
                                         </div></td>
                                     </tr>
@@ -848,25 +857,52 @@ function DatabaseContent() {
                             {tab === "assignments" && (
                                 <>
                                     <div className="form-group full"><label>Partie de Module (Séance)</label>
-                                        <select value={String(modal.data.module_part_id || "")} onChange={(e) => setField("module_part_id", e.target.value)}>
-                                            <option value="">-- Choisir --</option>
-                                            {moduleParts.map(mp => (
-                                                <option key={mp.id} value={mp.id}>{modules.find(m => m.id === mp.module_id)?.name} - {mp.type}</option>
-                                            ))}
+                                        <select value={String(modal.data.module_part_id || "")} onChange={(e) => setField("module_part_id", e.target.value)} style={{ minHeight: "40px" }}>
+                                            <option value="">-- Choisir une séance --</option>
+                                            {modules.map(mod => {
+                                                const parts = moduleParts.filter(mp => mp.module_id === mod.id);
+                                                if (parts.length === 0) return null;
+                                                return (
+                                                    <optgroup key={mod.id} label={`${mod.name} (${mod.code})`}>
+                                                        {parts.map(mp => (
+                                                            <option key={mp.id} value={mp.id}>
+                                                                {mp.type} ({mp.weekly_hours}H) - {mp.required_room_type}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
+                                                );
+                                            })}
                                         </select>
                                     </div>
-                                    <div className="form-group full"><label>Enseignant</label>
-                                        <select value={String(modal.data.teacher_id || "")} onChange={(e) => setField("teacher_id", e.target.value)}>
-                                            <option value="">-- Choisir --</option>
-                                            {[...teachers]
+                                    <div className="form-group full" style={{ marginBottom: "15px" }}>
+                                        <label>Enseignant</label>
+                                        <Select
+                                            options={[...teachers]
                                                 .sort((a, b) => {
                                                     if (a.name === "PROF") return -1;
                                                     if (b.name === "PROF") return 1;
                                                     return a.name.localeCompare(b.name);
                                                 })
-                                                .map(t => <option key={t.id} value={t.id}>{t.name}</option>)
-                                            }
-                                        </select>
+                                                .map(t => ({ value: t.id, label: t.name }))}
+                                            value={modal.data.teacher_id ? { value: modal.data.teacher_id, label: teachers.find(t => t.id === Number(modal.data.teacher_id))?.name } : null}
+                                            onChange={(selectedOption: any) => setField("teacher_id", selectedOption ? selectedOption.value : null)}
+                                            placeholder="-- Choisir ou taper un nom --"
+                                            isClearable
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    borderRadius: '6px',
+                                                    borderColor: 'var(--border)',
+                                                    minHeight: '40px',
+                                                    boxShadow: 'none',
+                                                    '&:hover': { borderColor: '#94a3b8' }
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999
+                                                })
+                                            }}
+                                        />
                                     </div>
                                     <div className="form-group full">
                                         <label style={{ fontSize: "0.8rem", color: "var(--navy)", fontWeight: 600 }}>Périmètre de cours (Cible)</label>
@@ -1038,8 +1074,9 @@ function DatabaseContent() {
                             <button className="btn btn-primary" onClick={save}>{saving ? "En cours..." : "Valider"}</button>
                         </div>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+            }
 
             <div className="toast-container">
                 {toasts.map((t) => (

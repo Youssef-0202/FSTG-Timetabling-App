@@ -143,6 +143,16 @@ def delete_groupe_filiere(group_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Groupe introuvable")
     db.delete(g); db.commit()
 
+@app.put("/groupe-filieres/{group_id}", response_model=schemas.GroupeFiliere)
+def update_groupe_filiere(group_id: int, data: schemas.GroupeFiliereCreate, db: Session = Depends(get_db)):
+    g = db.query(models.GroupeFiliere).filter(models.GroupeFiliere.id == group_id).first()
+    if not g:
+        raise HTTPException(status_code=404, detail="Groupe introuvable")
+    for k, v in data.model_dump(exclude_unset=True).items():
+        setattr(g, k, v)
+    db.commit(); db.refresh(g)
+    return g
+
 
 # SECTIONS  /sections
 
