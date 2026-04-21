@@ -219,7 +219,7 @@ def calculate_fitness_full(schedule, mask=None):
         daily_hours = list(days.values())
         if not daily_hours: continue
         
-        # S7: Évitement des journées "1 séance seulement" (1.5h)
+        # S7: Évitement des journées "1 séance seulement" 
         for h in daily_hours:
             if h == 1.5:
                 if mask.get("S_EMPTY_DAYS", True): s7_empty_day_penalty += 100
