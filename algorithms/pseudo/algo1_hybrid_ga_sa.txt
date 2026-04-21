@@ -1,5 +1,4 @@
-================================================================================
-Pseudo-Code : Algorithme 1 - Hybrid GA-SA (Memetique)
+Pseudo-Code : Algorithme 1 - Hybrid GA-SA 
 ================================================================================
 
 Description : 
@@ -10,7 +9,7 @@ tandis que le Recuit Simule (Simulated Annealing - SA) agit comme un
 operateur de recherche locale intensive pour polir chaque individu nouvellement 
 genere.
 
---------------------------------------------------------------------------------
+
 Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
 --------------------------------------------------------------------------------
 
