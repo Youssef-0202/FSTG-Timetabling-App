@@ -22,9 +22,25 @@ Input:
 - E: Nombre d'Elites a conserver intacts
 
 Output: 
-- Best_Schedule: Le meilleur emploi du temps trouve (sans conflit)
+- Best_Schedule: Le meilleur emploi du temps trouve 
 
-1:  procedure HYBRID_GA_SA(A_set)
+1:  procedure RUN_OPTIMIZATION()
+2:      // C'est l'appel depuis main_solver.py
+3:      A_set = LoadDataFromDatabase()
+4:      Max_Gen = 180
+5:      Max_Gen_After_H0 = 30
+6:      Generations_Since_H0 = 0
+7:      
+8:      Best_Overall = HYBRID_GA_SA(A_set, Pop_size=100, Max_Gen)
+9:      
+10:     ExportJSON(Best_Overall)
+11: end procedure
+
+--------------------------------------------------------------------------------
+Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
+--------------------------------------------------------------------------------
+
+1:  procedure HYBRID_GA_SA(A_set, Pop_size, Max_Gen, T0, Alpha, L_max, E)
 2:      // 1. Initialisation
 3:      Population = Empty List
 4:      for i = 1 to Pop_size do
@@ -33,38 +49,48 @@ Output:
 7:      end for
 8:      Best_Schedule = Solution with min Fitness in Population
 9:
-10:     // 2. Boucle Evolutive
-11:     for Gen = 1 to Max_Gen do
-12:         Sort Population by Fitness (Ascending)
-13:         New_Population = Take Top E from Population // Elitisme
-14:         
-15:         while size of New_Population < Pop_size do
-16:             // 2.1. Selection et Croisement
-17:             Parent_1, Parent_2 = TournamentSelect(Population)
-18:             Child = UniformCrossover(Parent_1, Parent_2)
-19:             
-20:             // 2.2. Mutation (Exploration)
-21:             if RandomNumber(0 to 1) < p_mut then
-22:                 Child = Mutate(Child) // Swap ou Shift aleatoire
-23:             end if
-24:             
-25:             // 2.3. Recherche Locale - Recuit Simule (Exploitation)
-26:             // Application du Local Search sur le Voisinage de l'enfant
-27:             Child = SimulatedAnnealingLS(Child, T0, Alpha, L_max)
-28:             
-29:             Add Child to New_Population
-30:         end while
-31:         
-32:         // 3. Mise a jour
-33:         Population = New_Population
-34:         Current_Best = Solution with min Fitness in Population
-35:         if Fitness(Current_Best) < Fitness(Best_Schedule) then
-36:             Best_Schedule = Current_Best
-37:         end if
-38:         
-39:     end for
-40:     return Best_Schedule
-41: end procedure
+10:     // 2. Boucle Evolutive (avec controle de convergence)
+11:     Generations_Since_H0 = 0
+12:     
+13:     for Gen = 1 to Max_Gen do
+14:         Sort Population by Fitness (Ascending)
+15:         New_Population = Take Top E from Population // Elitisme
+16:         
+17:         while size of New_Population < Pop_size do
+18:             // 2.1. Selection et Croisement
+19:             Parent_1, Parent_2 = TournamentSelect(Population)
+20:             Child = UniformCrossover(Parent_1, Parent_2)
+21:             
+22:             // 2.2. Mutation (Exploration)
+23:             if RandomNumber(0 to 1) < p_mut then
+24:                 Child = Mutate(Child) // Swap ou Shift aleatoire
+25:             end if
+26:             
+27:             // 2.3. Recherche Locale - Recuit Simule (Exploitation)
+28:             Child = SimulatedAnnealingLS(Child, T0, Alpha, L_max)
+29:             
+30:             Add Child to New_Population
+31:         end while
+32:         
+33:         // 3. Mise a jour
+34:         Population = New_Population
+35:         Current_Best = Solution with min Fitness in Population
+36:         
+37:         if Fitness(Current_Best) < Fitness(Best_Schedule) then
+38:             Best_Schedule = Current_Best
+39:         end if
+40:         
+41:         // 4. Critere d'Arret Anticipe (Early Stopping base sur les contraintes Dures)
+42:         if Hard_Violations(Best_Schedule) == 0 then
+43:             Generations_Since_H0 = Generations_Since_H0 + 1
+44:             if Generations_Since_H0 >= Max_Gen_After_H0 then
+45:                 BREAK // Arrete la boucle "for", solution trouvee
+46:             end if
+47:         end if
+48:         
+49:     end for
+50:     return Best_Schedule
+51: end procedure
 
 --------------------------------------------------------------------------------
 Sous-procedure : SimulatedAnnealingLS

@@ -7,6 +7,45 @@ from constraints import calculate_fitness_full
 import json
 import os
 
+def run_optimization():
+    # ... (reste du code identique jusqu'à l'affichage)
+    dm = DataManager()
+    if not dm.fetch_all_data(): return
+    
+    test_mask = {
+        "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
+        "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True,
+        "S_BALANCE": True, "S_STABILITY": True, "S_EMPTY_DAYS": True, "S_PREFERENCES": True
+    }
+
+    engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
+    engine.create_initial_population()
+    
+    best_overall = None
+    h_zero_since = 0
+    MAX_GEN_AFTER_H0 = 30 # Réduit un peu pour gagner du temps
+
+    for gen in range(1, 180): # Limite raisonnable
+        engine.evolve()
+        best_gen = engine.population[0]
+        h, s, details = calculate_fitness_full(best_gen, test_mask)
+        
+        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | H4(Cap):{details.get('H4_Capacity', 0)}")
+        
+        best_overall = best_gen
+        if h == 0:
+            h_zero_since += 1
+            if h_zero_since >= MAX_GEN_AFTER_H0: break
+
+    # FAILSAVE : On sauvegarde AVANT tout affichage console risqué
+    export_schedule_to_json(best_overall)
+    
+    # Puis affichage
+    try:
+        print_solution_summary(best_overall, dm)
+    except:
+        pass
+
 def export_schedule_to_json(schedule, filename="../backend/generated_timetable.json"):
     """Exporte le résultat de l'IA dans un fichier JSON pour l'interface sans toucher à la BDD"""
     print(f"\n---  Exportation de {len(schedule.assignments)} affectations vers {filename} ---")
@@ -84,44 +123,7 @@ def print_solution_summary(schedule, dm):
     except Exception as e:
         print(f" (Note: Erreur mineure d'affichage console : {e})")
 
-def run_optimization():
-    # ... (reste du code identique jusqu'à l'affichage)
-    dm = DataManager()
-    if not dm.fetch_all_data(): return
-    
-    test_mask = {
-        "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
-        "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True,
-        "S_BALANCE": True, "S_STABILITY": True, "S_EMPTY_DAYS": True, "S_PREFERENCES": True
-    }
 
-    engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
-    engine.create_initial_population()
-    
-    best_overall = None
-    h_zero_since = 0
-    MAX_GEN_AFTER_H0 = 30 # Réduit un peu pour gagner du temps
-
-    for gen in range(1, 180): # Limite raisonnable
-        engine.evolve()
-        best_gen = engine.population[0]
-        h, s, details = calculate_fitness_full(best_gen, test_mask)
-        
-        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | H4(Cap):{details.get('H4_Capacity', 0)}")
-        
-        best_overall = best_gen
-        if h == 0:
-            h_zero_since += 1
-            if h_zero_since >= MAX_GEN_AFTER_H0: break
-
-    # FAILSAVE : On sauvegarde AVANT tout affichage console risqué
-    export_schedule_to_json(best_overall)
-    
-    # Puis affichage
-    try:
-        print_solution_summary(best_overall, dm)
-    except:
-        pass
 
 
 if __name__ == "__main__":
