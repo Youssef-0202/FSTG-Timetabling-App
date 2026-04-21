@@ -1,92 +1,104 @@
-# Pseudo-Code : Algorithme 1 - Hybrid GA-SA (Mémétique)
+================================================================================
+Pseudo-Code : Algorithme 1 - Hybrid GA-SA (Memetique)
+================================================================================
 
-**Description :** 
-Cet algorithme illustre la structure principale du solveur d'emploi du temps. Il s'agit d'une hybridation profonde (Algorithme Mémétique) où l'Algorithme Génétique (GA) garantit l'exploration globale de l'espace de recherche à l'aide d'une population de solutions, tandis que le Recuit Simulé (Simulated Annealing - SA) agit comme un opérateur de recherche locale intensive pour polir chaque individu nouvellement généré.
+Description : 
+Cet algorithme illustre la structure principale du solveur d'emploi du temps. 
+Il s'agit d'une hybridation profonde ou l'Algorithme Genetique (GA) garantit 
+l'exploration globale de l'espace de recherche a l'aide d'une population de solutions, 
+tandis que le Recuit Simule (Simulated Annealing - SA) agit comme un 
+operateur de recherche locale intensive pour polir chaque individu nouvellement 
+genere.
 
----
+--------------------------------------------------------------------------------
+Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
+--------------------------------------------------------------------------------
 
-### Algorithm 1 : Integrative Hybrid GA–SA for University Timetabling
+Input: 
+- A_set: Ensemble des affectations (seances a placer)
+- Pop_size: Taille de la population
+- Max_Gen: Nombre maximum de generations
+- p_mut: Taux de mutation
+- T0, Alpha, L_max: Temperature initiale, Taux de refroidissement SA et Iterations SA
+- E: Nombre d'Elites a conserver intacts
 
-**Input:** 
-- $\mathcal{A}$: Set of assignments (module parts to schedule)
-- $N_p$: Population size
-- $G_{max}$: Maximum number of generations
-- $p_m$: Mutation rate
-- $T_0, \alpha, L_{max}$: Initial Temperature, Cooling rate, and Iterations for SA
-- $E$: Elitism count
+Output: 
+- Best_Schedule: Le meilleur emploi du temps trouve (sans conflit)
 
-**Output:** 
-- $s^*$: The best feasible schedule found
-
-1:  **procedure** HYBRID_GA_SA($\mathcal{A}$)
+1:  procedure HYBRID_GA_SA(A_set)
 2:      // 1. Initialisation
-3:      $P \leftarrow \emptyset$  
-4:      **for** $i = 1$ to $N_p$ **do**
-5:          $s \leftarrow$ GenerateRandomSchedule($\mathcal{A}$)
-6:          $P \leftarrow P \cup \{s\}$
-7:      **end for**
-8:      $s^* \leftarrow \arg\min_{s \in P} f(s)$
+3:      Population = Empty List
+4:      for i = 1 to Pop_size do
+5:          Schedule_i = GenerateRandomSchedule(A_set)
+6:          Add Schedule_i to Population
+7:      end for
+8:      Best_Schedule = Solution with min Fitness in Population
 9:
-10:     // 2. Boucle Évolutive
-11:     **for** $gen = 1$ to $G_{max}$ **do**
-12:         $P \leftarrow \text{SortByFitness}(P)$
-13:         $P_{new} \leftarrow$ SelectTop($P, E$) // Elitism: Keep $E$ best individuals
+10:     // 2. Boucle Evolutive
+11:     for Gen = 1 to Max_Gen do
+12:         Sort Population by Fitness (Ascending)
+13:         New_Population = Take Top E from Population // Elitisme
 14:         
-15:         **while** $|P_{new}| < N_p$ **do**
-16:             // 2.1. Sélection et Croisement
-17:             $s_1, s_2 \leftarrow \text{TournamentSelect}(P)$
-18:             $s_{child} \leftarrow \text{UniformCrossover}(s_1, s_2)$
+15:         while size of New_Population < Pop_size do
+16:             // 2.1. Selection et Croisement
+17:             Parent_1, Parent_2 = TournamentSelect(Population)
+18:             Child = UniformCrossover(Parent_1, Parent_2)
 19:             
 20:             // 2.2. Mutation (Exploration)
-21:             **if** $\text{Random}(0, 1) < p_m$ **then**
-22:                 $s_{child} \leftarrow \text{Mutate}(s_{child})$ // Random swap/shift
-23:             **end if**
+21:             if RandomNumber(0 to 1) < p_mut then
+22:                 Child = Mutate(Child) // Swap ou Shift aleatoire
+23:             end if
 24:             
-25:             // 2.3. Recherche Locale - Recuit Simulé (Exploitation)
-26:             $s_{child} \leftarrow \text{SimulatedAnnealingLS}(s_{child}, T_0, \alpha, L_{max})$
-27:             
-28:             $P_{new} \leftarrow P_{new} \cup \{s_{child}\}$
-29:         **end while**
-30:         
-31:         // 3. Mise à jour de la population et de la meilleure solution
-32:         $P \leftarrow P_{new}$
-33:         $s_{current\_best} \leftarrow \min_{s \in P} f(s)$
-34:         **if** $f(s_{current\_best}) < f(s^*)$ **then**
-35:             $s^* \leftarrow s_{current\_best}$
-36:         **end if**
-37:         
-38:     **end for**
-39:     **return** $s^*$
-40: **end procedure**
+25:             // 2.3. Recherche Locale - Recuit Simule (Exploitation)
+26:             // Application du Local Search sur le Voisinage de l'enfant
+27:             Child = SimulatedAnnealingLS(Child, T0, Alpha, L_max)
+28:             
+29:             Add Child to New_Population
+30:         end while
+31:         
+32:         // 3. Mise a jour
+33:         Population = New_Population
+34:         Current_Best = Solution with min Fitness in Population
+35:         if Fitness(Current_Best) < Fitness(Best_Schedule) then
+36:             Best_Schedule = Current_Best
+37:         end if
+38:         
+39:     end for
+40:     return Best_Schedule
+41: end procedure
 
----
+--------------------------------------------------------------------------------
+Sous-procedure : SimulatedAnnealingLS
+--------------------------------------------------------------------------------
+Commentaire : Le SA local teste 3 types de mouvements de voisinage: 
+Shift Time+Room, Swap Time, Shift Room avec des probabilites egales.
 
-### Sous-procédure : SimulatedAnnealingLS
-**Commentaire de recherche :** Le SA local teste 3 types de mouvements de voisinage (Shift Time+Room, Swap Time, Shift Room) avec des probabilités égales.
-
-1:  **procedure** SimulatedAnnealingLS($s, T_0, \alpha, L_{max}$)
-2:      $s_{best} \leftarrow s$
-3:      $T \leftarrow T_0$
-4:      **for** $l = 1$ to $L_{max}$ **do**
-5:          $r \leftarrow \text{Random}(0, 1)$
-6:          **if** $r < 0.33$ **then**
-7:              $s' \leftarrow \text{ShiftTimeAndRoom}(s)$
-8:          **else if** $r < 0.66$ **then**
-9:              $s' \leftarrow \text{SwapTimeslots}(s)$
-10:         **else**
-11:             $s' \leftarrow \text{ShiftRoomOnly}(s)$
-12:         **end if**
-13:         
-14:         $\Delta f \leftarrow f(s') - f(s)$
-15:         
-16:         **if** $\Delta f < 0$ **or** $\text{Random}(0, 1) < \exp(-\Delta f / T)$ **then**
-17:             $s \leftarrow s'$ // Accept neighbor
-18:             **if** $f(s) < f(s_{best})$ **then**
-19:                 $s_{best} \leftarrow s$
-20:             **end if**
-21:         **end if**
-22:         
-23:         $T \leftarrow T \times \alpha$ // Cooling schedule
-24:     **end for**
-25:     **return** $s_{best}$
-26: **end procedure**
+1:  procedure SimulatedAnnealingLS(Sch, T0, Alpha, L_max)
+2:      Best_Sch = Sch
+3:      T = T0
+4:      
+5:      for L = 1 to L_max do
+6:          R = RandomNumber(0 to 1)
+7:          if R < 0.33 then
+8:              Neighbor = ShiftTimeAndRoom(Sch)
+9:          else if R < 0.66 then
+10:             Neighbor = SwapTimeslots(Sch)
+11:         else
+12:             Neighbor = ShiftRoomOnly(Sch)
+13:         end if
+14:         
+15:         Delta = Fitness(Neighbor) - Fitness(Sch)
+16:         
+17:         // Critere d'acceptation de Metropolis
+18:         if Delta < 0 OR RandomNumber(0 to 1) < Exponential(-Delta / T) then
+19:             Sch = Neighbor // Accepter le mauvais mouvement pour eviter optimum local
+20:             if Fitness(Sch) < Fitness(Best_Sch) then
+21:                 Best_Sch = Sch
+22:             end if
+23:         end if
+24:         
+25:         T = T * Alpha // Refroidissement
+26:     end for
+27:     
+28:     return Best_Sch
+29: end procedure
