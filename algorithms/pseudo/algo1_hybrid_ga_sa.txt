@@ -5,9 +5,8 @@ Description :
 Cet algorithme illustre la structure principale du solveur d'emploi du temps. 
 Il s'agit d'une hybridation profonde ou l'Algorithme Genetique (GA) garantit 
 l'exploration globale de l'espace de recherche a l'aide d'une population de solutions, 
-tandis que le Recuit Simule (Simulated Annealing - SA) agit comme un 
-operateur de recherche locale intensive pour polir chaque individu nouvellement 
-genere.
+tandis que le Recuit Simule (SA) agit comme un operateur de recherche locale intensive pour 
+polir chaque individu nouvellement genere.
 
 
 Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
@@ -36,7 +35,7 @@ Output:
 10:     ExportJSON(Best_Overall)
 11: end procedure
 
---------------------------------------------------------------------------------
+
 Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
 --------------------------------------------------------------------------------
 
@@ -92,7 +91,7 @@ Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
 50:     return Best_Schedule
 51: end procedure
 
---------------------------------------------------------------------------------
+
 Sous-procedure : SimulatedAnnealingLS
 --------------------------------------------------------------------------------
 Commentaire : Le SA local teste 3 types de mouvements de voisinage: 

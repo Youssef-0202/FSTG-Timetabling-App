@@ -8,7 +8,7 @@ import json
 import os
 
 def run_optimization():
-    # ... (reste du code identique jusqu'à l'affichage)
+    
     dm = DataManager()
     if not dm.fetch_all_data(): return
     
@@ -21,9 +21,9 @@ def run_optimization():
     engine = HybridEngine(dm, pop_size=100, constraints_mask=test_mask)
     engine.create_initial_population()
     
-    best_overall = None
+    best_overall = None # À chaque génération, si la solution actuelle est la meilleure qu'on ait jamais vue on la sauvegarde dans ce coffre-fort. À la toute fin, c'est ce best_overall qu'on va exporter en JSON.
     h_zero_since = 0
-    MAX_GEN_AFTER_H0 = 30 # Réduit un peu pour gagner du temps
+    MAX_GEN_AFTER_H0 = 30 
 
     for gen in range(1, 180): # Limite raisonnable
         engine.evolve()
@@ -33,7 +33,7 @@ def run_optimization():
         print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | H4(Cap):{details.get('H4_Capacity', 0)}")
         
         best_overall = best_gen
-        if h == 0:
+        if h == 0 :
             h_zero_since += 1
             if h_zero_since >= MAX_GEN_AFTER_H0: break
 
