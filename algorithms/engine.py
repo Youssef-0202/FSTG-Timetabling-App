@@ -64,9 +64,9 @@ class HybridEngine:
             child = self.simulated_annealing_search(child)
                 
             new_gen.append(child)
-            self.population.sort(key=lambda x: self.get_score(x))
-        
+            
         self.population = new_gen
+        self.population.sort(key=lambda x: self.get_score(x))
     
     def crossover(self, p1, p2):
         """Mixes genes from two parents"""

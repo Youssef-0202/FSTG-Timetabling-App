@@ -26,11 +26,11 @@ def run_optimization():
     MAX_GEN_AFTER_H0 = 30 
 
     for gen in range(1, 180): # Limite raisonnable
-        engine.evolve()
-        best_gen = engine.population[0]
+        engine.evolve() # create a new population 
+        best_gen = engine.population[0] # select  best solution for current generation
         h, s, details = calculate_fitness_full(best_gen, test_mask)
         
-        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} | H4(Cap):{details.get('H4_Capacity', 0)}")
+        print(f"Génération {gen:03d} | Hard: {h} | Soft: {s} ")
         
         best_overall = best_gen
         if h == 0 :
