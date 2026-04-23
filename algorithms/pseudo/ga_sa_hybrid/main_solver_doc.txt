@@ -1,0 +1,90 @@
+================================================================================
+FICHIER 1/2 : main_solver.py  (Le Chef d'Orchestre)
+================================================================================
+Source : algorithms/main_solver.py
+Role   : Orchestre l execution de l algorithme GA+SA de bout en bout.
+         Il decide QUAND, COMBIEN et gere le cycle de vie complet.
+
+--------------------------------------------------------------------------------
+SECTION A : PARAMETRES DE CONFIGURATION
+--------------------------------------------------------------------------------
+
+Parametres de la Population (GA) :
+   POP_SIZE          = 100    -- Nombre d individus (emplois du temps) par generation
+   MAX_GEN           = 180    -- Nombre maximum de generations a executer
+   MAX_GEN_AFTER_H0  = 30     -- Generations supplementaires apres Hard=0 (polissage Soft)
+
+Parametres du Recuit Simule (SA) -- definis dans engine.py mais configures ici:
+   sa_temp     = 50.0    -- Temperature initiale (T0)
+   sa_cooling  = 0.95    -- Taux de refroidissement (Alpha)
+   sa_iterations = 400   -- Nombre d iterations SA par individu (L_max)
+
+Parametres de Mutation (GA) :
+   mutation_rate = 0.15    -- Probabilite de muter un enfant (15%)
+   elitism      = 2        -- Nombre d elites copies directement a la generation suivante
+
+Masque des Contraintes (activation/desactivation) :
+   H1  = True   -- Conflit Enseignant
+   H2  = True   -- Conflit Salle
+   H3  = True   -- Conflit Groupe Etudiant
+   H4  = True   -- Capacite Salle
+   H9  = True   -- Indisponibilite Enseignant
+   S_MIXING       = True   -- Melange de modules dans une demi-journee
+   S_CM_DISPERSION= True   -- Dispersion des CM sur la journee
+   S_GAPS         = True   -- Trous entre les cours
+   S_BALANCE      = True   -- Equilibre de la charge quotidienne
+   S_STABILITY    = True   -- Stabilite de la salle pour un module
+   S_EMPTY_DAYS   = True   -- Journees a une seule seance
+   S_PREFERENCES  = True   -- Creneaux sensibles (Samedi, fin journee)
+
+--------------------------------------------------------------------------------
+SECTION B : FLUX PRINCIPAL (run_optimization)
+--------------------------------------------------------------------------------
+
+ETAPE 1 : Chargement des donnees
+   dm = DataManager()
+   dm.fetch_all_data()       --> Charge depuis l API FastAPI:
+                                  - Enseignants + indisponibilites
+                                  - Salles + capacites + types
+                                  - Creneaux horaires (Timeslots)
+                                  - Sections + Groupes TD
+                                  - Module Parts (seances a placer = A_set)
+
+ETAPE 2 : Initialisation du Moteur
+   engine = HybridEngine(dm, pop_size=100, constraints_mask=mask)
+   engine.create_initial_population()
+                             --> Cree 100 emplois du temps ALEATOIRES
+                                 (chaque seance = salle aleatoire + creneau aleatoire)
+
+ETAPE 3 : Boucle Evolutive (Boucle GA)
+   for gen in range(1, 180):
+   
+       engine.evolve()       --> Une iteration complete du GA :
+                                  1. Trier la population par fitness
+                                  2. Copier les 2 elites
+                                  3. Pour chaque nouvel individu :
+                                     a. TournamentSelect (choisir 2 parents)
+                                     b. UniformCrossover (creer un enfant)
+                                     c. Mutate (15% chance)
+                                     d. SimulatedAnnealingLS (polir l enfant)
+                                  4. Remplacer la population
+                                  5. Trier la nouvelle population
+       
+       best_gen = engine.population[0]
+                             --> Recuperer le meilleur individu (index 0 apres tri)
+       
+       h, s = calculate_fitness_full(best_gen)
+                             --> Evaluer : Hard violations et Score Soft
+
+ETAPE 4 : Critere d Arret Anticipe (Early Stopping)
+   if h == 0 :
+       h_zero_since += 1
+       if h_zero_since >= 30 : STOP
+                             --> Des que 0 conflit pendant 30 generations => FIN
+
+ETAPE 5 : Export du Resultat
+   export_schedule_to_json(best_overall)
+                             --> Sauvegarde dans backend/generated_timetable.json
+                             --> L interface web lit ce JSON pour affichage
+
+================================================================================

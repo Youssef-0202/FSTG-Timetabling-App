@@ -1,0 +1,89 @@
+================================================================================
+FICHIER 2/2 : engine.py  (Le Moteur Algorithmique)
+================================================================================
+Source : algorithms/engine.py
+Role   : Contient TOUTE la logique mathematique de l algorithme hybride GA+SA.
+         Il sait COMMENT faire evoluer une population, mais ne sait pas QUAND.
+
+Classe principale : HybridEngine
+   - Recoit les donnees depuis DataManager (via self.dm)
+   - Expose les methodes utilisees par main_solver.py
+
+--------------------------------------------------------------------------------
+SECTION A : PARAMETRES (definis dans __init__)
+--------------------------------------------------------------------------------
+
+   self.dm            --> Reference vers DataManager (donnees : salles, profs, etc.)
+   self.pop_size      --> Taille de la population (defaut: 30, override: 100)
+   self.mutation_rate --> Taux de mutation (0.15 = 15%)
+   self.elitism       --> Nombre d elites a conserver (2)
+   self.sa_iterations --> Iterations du recuit simule local (400)
+   self.sa_temp       --> Temperature initiale SA (50.0)
+   self.sa_cooling    --> Taux de refroidissement SA (0.95)
+
+--------------------------------------------------------------------------------
+SECTION B : METHODES DEFINIES DANS engine.py
+--------------------------------------------------------------------------------
+
+METHODE 1 : get_score(schedule)
+   Role   : Calcule le score scalaire d un emploi du temps pour les comparaisons
+   Formule: score = (10000 * Hard_Violations) + Soft_Score
+   Appelle: calculate_fitness_full() depuis constraints.py
+   Usage  : Utilisee pour trier la population et comparer les individus
+   Retour : Un nombre (plus bas = meilleur)
+
+METHODE 2 : create_initial_population()
+   Role   : Cree la premiere generation d emplois du temps ALEATOIRES
+   Etapes :
+      - self.population = []         (reset de la liste)
+      - Pour chaque seance (module_part) :
+           Si seance "locked" : assigner la salle et creneau fixes
+           Sinon              : choisir salle ET creneau aleatoires
+      - Creer un objet Schedule (individu) et l ajouter a self.population
+   Resultat: self.population contient Pop_size individus aleatoires
+
+METHODE 3 : evolve()
+   Role   : Execute UNE generation complete de l algorithme GA
+   Etapes :
+      1. Trier self.population par score (Ascending) --> meilleur en [0]
+      2. new_gen = les 2 meilleurs (Elitisme)
+      3. Boucle jusqu a Pop_size individus :
+           a. TournamentSelect x2 --> choisir Parent_1 et Parent_2
+           b. crossover(P1, P2)   --> creer un Enfant
+           c. Si Random < 0.15    --> mutate(Enfant)
+           d. SimulatedAnnealingLS(Enfant) --> polir l enfant
+           e. Ajouter Enfant a new_gen
+      4. self.population = new_gen
+      5. Trier self.population (pour que [0] soit le meilleur)
+
+METHODE 4 : crossover(parent1, parent2)
+   Role   : Croisement uniforme (Uniform Crossover)
+   Logique: Pour chaque gene (seance) :
+               - 50% chance : prendre le gene de Parent_1
+               - 50% chance : prendre le gene de Parent_2
+   Resultat: Un nouvel individu (Schedule) avec les genes melanges
+
+METHODE 5 : mutate(schedule)
+   Role   : Modifier aleatoirement UN gene d un individu
+   Cible  : Seulement les seances NON-LOCKEES (is_locked = False)
+   Logique: Choisir un index aleatoire parmi les seances non-lockees
+            Assigner une salle aleatoire ET un creneau aleatoire
+   But    : Apporter de la diversite et eviter les optima locaux
+
+METHODE 6 : simulated_annealing_search(schedule)
+   Role   : Recherche Locale intensive sur un individu (Recuit Simule)
+   Entree : Un individu (enfant genere par crossover)
+   Etapes :
+      - T = sa_temp (Temperature initiale)
+      - Pour L de 1 a sa_iterations (400 iterations) :
+           1. Generer un voisin avec UN des 3 mouvements :
+              * MOVE 1 (33%) : ShiftBoth   - changer salle ET creneau
+              * MOVE 2 (33%) : SwapTime    - echanger les creneaux de 2 seances
+              * MOVE 3 (33%) : ShiftRoom   - changer seulement la salle
+           2. Calculer Delta = score(Voisin) - score(Courant)
+           3. Accepter si Delta < 0  (amelioration garantie)
+              OU       si Random < exp(-Delta / T)  (Metropolis - accepte parfois le pire)
+           4. T = T * sa_cooling (refroidissement)
+   Retour : Le meilleur individu trouve parmi toutes les 400 iterations
+
+================================================================================
