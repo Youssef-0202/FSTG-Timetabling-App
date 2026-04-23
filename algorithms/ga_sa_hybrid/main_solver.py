@@ -111,7 +111,7 @@ def run_optimization():
         best_gen = engine.population[0]
 
         # Evaluer le meilleur individu de cette generation
-        h, s, details = calculate_fitness_full(best_gen, CONSTRAINTS_MASK)
+        score, h, s, details = calculate_fitness_full(best_gen, CONSTRAINTS_MASK)
 
         print(f"  Generation {gen:03d} | Hard: {h:3d} | Soft: {s:6.0f}")
 

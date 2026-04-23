@@ -244,10 +244,14 @@ def calculate_fitness_full(schedule, mask=None):
     schedule.h9 = h9_violations
     schedule.gaps = total_soft
     
-    denominator = 1 + (M * h_violations) + total_soft
-    schedule.fitness = 1 / max(0.0001, denominator)
+    # FINAL CALCULATION (Lexicographical weighted sum)
+    # Total Score = M * Hard_Violations + Soft_Score
+    total_score = (M * h_violations) + total_soft
     
-    return h_violations, total_soft, {
+    # We store the raw score as "fitness" (in this project, we minimize cost)
+    schedule.fitness = total_score
+    
+    return total_score, h_violations, total_soft, {
         "H1_Teacher": h1_violations,
         "H2_Room": h2_violations,
         "H3_Section": h3_violations,

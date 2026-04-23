@@ -73,18 +73,9 @@ class HybridEngine:
     # ==========================================================================
 
     def get_score(self, schedule):
-        """
-        Calcule le score scalaire d un emploi du temps (plus petit = meilleur).
-
-        Formule lexicographique : score = (M * Hard_Violations) + Soft_Score
-        Le facteur M=10000 garantit que toute solution Hard=0 est TOUJOURS
-        meilleure qu une solution avec Hard=1, peu importe le score Soft.
-
-        Returns: float -- score scalaire (a minimiser)
-        """
-        h, s, details = calculate_fitness_full(schedule, mask=self.constraints_mask)
-        M = 10000
-        return (M * h) + s
+        """Calculates scalar score for comparison (Total Penalty)"""
+        score, h, s, details = calculate_fitness_full(schedule, mask=self.constraints_mask)
+        return score
 
     
     # SECTION C : INITIALISATION DE LA POPULATION
