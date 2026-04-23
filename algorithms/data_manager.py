@@ -93,7 +93,7 @@ class DataManager:
                         real_size = section_caps.get(sid, 200)
                         if real_size == 0: real_size = 200
                     else:
-                        # Pour un TD/TP, l'effectif est la somme des groupes rattachés à cette séance
+                        # Pour un TD , l'effectif est la somme des groupes rattachés à cette séance
                         # (Généralement 1 groupe, mais supporte les fusions de groupes)
                         real_size = sum(g.get('size', 40) for g in a.get('td_groups', []))
                         if real_size == 0: real_size = 40

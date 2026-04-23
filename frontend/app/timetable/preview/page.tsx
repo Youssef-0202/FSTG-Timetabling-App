@@ -77,6 +77,10 @@ export default function TimetablePage() {
         });
     };
 
+    const activeTeachers = React.useMemo(() => {
+        return teachers.filter(t => assignments.some(a => String(a.teacher_id) === String(t.id)));
+    }, [teachers, assignments]);
+
     return (
         <div className="page-container">
             <div className="hero-section" style={{ background: "linear-gradient(90deg, #1e3a8a, #0f172a)" }}>
@@ -87,14 +91,14 @@ export default function TimetablePage() {
             <div className="content-wrapper">
                 <div className="top-bar">
                     <div className="mode-toggle">
-                        <button className={viewMode === "section" ? "active" : ""} onClick={() => setViewMode("section")}><Users size={16} /> Par Section</button>
-                        <button className={viewMode === "teacher" ? "active" : ""} onClick={() => setViewMode("teacher")}><UserIcon size={16} /> Par Prof</button>
+                        <button className={viewMode === "section" ? "active" : ""} onClick={() => { setViewMode("section"); if (sections.length > 0) setSelectedId(String(sections[0].id)); }}><Users size={16} /> Par Section</button>
+                        <button className={viewMode === "teacher" ? "active" : ""} onClick={() => { setViewMode("teacher"); if (activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id)); }}><UserIcon size={16} /> Par Prof</button>
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
 
                     {viewMode !== "master" && (
                         <select className="id-selector" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
-                            {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                            {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : activeTeachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
                     )}
                     <button className="btn-download"><Download size={16} /> Exporter PDF</button>
@@ -129,13 +133,18 @@ export default function TimetablePage() {
                                                                     const mod = modules.find(m => m.id === mp?.module_id);
                                                                     const room = rooms.find(r => r.id === c.room_id);
                                                                     const teacher = teachers.find(t => t.id === c.teacher_id);
+                                                                    const sectionTarget = sections.find(s => String(s.id) === String(c.section_id));
+
                                                                     return (
                                                                         <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`}>
                                                                             <div className="c-name">{mod?.name}</div>
                                                                             <div className="c-info-row">
                                                                                 <div className="c-room"><MapPin size={10} /> {room?.name}</div>
-                                                                                {teacher && mp?.type === "CM" && (
+                                                                                {viewMode === "section" && teacher && mp?.type === "CM" && (
                                                                                     <div className="c-teacher"><UserIcon size={10} /> {teacher.name}</div>
+                                                                                )}
+                                                                                {viewMode === "teacher" && mp?.type === "CM" && sectionTarget && (
+                                                                                    <div className="c-teacher"><Users size={10} /> {sectionTarget.name}</div>
                                                                                 )}
                                                                                 {c.td_groups && c.td_groups.length > 0 && (
                                                                                     <div className="c-groups">

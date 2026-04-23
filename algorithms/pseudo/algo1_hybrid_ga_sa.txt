@@ -9,6 +9,50 @@ tandis que le Recuit Simule (SA) agit comme un operateur de recherche locale int
 polir chaque individu nouvellement genere.
 
 
+FLUX GENERAL DU SYSTEME 
+================================================================================
+
+ ETAPE 1 : Chargement des donnees (DataManager)
+            |
+            |---> Recuperer les Enseignants, Salles, Creneaux, Sections depuis l'API
+            |---> Construire la liste A_set (toutes les seances a placer)
+            |---> Verifier que les donnees sont completes (sinon arreter)
+            |
+            v
+ ETAPE 2 : Creation de la Population Initiale (GA - Initialisation)
+            |
+            |---> Generer Pop_size (100) emplois du temps aleatoires
+            |---> Chaque emploi du temps = 1 chromosome (un individu)
+            |---> Chaque gene = (Seance -> Salle aleatoire + Creneau aleatoire)
+            |
+            v
+ ETAPE 3 : Boucle Evolutive GA (moteur principal - engine.py)
+            |
+            |--- Pour chaque Generation (jusqu'a Max_Gen ou Early Stop) :
+            |       |
+            |       |--> Elitisme   : Garder les 2 meilleurs sans les modifier
+            |       |--> Croisement : Melanger les genes de 2 bons parents
+            |       |--> Mutation   : Modifier aleatoirement un gene (15% chance)
+            |       |
+            |       v
+ ETAPE 4 : Couche de Polissage Local SA (pour chaque enfant genere)
+            |
+            |---> Executer le Recuit Simule sur l'enfant (L_max iterations)
+            |---> 3 mouvements possibles : Shift, Swap, RoomOnly
+            |---> Accepter les mauvaises solutions parfois (critere Metropolis)
+            |---> Retourner la meilleure version de l'enfant
+            |
+            v
+ ETAPE 5 : Critere d'Arret et Export
+            |
+            |---> Si Hard_Violations == 0 pendant 30 generations => STOP
+            |---> Exporter Best_Schedule vers generated_timetable.json
+            |---> Interface Web lit le JSON et affiche l'emploi du temps
+
+================================================================================
+DETAILS LIGNE PAR LIGNE
+================================================================================
+
 Algorithm 1 : Integrative Hybrid GA-SA for University Timetabling
 --------------------------------------------------------------------------------
 
