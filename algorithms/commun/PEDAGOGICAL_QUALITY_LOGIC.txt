@@ -1,0 +1,125 @@
+================================================================================
+LOGIQUE DE LA QUALITE PEDAGOGIQUE
+================================================================================
+
+1. DEFINITION
+-------------
+La qualite pedagogique represente le niveau de confort et d'efficacite de
+l'apprentissage pour les etudiants et de travail pour les enseignants. 
+Contrairement aux conflits (Hard), ces regles ne sont pas bloquantes mais 
+l'algorithme tente de les optimiser au maximum.
+
+2. LES 9 PILIERS DE LA QUALITE (SOFT CONSTRAINTS)
+-------------------------------------------------
+
+[S1] Homogeneite des Demi-Journees (Mixing)
+     But : Eviter que les etudiants changent de matiere trop souvent dans 
+     une matinée ou un après-midi.
+     
+[S2] Non-Dispersion des CM (Lectures)
+     But : Eviter d'avoir un CM le matin et un autre CM de la meme section
+     le soir (respect de la continuite pedagogique).
+
+[S3] Reduction des Trous (Gaps)
+     But : Minimiser les heures d'attente inutiles pour les etudiants
+     entre deux seances de cours.
+
+[S4] Respect de la Pause Dejeuner (Noon Slot)
+     But : Eviter de placer des cours a 12h30 pour permettre aux etudiants
+     de se restaurer correctement.
+
+[S5] Equilibre de la Charge (Daily Balance)
+     But : Distribuer les heures de cours equitablement sur la semaine.
+
+[S6] Stabilite des Salles (Room Stability)
+     But : Garder le meme module dans la meme salle sur plusieurs semaines.
+
+[S7] Evitement des Journees Vides (Empty Days)
+     But : Eviter qu'un etudiant se deplace pour 1h30 de cours seulement.
+
+[S8] Liberation des Apres-Midis
+     But : Favoriser au moins 2 apres-midis sans cours par semaine pour 
+     permettre le travail personnel ou les activites extra-scolaires.
+
+[S9] Evitement de la Fatigue (Late Afternoon)
+     But : Penaliser les créneaux de fin de journée (12h30 et 16h35).
+
+
+3. PSEUDO-CODE : CALCUL DU SCORE PEDAGOGIQUE
+--------------------------------------------
+
+Procedure Calculate_Pedagogical_Score(Schedule) :
+    Total_Penalty = 0
+
+    // [S1, S2, S3] Analyse par Section et par Bloc (Matin/Apres-midi)
+    For each Section in Database:
+        For each (Day, SemiDay) in Schedule:
+            Sessions = Get_Sessions(Section, Day, SemiDay)
+            
+            // [S1] Homogeneite 
+            If len(Unique_Modules(Sessions)) > 1 then Penalty += 30
+            
+            // [S3] Gaps
+            Gap = Max_Slot(Sessions) - Min_Slot(Sessions) - 1
+            If Gap > 0 then Penalty += Gap * 5
+
+    // [S4, S5, S7, S8, S9] Analyse Quotidienne
+    For each Group in Database:
+        Busy_Afternoons = 0
+        For each Day in Week:
+            Total_Hours = Count_Sessions(Group, Day) * 2
+            
+            // [S7] Journee trop courte '2h'
+            If Total_Hours == 1.5 then Penalty += 100
+            
+            // [S5] Equilibre
+            Average = Total_Week_Hours / 5
+            Penalty += Abs(Total_Hours - Average) * 10
+            
+            // [S4 et S9] Preferences et Fatigue (Base sur l'heure reelle)
+            For each Session in Day:
+                If Session.Start_Time == "12:30" then Penalty += 40 // Pause Dej
+                If Session.Start_Time == "14:30" then Penalty += 10
+                If Session.Start_Time == "16:35" then Penalty += 20 // Fatigue
+
+            If Has_Class_In_Afternoon(Group, Day) then Busy_Afternoons += 1
+
+        // [S8] Verifier si on a au moins 2 apres-midis libres
+        Free_Afternoons = 5 - Busy_Afternoons
+        If Free_Afternoons < 2 then 
+            Penalty += (2 - Free_Afternoons) * 100
+
+    // [S6] Stabilite des salles
+    For each Module in Database:
+        Rooms_Used = Get_Unique_Rooms(Module, Schedule)
+        If len(Rooms_Used) > 1 then 
+            Penalty += (len(Rooms_Used) - 1) * 50 
+
+    Return Total_Penalty
+
+
+4. MODELISATION MATHEMATIQUE (Fonction Objectif)
+-----------------------------------------------
+Pour evaluer la solution x, nous utilisons une fonction de cout (Score) que 
+l'algorithme cherche a MINIMISER.
+
+Formule :  F(x) = (M * H(x)) + Sum( Wi * Si(x) )
+
+Où :
+- F(x) : Score final de penalite (0 = Perfection).
+- M    : Facteur de penalite "Big M" (10 000).
+- H(x) : Somme des violations des contraintes Dures (Hard).
+- Si(x): Valeur brute de la contrainte souple i (1 a 9).
+- Wi   : Poids (Importance) accorde a la contrainte i.
+
+5. SYSTEME DE PONTUATION (Weights)
+----------------------------------
+- Liberation apm / Journee  2h (S7, S8) : 80 pts (Priorite Qualitative)
+- Instabilite de salle (S6)              : 50 pts
+- Violation pause Dejeuner (S4)          : 40 pts
+- Mélange de cours (S1)                  : 30 pts
+- Fatigue fin de journée (S9 : 16h35)    : 20 pts
+- Fatigue début après-midi (S9 : 14h30)  : 10 pts
+- Trous (S3)                             : 5 pts / heure
+
+================================================================================

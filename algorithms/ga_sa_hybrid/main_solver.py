@@ -53,6 +53,7 @@ CONSTRAINTS_MASK = {
     "S_STABILITY":     True,   # Un module reste dans la meme salle d une semaine a l autre
     "S_EMPTY_DAYS":    True,   # Eviter les journees a une seule seance (trop courtes)
     "S_PREFERENCES":   True,   # Eviter les creneaux sensibles (Samedi, fin de journee)
+    "S_FREE_AFTERNOONS": True, # Favoriser au moins 2 apres-midis vides par semaine
 }
 
 

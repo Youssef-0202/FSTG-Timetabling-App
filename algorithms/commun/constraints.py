@@ -150,17 +150,46 @@ def calculate_fitness_full(schedule, mask=None):
 
     # 3. Traditional Gaps & Sensitive Slots (S4)
     sensitive_penalty = 0
+    group_afternoon_work = {} # group_id -> set of days where group has class in afternoon
+    
     for (sec_id, day, sd), sessions in section_semiday_blocks.items():
         for s in sessions:
             slot_id = s['slot']
-            # S4: Sensitive Slots (Samedi ou fin de journée)
-            # Supposons que IDs 5, 10, 15, 20... sont les slots de fin de journée ou Samedi
-            # Adapté selon tes IDs de timeslots. Si Samedi est le jour 6:
-            if day == "Samedi":
-                if mask.get("S_PREFERENCES", True): sensitive_penalty += 30
-            # Si c'est le dernier créneau de la journée (ex: 4ème séance)
-            if slot_id % 4 == 0: 
+            # On recupere l'heure de debut pour identifier le creneau precisement
+            # On cherche dans les donnees du DataManager l'objet TimeSlot correspondant a cet ID
+            ts = dm.slot_map.get(slot_id)
+            if not ts: continue
+
+            start_t = str(ts.start_time) # Format "HH:MM:SS"
+            daily_slot_index = 0
+            
+            # Mapping intelligent base sur l'heure reelle
+            if "08:30" in start_t: daily_slot_index = 1
+            elif "10:35" in start_t or "10:30" in start_t: daily_slot_index = 2
+            elif "12:30" in start_t: daily_slot_index = 3
+            elif "14:30" in start_t: daily_slot_index = 4
+            elif "16:30" in start_t or "16:35" in start_t: daily_slot_index = 5
+            
+            # S4: Sensitive Slots (Pénalités de confort)
+            # Pas de pénalité pour le Samedi (traité comme un jour normal)
+            
+            # Pénalité forte pour 12:30 (Slot 3) - Pause déjeuner
+            if daily_slot_index == 3:
+                if mask.get("S_PREFERENCES", True): sensitive_penalty += 40
+                
+            # Pénalité pour 14:30 (Slot 4)
+            if daily_slot_index == 4:
                 if mask.get("S_PREFERENCES", True): sensitive_penalty += 10
+            
+            # Pénalité pour fin de journée 16:30 (Slot 5)
+            if daily_slot_index == 5:
+                if mask.get("S_PREFERENCES", True): sensitive_penalty += 20
+
+            # Track Afternoon Work for S8 (Apres-midis = a partir de 14h30)
+            if daily_slot_index >= 4:
+                if sec_id not in group_afternoon_work: group_afternoon_work[sec_id] = set()
+                group_afternoon_work[sec_id].add(day)
+
         if len(sessions) > 1:
             sessions.sort(key=lambda x: x['slot'])
             gap = sessions[1]['slot'] - sessions[0]['slot'] - 1
@@ -168,22 +197,16 @@ def calculate_fitness_full(schedule, mask=None):
                 if mask.get("S_GAPS", True): total_gaps += gap * 5
                 gap_count += 1
 
+    # S8 : Favoriser au moins 2 après-midis vides par semaine
+    s8_free_afternoon_penalty = 0
+    for sec_id, busy_days in group_afternoon_work.items():
+        free_afternoons = 5 - len(busy_days) # On suppose 5 jours travaillés (Lundi-Vendredi)
+        if free_afternoons < 2:
+            if mask.get("S_FREE_AFTERNOONS", True):
+                s8_free_afternoon_penalty += (2 - free_afternoons) * 80
+
     # FINAL CALCULATION
-    h_violations = h1_violations + h2_violations + h3_violations + h4_violations + h9_violations
-    soft_violations = total_gaps + consec_penalty
-    
-    # Store for UI display in main_solver
-    schedule.h_violations = h_violations
-    schedule.h1 = h1_violations
-    schedule.h2 = h2_violations
-    schedule.h3 = h3_violations
-    schedule.h4 = h4_violations
-    schedule.h9 = h9_violations
-    schedule.gaps = total_gaps + consec_penalty
-    
-    M = 10000
-    # Use max(0, ...) to ensure don't cause division by zero
-    raw_soft_score = schedule.gaps
+    raw_soft_score = total_gaps + consec_penalty
     
     # --- SOURCED SOFT CONSTRAINTS (S5, S6, S7) ---
     s5_balance_penalty = 0
@@ -222,7 +245,7 @@ def calculate_fitness_full(schedule, mask=None):
         # S7: Évitement des journées "1 séance seulement" 
         for h in daily_hours:
             if h == 1.5:
-                if mask.get("S_EMPTY_DAYS", True): s7_empty_day_penalty += 100
+                if mask.get("S_EMPTY_DAYS", True): s7_empty_day_penalty += 80
 
         # S5: Équilibre (Balance) - Éviter les jours à 6h+ si d'autres jours ont 1.5h
         if len(daily_hours) > 1:
@@ -264,6 +287,7 @@ def calculate_fitness_full(schedule, mask=None):
         "S5_Balance": int(s5_balance_penalty),
         "S6_Stability": s6_stability_penalty,
         "S7_EmptyDays": s7_empty_day_penalty,
+        "S8_FreeAfternoons": s8_free_afternoon_penalty,
     }
 
 if __name__ == "__main__":

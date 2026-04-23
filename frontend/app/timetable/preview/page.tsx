@@ -266,34 +266,34 @@ export default function TimetablePage() {
                 .room-col-header span { display: block; font-size: 0.85rem; color: #1e293b; }
                 .room-col-header small { color: #64748b; font-weight: 500; font-size: 0.65rem; }
 
-                .pure-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; }
-                .time-header { font-weight: 700; color: #1e293b; width: 110px; text-align: center; font-size: 0.85rem; background: #fafafa; }
+                .pure-table td { padding: 4px 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; }
+                .time-header { font-weight: 700; color: #1e293b; width: 100px; text-align: center; font-size: 0.8rem; background: #fafafa; }
                 .sticky-cell { position: sticky; left: 0; background: #f8fafc; z-index: 5; font-weight: 800; border-right: 2px solid #e2e8f0; }
-                .header-time { min-width: 110px; }
+                .header-time { min-width: 100px; }
 
-                .course-box { padding: 10px; border-radius: 8px; font-size: 0.8rem; height: 100%; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
-                .m-assignment { padding: 6px; border-radius: 6px; font-size: 0.7rem; min-height: 50px; min-width: 150px; }
+                .course-box { padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; min-height: 55px; display: flex; flex-direction: column; justify-content: center; }
+                .m-assignment { padding: 4px; border-radius: 6px; font-size: 0.65rem; min-height: 45px; min-width: 140px; }
                 
-                .room-info { display: flex; flex-direction: column; gap: 2px; align-items: center; margin-top: 4px; }
-                .type-tag { color: #64748b; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; }
-                .cap-tag { background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: 700; }
+                .room-info { display: flex; flex-direction: column; gap: 1px; align-items: center; margin-top: 2px; }
+                .type-tag { color: #64748b; font-weight: 600; font-size: 0.55rem; text-transform: uppercase; }
+                .cap-tag { background: #e2e8f0; color: #475569; padding: 1px 4px; border-radius: 3px; font-size: 0.55rem; font-weight: 700; }
 
                 .cm { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e40af; }
                 .td { background: #f0fdf4; border-left: 4px solid #22c55e; color: #166534; }
                 .tp { background: #fdf2f8; border-left: 4px solid #ec4899; color: #9d174d; }
 
-                .c-name { font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2; margin-bottom: 4px; }
-                .c-room { font-size: 0.75rem; display: flex; align-items: center; gap: 4px; opacity: 0.8; }
+                .c-name { font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.1; margin-bottom: 2px; }
+                .c-room { font-size: 0.7rem; display: flex; align-items: center; gap: 4px; opacity: 0.8; }
                 
-                .m-mod { font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
-                .day-separator { background: #f1f5f9; }
-                .day-separator td { padding: 8px 15px; font-weight: 900; color: #475569; font-size: 0.75rem; letter-spacing: 1.5px; position: sticky; left: 0; }
+                .m-mod { font-weight: 700; line-height: 1.1; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+                .day-separator { background: #334155; }
+                .day-separator td { padding: 6px 15px; font-weight: 800; color: white; font-size: 0.7rem; letter-spacing: 2px; position: sticky; left: 0; text-align: left; }
                 
-                .time-label { text-align: center; min-width: 110px; font-size: 0.8rem; color: #0f172a; }
+                .time-label { text-align: center; min-width: 100px; font-size: 0.75rem; color: #0f172a; }
 
-                .c-info-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; flex-wrap: wrap; gap: 4px; }
-                .c-groups { display: flex; gap: 4px; flex-wrap: wrap; }
-                .group-tag { background: rgba(0,0,0,0.05); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+                .c-info-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; flex-wrap: wrap; gap: 2px; }
+                .c-groups { display: flex; gap: 2px; flex-wrap: wrap; }
+                .group-tag { background: rgba(0,0,0,0.05); padding: 0px 4px; border-radius: 3px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
                 .td .group-tag { background: rgba(22, 101, 52, 0.1); color: #166534; border: 1px solid rgba(22, 101, 52, 0.2); }
                 .tp .group-tag { background: rgba(157, 23, 77, 0.1); color: #9d174d; border: 1px solid rgba(157, 23, 77, 0.2); }
 
