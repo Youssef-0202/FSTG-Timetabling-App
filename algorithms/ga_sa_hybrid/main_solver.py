@@ -1,11 +1,11 @@
 # ==============================================================================
 # main_solver.py — Chef d Orchestre de l algorithme GA+SA
-# ==============================================================================
+# 
 # Role        : Orchestre l execution complete de l algorithme de bout en bout.
 #               Il decide QUAND lancer, COMBIEN de generations faire,
 #               QUAND s arreter, et sauvegarde le resultat final.
 # Dependances : DataManager | HybridEngine | calculate_fitness_full
-# Execution   : python main_solver.py  (depuis le dossier ga_sa_hybrid/)
+# Execution   : python main_solver.py  
 # ==============================================================================
 
 import sys
@@ -13,21 +13,28 @@ import os
 import json
 import requests
 
-# ── Ajout du dossier parent (algorithms/) au path pour les imports ──
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from data_manager import DataManager, API_BASE_URL
 from constraints import calculate_fitness_full
 from engine import HybridEngine
 
 
-# ==============================================================================
+
 # SECTION A : PARAMETRES GLOBAUX DE CONFIGURATION
 # ==============================================================================
 
 # ── Parametres de la boucle evolutive (GA) ──
 POP_SIZE         = 100   # Nombre d individus (chromosomes) par generation
 MAX_GEN          = 180   # Limite maximale de generations a executer
-MAX_GEN_AFTER_H0 = 30    # Generations supplementaires apres Hard=0 (polissage Soft)
+MAX_GEN_AFTER_H0 = 30    # Generations supplementaires apres Hard=0 
+
+MUTATION_RATE    = 0.15  # Probabilite de mutation (exploration)
+ELITISM          = 2     # Nombre d elites a conserver (stabilite)
+
+# ── Parametres du Recuit Simule Local (SA - Polissage) ──
+SA_ITERATIONS    = 400   # Budget d iterations SA par enfant (L_max)
+SA_TEMP          = 50.0  # Temperature de depart (T0)
+SA_COOLING       = 0.95  # Taux de refroidissement (Alpha)
 
 # ── Masque des contraintes (True = active, False = desactivee) ──
 CONSTRAINTS_MASK = {
@@ -49,7 +56,7 @@ CONSTRAINTS_MASK = {
 }
 
 
-# ==============================================================================
+
 # SECTION B : FLUX PRINCIPAL DE L ALGORITHME
 # ==============================================================================
 
@@ -57,8 +64,8 @@ def run_optimization():
     """
     Flux complet de l algorithme hybride GA+SA :
 
-    ETAPE 1 : Charger les donnees depuis l API (DataManager)
-    ETAPE 2 : Creer la population initiale aleatoire (HybridEngine)
+    ETAPE 1 : Charger les donnees depuis l API 
+    ETAPE 2 : Creer la population initiale aleatoire 
     ETAPE 3 : Boucle evolutive GA Generation par Generation
     ETAPE 4 : Critere d arret anticipe (Early Stopping quand Hard=0)
     ETAPE 5 : Exporter le meilleur emploi du temps en JSON
@@ -75,8 +82,17 @@ def run_optimization():
         print("[ERREUR] Impossible de charger les donnees. Verifiez le backend.")
         return
 
-    # ── ETAPE 2 : Creation de la population initiale aleatoire ──
-    engine = HybridEngine(dm, pop_size=POP_SIZE, constraints_mask=CONSTRAINTS_MASK)
+    # ── ETAPE 2 : Initialisation du Moteur ──
+    engine = HybridEngine(
+        dm, 
+        pop_size=POP_SIZE, 
+        constraints_mask=CONSTRAINTS_MASK,
+        mutation_rate=MUTATION_RATE,
+        elitism=ELITISM,
+        sa_iterations=SA_ITERATIONS,
+        sa_temp=SA_TEMP,
+        sa_cooling=SA_COOLING
+    )
     engine.create_initial_population()
     print(f"\n Population initiale creee : {POP_SIZE} individus aleatoires")
     print(f" Lancement de la boucle evolutive (max {MAX_GEN} generations)...\n")
@@ -91,7 +107,7 @@ def run_optimization():
         # Executer une generation complete (tri + elitisme + crossover + mutation + SA)
         engine.evolve()
 
-        # Recuperer le meilleur individu de la generation (index [0] apres tri)
+        # Recuperer le meilleur individu de la generation 
         best_gen = engine.population[0]
 
         # Evaluer le meilleur individu de cette generation
@@ -102,7 +118,7 @@ def run_optimization():
         # Mettre a jour le coffre-fort si c est la meilleure solution globale
         best_overall = best_gen
 
-        # ── ETAPE 4 : Critere d Arret Anticipe (Early Stopping) ──
+        # ── ETAPE 4 : Critere d Arret Anticipe  ──
         if h == 0:
             h_zero_since += 1
             print(f"           → Hard=0 depuis {h_zero_since} generations...")
@@ -115,7 +131,7 @@ def run_optimization():
     export_schedule_to_json(best_overall)
 
 
-# ==============================================================================
+# 
 # SECTION C : EXPORT DU RESULTAT EN JSON
 # ==============================================================================
 
@@ -124,7 +140,7 @@ def export_schedule_to_json(schedule, filename="../../backend/generated_timetabl
     Exporte le meilleur emploi du temps en JSON pour l interface web.
 
     Le fichier JSON est lu directement par le frontend Next.js pour l affichage.
-    Il est sauvegarde dans backend/generated_timetable.json (sans toucher a la BDD).
+    Il est sauvegarde dans backend/generated_timetable.json 
 
     Format de chaque entree : compatible avec le format de l API /assignments
     """
@@ -178,7 +194,7 @@ def export_schedule_to_json(schedule, filename="../../backend/generated_timetabl
     print(" Consultez localhost:3000/timetable/preview pour voir le resultat.\n")
 
 
-# ==============================================================================
+
 # POINT D ENTREE
 # ==============================================================================
 

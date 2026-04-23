@@ -14,7 +14,6 @@ import math
 import sys
 import os
 
-# ── Ajout du dossier parent (algorithms/) au path pour les imports ──
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from models import Schedule, Assignment
 from constraints import calculate_fitness_full
@@ -29,7 +28,14 @@ class HybridEngine:
     # SECTION A : INITIALISATION & PARAMETRES
     # ========================================
 
-    def __init__(self, data_manager, pop_size=30, constraints_mask=None):
+    def __init__(self, data_manager, 
+                 pop_size=30, 
+                 constraints_mask=None,
+                 mutation_rate=0.15,
+                 elitism=2,
+                 sa_iterations=400,
+                 sa_temp=50.0,
+                 sa_cooling=0.95):
         """
         Initialise le moteur avec les donnees et les parametres de l algorithme.
 
@@ -37,19 +43,24 @@ class HybridEngine:
             data_manager      -- Objet DataManager contenant salles, profs, creneaux
             pop_size          -- Nombre d individus (chromosomes) dans la population
             constraints_mask  -- Dictionnaire pour activer/desactiver chaque contrainte
+            mutation_rate     -- Probabilite de mutation (0.0 a 1.0)
+            elitism           -- Nombre d individus a conserver intacts
+            sa_iterations     -- Budget d iterations pour la recherche locale (L_max)
+            sa_temp           -- Temperature de depart pour SA (T0)
+            sa_cooling        -- Coefficient de refroidissement (Alpha)
         """
         # ── Donnees ──
         self.dm = data_manager
 
         # ── GA Parameters ──
-        self.pop_size      = pop_size   # Nombre de chromosomes par generation
-        self.mutation_rate = 0.15       # Probabilite de muter un enfant (15%)
-        self.elitism       = 2          # Nombre d elites copies directement a la gen suivante
+        self.pop_size      = pop_size
+        self.mutation_rate = mutation_rate
+        self.elitism       = elitism
 
         # ── SA Parameters (Recuit Simule Local) ──
-        self.sa_iterations = 400        # Nombre d iterations SA par individu (L_max)
-        self.sa_temp       = 50.0       # Temperature initiale (T0)
-        self.sa_cooling    = 0.95       # Taux de refroidissement (Alpha) : T = T * Alpha
+        self.sa_iterations = sa_iterations
+        self.sa_temp       = sa_temp
+        self.sa_cooling    = sa_cooling
 
         # ── Masque des contraintes actives ──
         self.constraints_mask = constraints_mask or {
