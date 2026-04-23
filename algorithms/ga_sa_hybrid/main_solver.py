@@ -84,6 +84,10 @@ def run_optimization():
         return
 
     # ── ETAPE 2 : Initialisation du Moteur ──
+    import time
+    import statistics
+    
+    start_time_exec = time.time()
     engine = HybridEngine(
         dm, 
         pop_size=POP_SIZE, 
@@ -95,40 +99,94 @@ def run_optimization():
         sa_cooling=SA_COOLING
     )
     engine.create_initial_population()
-    print(f"\n Population initiale creee : {POP_SIZE} individus aleatoires")
-    print(f" Lancement de la boucle evolutive (max {MAX_GEN} generations)...\n")
+    
+    # Statistiques initiales pour calcul d'amelioration
+    init_score, _, init_soft, _ = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
+    
+    print(f"\n Population initiale creee : {POP_SIZE} individus")
+    print(f" Score Initial (Best) : {init_score} | Soft: {init_soft}")
+    print(f" Lancement de la boucle evolutive...\n")
 
     # Variables de controle de la boucle
-    best_overall    = None   # Coffre-fort : meilleure solution jamais trouvee
-    h_zero_since    = 0      # Compteur : generations consecutives avec Hard=0
+    best_overall    = None   
+    h_zero_since    = 0      
+    history_report  = []
 
     # ── ETAPE 3 : Boucle Evolutive GA ──
     for gen in range(1, MAX_GEN + 1):
-
-        # Executer une generation complete (tri + elitisme + crossover + mutation + SA)
+        gen_start = time.time()
         engine.evolve()
-
-        # Recuperer le meilleur individu de la generation 
+        gen_duration = time.time() - gen_start
+        
         best_gen = engine.population[0]
-
-        # Evaluer le meilleur individu de cette generation
         score, h, s, details = calculate_fitness_full(best_gen, CONSTRAINTS_MASK)
+        
+        # Calcul de l'amelioration par rapport au TOUT DEBUT
+        improvement = ((init_score - score) / max(1, init_score)) * 100
+        
+        # --- Affichage Intelligent ---
+        line = f" Gen {gen:03d} | Score: {score:8.0f} | H: {h} | S: {s:5.0f} | Imp: {improvement:>5.1f}% | Time: {gen_duration:4.2f}s"
+        
+        # Detail si conflits presents
+        if h > 0:
+            h_details = f" → Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
+            print(line + h_details)
+        else:
+            print(line + " [POLISSAGE]")
 
-        print(f"  Generation {gen:03d} | Hard: {h:3d} | Soft: {s:6.0f}")
-
-        # Mettre a jour le coffre-fort si c est la meilleure solution globale
         best_overall = best_gen
+        history_report.append(score)
 
         # ── ETAPE 4 : Critere d Arret Anticipe  ──
         if h == 0:
             h_zero_since += 1
-            print(f"           → Hard=0 depuis {h_zero_since} generations...")
             if h_zero_since >= MAX_GEN_AFTER_H0:
-                print(f"\n [STOP] Critere d arret atteint : Hard=0 pendant {MAX_GEN_AFTER_H0} generations.")
+                print(f"\n [STOP] Stabilite atteinte (H=0 depuis {MAX_GEN_AFTER_H0} gen).")
                 break
 
-    # ── ETAPE 5 : Export du resultat final ──
-    print("\n" + "=" * 55)
+    # ── ETAPE 5 : Rapport de Synthese Final ──
+    duration = time.time() - start_time_exec
+    
+    # Stats de la population finale
+    final_fitnesses = [p.fitness for p in engine.population]
+    avg_pop = statistics.mean(final_fitnesses)
+    std_pop = statistics.stdev(final_fitnesses) if len(final_fitnesses) > 1 else 0
+    worst_pop = max(final_fitnesses)
+    
+    report_lines = [
+        "\n" + "=" * 60,
+        " ANALYSE FINALE DES PERFORMANCES ",
+        "=" * 60,
+        f" Temps total d'execution  : {duration:.2f} secondes",
+        f" Vitesse moyenne          : {duration/gen:.2f} sec/gen",
+        "-" * 60,
+        f" Score Initial (Best)     : {init_score}",
+        f" Score Final   (Best)     : {engine.population[0].fitness}",
+        f" Amelioration Totale      : {((init_score - engine.population[0].fitness)/max(1,init_score))*100:.1f} %",
+        "-" * 60,
+        " STATISTIQUES DE LA DERNIERE POPULATION :",
+        f"  - Meilleure Solution    : {engine.population[0].fitness}",
+        f"  - Pire Solution         : {worst_pop}",
+        f"  - Moyenne Population    : {avg_pop:.1f}",
+        f"  - Ecart-type (Std Dev)  : {std_pop:.1f}",
+        "-" * 60,
+        " DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :",
+    ]
+    
+    final_score, final_h, final_s, final_details = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
+    for k, v in final_details.items():
+        if v > 0: report_lines.append(f"  - {k:20} : {v}")
+    
+    report_lines.append("=" * 60)
+    
+    summary_text = "\n".join(report_lines)
+    print(summary_text)
+
+    # Sauvegarde
+    with open(os.path.join(os.path.dirname(__file__), "last_run_report.txt"), "w", encoding="utf-8") as f:
+        f.write(summary_text)
+
+    # ── ETAPE 6 : Export JSON pour UI ──
     export_schedule_to_json(best_overall)
 
 

@@ -122,3 +122,33 @@ Procedure de Recherche Locale : SimulatedAnnealingLS(Individu)
 18: return Best_Local
 
 
+--------------------------------------------------------------------------------
+PROCEDURE : SYNTHESE_ET_STATISTIQUES (SUMMARY_FUNCTION)
+--------------------------------------------------------------------------------
+1:  FIN_TEMPS = TEMPS_ACTUEL()
+2:  DUREE = FIN_TEMPS - DEBUT_TEMPS
+3:  
+4:  BEST = POPULATION[0]
+5:  SCORE_FINAL, HARD, SOFT = EVALUER(BEST)
+6:  
+7:  // Calcul des statistiques de population
+8:  FITNESSES = [individu.fitness for individu in POPULATION]
+9:  MOYENNE = CALCULER_MOYENNE(FITNESSES)
+10: ECART_TYPE = CALCULER_ECART_TYPE(FITNESSES)
+11: 
+12: // Calcul de la progression scientifique
+13: AMELIORATION = ((SCORE_INITIAL - SCORE_FINAL) / SCORE_INITIAL) * 100
+14: 
+15: // Rapport de Sortie
+16: AFFICHER "Temps d'exécution : ", DUREE, " secondes"
+17: AFFICHER "Générations totales : ", GEN_COUNTER
+18: AFFICHER "Amélioration globale : ", AMELIORATION, "%"
+19: AFFICHER "Conflits Hard restants : ", HARD
+20: AFFICHER "Pénalités Soft restantes : ", SOFT
+21: 
+22: // Journalisation (Log)
+23: ECRIRE_DANS_FICHIER("last_run_report.txt", RAPPORT_COMPLET)
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT
+--------------------------------------------------------------------------------
