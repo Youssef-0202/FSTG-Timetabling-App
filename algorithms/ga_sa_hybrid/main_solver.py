@@ -14,8 +14,8 @@ import json
 import requests
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from data_manager import DataManager, API_BASE_URL
-from constraints import calculate_fitness_full
+from commun.data_manager import DataManager, API_BASE_URL
+from commun.constraints import calculate_fitness_full
 from engine import HybridEngine
 
 

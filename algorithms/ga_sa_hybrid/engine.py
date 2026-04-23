@@ -15,8 +15,8 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from models import Schedule, Assignment
-from constraints import calculate_fitness_full
+from commun.models import Schedule, Assignment
+from commun.constraints import calculate_fitness_full
 
 
 class HybridEngine:
