@@ -57,7 +57,7 @@ class HybridEngine:
             "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
         }
 
-    # ==========================================================================
+    
     # SECTION B : SCORING
     # ==========================================================================
 
@@ -75,7 +75,7 @@ class HybridEngine:
         M = 10000
         return (M * h) + s
 
-    # ==========================================================================
+    
     # SECTION C : INITIALISATION DE LA POPULATION
     # ==========================================================================
 
@@ -104,7 +104,7 @@ class HybridEngine:
             sch = Schedule(self.dm, assignments)
             self.population.append(sch)
 
-    # ==========================================================================
+   
     # SECTION D : EVOLUTION (UNE GENERATION GA COMPLETE)
     # ==========================================================================
 
@@ -113,16 +113,16 @@ class HybridEngine:
         Execute UNE generation complete de l algorithme Genetique.
 
         Etapes :
-            1. Trier la population par score (meilleur en [0])
+            1. Trier la population par score 
             2. Copier les E meilleurs sans modification (Elitisme)
             3. Boucler jusqu a Pop_size individus :
-               a. TournamentSelect x2 → choisir Parent_1 et Parent_2
-               b. UniformCrossover   → creer un Enfant
-               c. Mutate (15%)       → modifier aleatoirement un gene de l Enfant
-               d. SA Local Search    → polir intensivement l Enfant (400 iterations SA)
+               a. TournamentSelect x2  → choisir Parent_1 et Parent_2
+               b. UniformCrossover     → creer un Enfant
+               c. Mutate               → modifier aleatoirement un gene de l Enfant
+               d. SA Local Search      → polir intensivement l Enfant (400 iterations SA)
                e. Ajouter l Enfant a la nouvelle generation
             4. Remplacer l ancienne population par la nouvelle
-            5. Trier la nouvelle population (population[0] = meilleur de la gen)
+            5. Trier la nouvelle population -> population[0] = meilleur de la gen)
         """
         # 1. Trier par fitness (ascending : meilleur score en [0])
         self.population.sort(key=lambda x: self.get_score(x))
@@ -153,7 +153,7 @@ class HybridEngine:
         self.population = new_gen
         self.population.sort(key=lambda x: self.get_score(x))
 
-    # ==========================================================================
+
     # SECTION E : OPERATEURS GENETIQUES
     # ==========================================================================
 
@@ -192,7 +192,7 @@ class HybridEngine:
         schedule.assignments[idx].room     = random.choice(self.dm.rooms)
         schedule.assignments[idx].timeslot = random.choice(self.dm.timeslots)
 
-    # ==========================================================================
+    
     # SECTION F : RECHERCHE LOCALE (RECUIT SIMULE LOCAL - SA)
     # ==========================================================================
 
@@ -205,6 +205,8 @@ class HybridEngine:
             MOVE 1 (r < 0.33) : ShiftBoth  — changer salle ET creneau d une seance
             MOVE 2 (r < 0.66) : SwapTime   — echanger les creneaux de 2 seances
             MOVE 3 (sinon)    : ShiftRoom  — changer seulement la salle d une seance
+        une recherche locale par recuit simulé avec un schéma de refroidissement géométrique continu
+        et un arrêt par budget d'itérations
 
         Critere d acceptation de Metropolis :
             - Accepter si Delta < 0   (le voisin est meilleur)
@@ -256,6 +258,6 @@ class HybridEngine:
                     best_sch = neighbor
                     best_fit = neighbor_fit
 
-            temp *= self.sa_cooling  # Refroidissement : T = T * Alpha
+            temp *= self.sa_cooling  # Refroidissement : T = T * Alpha | refroidissement géométrique continu
 
         return best_sch
