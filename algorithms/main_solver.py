@@ -39,12 +39,6 @@ def run_optimization():
 
     # FAILSAVE : On sauvegarde AVANT tout affichage console risqué
     export_schedule_to_json(best_overall)
-    
-    # Puis affichage
-    try:
-        print_solution_summary(best_overall, dm)
-    except:
-        pass
 
 def export_schedule_to_json(schedule, filename="../backend/generated_timetable.json"):
     """Exporte le résultat de l'IA dans un fichier JSON pour l'interface sans toucher à la BDD"""
@@ -88,42 +82,6 @@ def export_schedule_to_json(schedule, filename="../backend/generated_timetable.j
         
     print(f"   Planning sauvegardé avec succès dans {filepath}")
     print("   Allez sur localhost:3000/timetable-preview pour voir l'aperçu !\n")
-
-
-from datetime import datetime
-
-def print_solution_summary(schedule, dm):
-    """Affiche un résumé lisible avec conversion sécurisée des dates"""
-    print("\n" + "="*50)
-    print(" MEILLEURE SOLUTION TROUVÉE")
-    print("="*50)
-    
-    try:
-        sorted_as = sorted(schedule.assignments, key=lambda a: (a.timeslot.day, str(a.timeslot.start_time)))
-        
-        for a in sorted_as:
-            m_type = getattr(a.module_part, 'type', '??')
-            m_name = getattr(a.module_part, 'name', f"Mod#{a.module_part.module_id}")
-            
-            t_id = getattr(a.module_part, 'teacher_id', None)
-            t_obj = dm.teacher_map.get(t_id) if t_id else None
-            t_name = t_obj.name if t_obj else "SANS PROF"
-
-            day_str = f"{str(a.timeslot.day)[:3]}".upper()
-            
-            # Sécurité sur le format de l'heure
-            raw_time = a.timeslot.start_time
-            if hasattr(raw_time, 'strftime'):
-                time_str = raw_time.strftime('%H:%M')
-            else:
-                time_str = str(raw_time)[:5] # Prend "HH:MM" de "HH:MM:SS"
-            
-            print(f"[{day_str} {time_str}] {m_type:2} | {m_name:30} | Prof: {t_name:15} | Salle: {a.room.name:10}")
-        print("="*50)
-    except Exception as e:
-        print(f" (Note: Erreur mineure d'affichage console : {e})")
-
-
 
 
 if __name__ == "__main__":
