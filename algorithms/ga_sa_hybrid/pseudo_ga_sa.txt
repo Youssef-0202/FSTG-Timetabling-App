@@ -139,15 +139,18 @@ PROCEDURE : SYNTHESE_ET_STATISTIQUES (SUMMARY_FUNCTION)
 12: // Calcul de la progression scientifique
 13: AMELIORATION = ((SCORE_INITIAL - SCORE_FINAL) / SCORE_INITIAL) * 100
 14: 
-15: // Rapport de Sortie
-16: AFFICHER "Temps d'exécution : ", DUREE, " secondes"
-17: AFFICHER "Générations totales : ", GEN_COUNTER
-18: AFFICHER "Amélioration globale : ", AMELIORATION, "%"
-19: AFFICHER "Conflits Hard restants : ", HARD
-20: AFFICHER "Pénalités Soft restantes : ", SOFT
-21: 
-22: // Journalisation (Log)
-23: ECRIRE_DANS_FICHIER("last_run_report.txt", RAPPORT_COMPLET)
+15: // Rapport de Sortie (Uniquement si VERBOSE=VRAI)
+16: SI VERBOSE == VRAI ALORS
+17:     SI HARD > 0 ALORS
+18:         AFFICHER "Détails conflits : ", DETAILS_HARD(BEST)
+19:     SINON
+20:         AFFICHER "Détails qualité : ", DETAILS_SOFT(BEST)
+21:     FIN SI
+22:     AFFICHER "Total Temps : ", DUREE, "s | Amélioration : ", AMELIORATION, "%"
+23: FIN SI
+24: 
+25: // Journalisation (Log systématique)
+26: ECRIRE_DANS_FICHIER("last_run_report.txt", RAPPORT_COMPLET)
 
 --------------------------------------------------------------------------------
 FIN DU DOCUMENT

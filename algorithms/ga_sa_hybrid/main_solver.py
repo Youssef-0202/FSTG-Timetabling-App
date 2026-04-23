@@ -1,3 +1,4 @@
+
 # ==============================================================================
 # main_solver.py — Chef d Orchestre de l algorithme GA+SA
 # 
@@ -8,35 +9,36 @@
 # Execution   : python main_solver.py  
 # ==============================================================================
 
-import sys
 import os
+import sys
 import json
-import requests
+from datetime import datetime
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from commun.data_manager import DataManager, API_BASE_URL
+# Ajouter le chemin racine pour permettre les imports de 'commun'
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from commun.data_manager import DataManager
+from commun.models import Schedule
 from commun.constraints import calculate_fitness_full
-from engine import HybridEngine
+from .engine import HybridEngine
 
 
-
-# SECTION A : PARAMETRES GLOBAUX DE CONFIGURATION
+# CONFIGURATION ET PARAMÈTRES 
 # ==============================================================================
 
-# ── Parametres de la boucle evolutive (GA) ──
-POP_SIZE         = 100   # Nombre d individus (chromosomes) par generation
-MAX_GEN          = 180   # Limite maximale de generations a executer
-MAX_GEN_AFTER_H0 = 30    # Generations supplementaires apres Hard=0 
+# 1. Parametres de l'Algorithme Genetique (GA)
+POP_SIZE = 100
+MAX_GEN = 150
+MUTATION_RATE = 0.15
+ELITISM = 2
+MAX_GEN_AFTER_H0 = 30 # Nombre de gens a faire apres avoir atteint 0 conflit
 
-MUTATION_RATE    = 0.15  # Probabilite de mutation (exploration)
-ELITISM          = 2     # Nombre d elites a conserver (stabilite)
+# 2. Parametres du Recuit Simule (SA) - Recherche Locale
+SA_ITERATIONS = 400
+SA_TEMP = 50.0
+SA_COOLING = 0.95
 
-# ── Parametres du Recuit Simule Local (SA - Polissage) ──
-SA_ITERATIONS    = 400   # Budget d iterations SA par enfant (L_max)
-SA_TEMP          = 50.0  # Temperature de depart (T0)
-SA_COOLING       = 0.95  # Taux de refroidissement (Alpha)
-
-# ── Masque des contraintes (True = active, False = desactivee) ──
+# 3. Masque des Contraintes (Activer/Desactiver des regles)
 CONSTRAINTS_MASK = {
     # Contraintes Dures (Hard) — a respecter absolument
     "H1": True,   # Pas deux cours au meme creneau pour le meme prof
@@ -80,12 +82,25 @@ def run_optimization():
 
     dm = DataManager()
     if not dm.fetch_all_data():
-        print("[ERREUR] Impossible de charger les donnees. Verifiez le backend.")
+        print("Erreur : Impossible de charger les donnees.")
         return
 
-    # ── ETAPE 2 : Initialisation du Moteur ──
-    import time
-    import statistics
+    # ── ETAPE 2 : Statistiques et Initialisation Log ──
+    from commun.reporting import print_generation_status, generate_final_report, initialize_log_file
+    
+    db_stats = {
+        "nb_teachers": len(dm.teachers),
+        "nb_rooms": len(dm.rooms),
+        "nb_sections": len(dm.sections),
+        "nb_module_parts": len(dm.module_parts),
+        "nb_slots": len(dm.timeslots)
+    }
+    params = {
+        "POP_SIZE": POP_SIZE, "MAX_GEN": MAX_GEN, "MUTATION_RATE": MUTATION_RATE,
+        "SA_ITERATIONS": SA_ITERATIONS, "SA_TEMP": SA_TEMP
+    }
+    
+    initialize_log_file(params, db_stats)
     
     start_time_exec = time.time()
     engine = HybridEngine(
@@ -98,164 +113,69 @@ def run_optimization():
         sa_temp=SA_TEMP,
         sa_cooling=SA_COOLING
     )
+    
     engine.create_initial_population()
     
-    # Statistiques initiales pour calcul d'amelioration
+    # Statistiques initiales
     init_score, _, init_soft, _ = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
     
-    print(f"\n Population initiale creee : {POP_SIZE} individus")
-    print(f" Score Initial (Best) : {init_score} | Soft: {init_soft}")
-    print(f" Lancement de la boucle evolutive...\n")
+    if VERBOSE:
+        print(f"\n[START] Lancement GA-SA Hybrid Solver")
+        print(f"        Seances a placer: {db_stats['nb_module_parts']} | Score Initial: {init_score}")
 
-    # Variables de controle de la boucle
-    best_overall    = None   
-    h_zero_since    = 0      
-    history_report  = []
+    h_zero_since = 0
 
     # ── ETAPE 3 : Boucle Evolutive GA ──
     for gen in range(1, MAX_GEN + 1):
         gen_start = time.time()
+        
+        # Executer une generation complete (tri + elitisme + crossover + mutation + SA)
         engine.evolve()
-        gen_duration = time.time() - gen_start
         
-        best_gen = engine.population[0]
-        score, h, s, details = calculate_fitness_full(best_gen, CONSTRAINTS_MASK)
+        gen_dur = time.time() - gen_start
         
-        # Calcul de l'amelioration par rapport au TOUT DEBUT
-        improvement = ((init_score - score) / max(1, init_score)) * 100
-        
-        # --- Affichage Intelligent ---
-        line = f" Gen {gen:03d} | Score: {score:8.0f} | H: {h} | S: {s:5.0f} | Imp: {improvement:>5.1f}% | Time: {gen_duration:4.2f}s"
-        
-        # Detail si conflits presents
-        if h > 0:
-            h_details = f" → Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
-            print(line + h_details)
-        else:
-            print(line + " [POLISSAGE]")
+        # Affichage du statut (Encapsule dans reporting.py)
+        print_generation_status(gen, engine.population[0], gen_dur, init_score, 
+                                CONSTRAINTS_MASK, verbose=VERBOSE)
 
-        best_overall = best_gen
-        history_report.append(score)
-
-        # ── ETAPE 4 : Critere d Arret Anticipe  ──
-        if h == 0:
+        # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
+        if engine.population[0].h_violations == 0:
             h_zero_since += 1
             if h_zero_since >= MAX_GEN_AFTER_H0:
-                print(f"\n [STOP] Stabilite atteinte (H=0 depuis {MAX_GEN_AFTER_H0} gen).")
+                if VERBOSE: print(f"\n[STOP] Convergence de stabilite atteinte.")
                 break
+        else:
+            h_zero_since = 0
 
-    # ── ETAPE 5 : Rapport de Synthese Final ──
+    # ── ETAPE 4 : Rapport Final et Statistiques ──
     duration = time.time() - start_time_exec
-    
-    # Stats de la population finale
-    final_fitnesses = [p.fitness for p in engine.population]
-    avg_pop = statistics.mean(final_fitnesses)
-    std_pop = statistics.stdev(final_fitnesses) if len(final_fitnesses) > 1 else 0
-    worst_pop = max(final_fitnesses)
-    
-    report_lines = [
-        "\n" + "=" * 60,
-        " ANALYSE FINALE DES PERFORMANCES ",
-        "=" * 60,
-        f" Temps total d'execution  : {duration:.2f} secondes",
-        f" Vitesse moyenne          : {duration/gen:.2f} sec/gen",
-        "-" * 60,
-        f" Score Initial (Best)     : {init_score}",
-        f" Score Final   (Best)     : {engine.population[0].fitness}",
-        f" Amelioration Totale      : {((init_score - engine.population[0].fitness)/max(1,init_score))*100:.1f} %",
-        "-" * 60,
-        " STATISTIQUES DE LA DERNIERE POPULATION :",
-        f"  - Meilleure Solution    : {engine.population[0].fitness}",
-        f"  - Pire Solution         : {worst_pop}",
-        f"  - Moyenne Population    : {avg_pop:.1f}",
-        f"  - Ecart-type (Std Dev)  : {std_pop:.1f}",
-        "-" * 60,
-        " DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :",
-    ]
-    
-    final_score, final_h, final_s, final_details = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
-    for k, v in final_details.items():
-        if v > 0: report_lines.append(f"  - {k:20} : {v}")
-    
-    report_lines.append("=" * 60)
-    
-    summary_text = "\n".join(report_lines)
-    print(summary_text)
+    generate_final_report(engine, duration, init_score, CONSTRAINTS_MASK, verbose=VERBOSE)
 
-    # Sauvegarde
-    with open(os.path.join(os.path.dirname(__file__), "last_run_report.txt"), "w", encoding="utf-8") as f:
-        f.write(summary_text)
+    # ── ETAPE 5 : Export JSON final pour l'interface ──
+    export_schedule_to_json(engine.population[0])
 
-    # ── ETAPE 6 : Export JSON pour UI ──
-    export_schedule_to_json(best_overall)
-
-
-# 
-# SECTION C : EXPORT DU RESULTAT EN JSON
-# ==============================================================================
-
-def export_schedule_to_json(schedule, filename="../../backend/generated_timetable.json"):
-    """
-    Exporte le meilleur emploi du temps en JSON pour l interface web.
-
-    Le fichier JSON est lu directement par le frontend Next.js pour l affichage.
-    Il est sauvegarde dans backend/generated_timetable.json 
-
-    Format de chaque entree : compatible avec le format de l API /assignments
-    """
-    if schedule is None:
-        print("[ERREUR] Aucune solution a exporter.")
-        return
-
-    print(f" Exportation de {len(schedule.assignments)} affectations...")
-
-    # Recuperer les donnees actuelles de la BDD pour enrichir l export (td_groups, etc.)
-    try:
-        current_db = requests.get(f"{API_BASE_URL}/assignments").json()
-        db_map = {a['id']: a for a in current_db}
-    except Exception as e:
-        print(f" [ERREUR] Connexion backend impossible : {e}")
-        return
-
-    export_data = []
+def export_schedule_to_json(schedule):
+    """Convertit l'emploi du temps en format JSON compatible avec le frontend."""
+    output = []
     for a in schedule.assignments:
-        assignment_id = a.module_part.id
-        orig = db_map.get(assignment_id, {})
-
-        # Construire l entree JSON au format attendu par le frontend
-        export_item = {
-            "id":             assignment_id,
-            "module_part_id": orig.get("module_part_id", getattr(a.module_part, 'module_id', 0)),
-            "teacher_id":     orig.get("teacher_id",     getattr(a.module_part, 'teacher_id', 0)),
-            "section_id":     orig.get("section_id"),
-            "room_id":        a.room.id,
-            "slot_id":        a.timeslot.id,
-            "is_locked":      orig.get("is_locked", False),
-            "td_groups":      orig.get("td_groups", []),
-            "module_part":    orig.get("module_part", {}),
-            "teacher":        orig.get("teacher", {}),
-            "room":           {"id": a.room.id,      "name": a.room.name},
-            "timeslot":       {
-                "id":         a.timeslot.id,
-                "day":        a.timeslot.day,
-                "start_time": a.timeslot.start_time,
-                "end_time":   a.timeslot.end_time
-            },
-        }
-        export_data.append(export_item)
-
-    # Sauvegarder le fichier JSON
-    filepath = os.path.join(os.path.dirname(__file__), filename)
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(export_data, f, indent=4, ensure_ascii=False)
-
-    print(f" Sauvegarde reussie : {filepath}")
-    print(" Consultez localhost:3000/timetable/preview pour voir le resultat.\n")
-
-
-
-# POINT D ENTREE
-# ==============================================================================
+        output.append({
+            "id": a.module_part.id,
+            "module_part_id": a.module_part.id,
+            "teacher_id": a.module_part.teacher_id,
+            "room_id": a.room.id,
+            "slot_id": a.timeslot.id,
+            "section_id": a.module_part.section_id,
+            "td_groups": [{"id": g.id, "name": g.name} for g in a.module_part.td_groups]
+        })
+    
+    file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
+                             "backend", "generated_timetable.json")
+    
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=4)
+    
+    if VERBOSE:
+        print(f"\n[EXPORT] Solution sauvegardee dans : {os.path.basename(file_path)}")
 
 if __name__ == "__main__":
     run_optimization()

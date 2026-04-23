@@ -3,6 +3,33 @@ import time
 import statistics
 import os
 
+def initialize_log_file(params, db_stats):
+    """Cree l'en-tete du fichier de log avec les parametres et stats DB."""
+    log_path = os.path.join(os.getcwd(), "last_run_report.txt")
+    header = [
+        "=" * 60,
+        " RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS",
+        f" Date : {time.strftime('%Y-%m-%d %H:%M:%S')}",
+        "=" * 60,
+        "\n1. PARAMETRES DE L'ALGORITHME :",
+        f" - Population Size      : {params['POP_SIZE']}",
+        f" - Max Generations      : {params['MAX_GEN']}",
+        f" - Mutation Rate        : {params['MUTATION_RATE']}",
+        f" - SA Iterations        : {params['SA_ITERATIONS']}",
+        f" - SA Temp Initial      : {params['SA_TEMP']}",
+        "\n2. STATISTIQUES DE LA BASE DE DONNEES :",
+        f" - Nombre d'Enseignants : {db_stats['nb_teachers']}",
+        f" - Nombre de Salles     : {db_stats['nb_rooms']}",
+        f" - Nombre de Sections   : {db_stats['nb_sections']}",
+        f" - Seances a placer     : {db_stats['nb_module_parts']}",
+        f" - Creneaux disponibles : {db_stats['nb_slots']}",
+        "\n" + "=" * 60,
+        " SUIVI DES GENERATIONS :",
+        "=" * 60 + "\n"
+    ]
+    with open(log_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(header))
+
 def print_generation_status(gen, individual, gen_duration, init_score, mask, verbose=True):
     """Affiche le statut d'une generation."""
     if not verbose:
@@ -20,7 +47,8 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
         h_details = " → Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
         print(line + h_details)
     else:
-        print(line + " [POLISSAGE]")
+        s_details = " → Soft: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('S') and v > 0])
+        print(line + s_details)
 
 def generate_final_report(engine, total_duration, init_score, mask, verbose=True):
     """Cree et affiche le rapport final, et le sauvegarde dans un fichier."""
@@ -64,10 +92,10 @@ def generate_final_report(engine, total_duration, init_score, mask, verbose=True
     if verbose:
         print(summary_text)
 
-    # Sauvegarde automatique
+    # Sauvegarde automatique (Ajout a la fin du fichier existant)
     log_path = os.path.join(os.getcwd(), "last_run_report.txt")
     try:
-        with open(log_path, "w", encoding="utf-8") as f:
+        with open(log_path, "a", encoding="utf-8") as f:
             f.write(summary_text)
     except:
         pass
