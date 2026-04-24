@@ -223,19 +223,25 @@ class HybridEngine:
 
     def crossover(self, p1, p2):
         """
-        Croisement Uniforme (Uniform Crossover) entre deux parents.
-
-        Pour chaque gene (seance) :
-            - 50% de probabilite : prendre le gene de Parent_1
-            - 50% de probabilite : prendre le gene de Parent_2
-
-        Returns: Schedule -- un nouvel individu avec les genes melanges
+        Module-preserving Uniform Crossover (P7).
+        On choisit le parent AU NIVEAU DU MODULE, pas de la séance.
+        Toutes les séances d'un même module viennent du même parent.
         """
-        new_assignments = []
-        for i in range(len(p1.assignments)):
+        # Grouper les indices de séances par module_id
+        module_groups = {}
+        for i, a in enumerate(p1.assignments):
+            mid = a.module_part.module_id
+            module_groups.setdefault(mid, []).append(i)
+
+        new_assignments = [None] * len(p1.assignments)
+
+        for module_id, indices in module_groups.items():
+            # Choisir UN seul parent pour TOUT le module
             parent = p1 if random.random() < 0.5 else p2
-            orig = parent.assignments[i]
-            new_assignments.append(Assignment(orig.module_part, orig.room, orig.timeslot))
+            for i in indices:
+                orig = parent.assignments[i]
+                new_assignments[i] = Assignment(orig.module_part, orig.room, orig.timeslot)
+
         return Schedule(self.dm, new_assignments)
 
     def mutate(self, schedule):
@@ -299,68 +305,126 @@ class HybridEngine:
 
     def simulated_annealing_search(self, schedule):
         """
-        Recherche Locale par Recuit Simule (SA) sur un individu.
-
-        Applique L_max=400 iterations de perturbations sur l individu recu.
-        A chaque iteration, un des 3 mouvements de voisinage est choisi :
-            MOVE 1 (r < 0.33) : ShiftBoth  — changer salle ET creneau d une seance
-            MOVE 2 (r < 0.66) : SwapTime   — echanger les creneaux de 2 seances
-            MOVE 3 (sinon)    : ShiftRoom  — changer seulement la salle d une seance
-        une recherche locale par recuit simulé avec un schéma de refroidissement géométrique continu
-        et un arrêt par budget d'itérations
-
-        Critere d acceptation de Metropolis :
-            - Accepter si Delta < 0   (le voisin est meilleur)
-            - Accepter si Random < exp(-Delta / T)  (accepte parfois un moins bon)
-            → Cette acceptation probabiliste permet d eviter les optima locaux.
-
-        Returns: Schedule -- le meilleur individu trouve parmi toutes les iterations
+        Recherche Locale par Recuit Simulé (SA) optimisée (P3 + P10).
+        - P3 : Exécution "In-place" avec Undo (gain de temps considérable).
+        - P10 : Bi-phasé (Hard vs Soft) avec mouvements spécialisés.
         """
         current_sch = schedule
         current_fit = self.get_score(current_sch)
-        best_sch    = current_sch
-        best_fit    = current_fit
         
-        # P5 : Température adaptive (~5% du score courant)
+        # P5 : Température adaptive (5% du score courant)
         temp = max(self.sa_temp, current_fit * 0.05)
+        
+        # Snapshot de départ
+        best_fit = current_fit
+        best_state = [(a.room, a.timeslot) for a in schedule.assignments]
+        
+        # P10 : Déterminer la phase (Hard si violations hard > 0, sinon Soft)
+        active_phase = 'hard' if schedule.h_violations > 0 else 'soft'
 
-        for _ in range(self.sa_iterations):
-            neighbor = schedule.copy()
-            r = random.random()
+        for it in range(self.sa_iterations):
+            # Transition dynamique vers le soft si le hard est résolu à mi-parcours
+            if it == self.sa_iterations // 2 and active_phase == 'hard':
+                if schedule.h_violations == 0: active_phase = 'soft'
 
-            unlocked_indices = [i for i, a in enumerate(neighbor.assignments) if not a.module_part.is_locked]
-            if not unlocked_indices:
-                break
+            unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
+            if not unlocked: break
 
-            if r < 0.33:
-                # MOVE 1 : Shift Both (salle + creneau)
-                idx = random.choice(unlocked_indices)
-                neighbor.assignments[idx].room     = random.choice(self.dm.rooms)
-                neighbor.assignments[idx].timeslot = random.choice(self.dm.timeslots)
+            # P3 : Sauvegarde locale pour Undo O(1)
+            idx = random.choice(unlocked) if active_phase == 'hard' else None # pour certains moves soft
+            saved_indices = []
+            saved_states = []
 
-            elif r < 0.66:
-                # MOVE 2 : Swap Timeslots (echanger 2 seances)
-                if len(unlocked_indices) >= 2:
-                    idx1, idx2 = random.sample(unlocked_indices, 2)
-                    neighbor.assignments[idx1].timeslot, neighbor.assignments[idx2].timeslot = \
-                        neighbor.assignments[idx2].timeslot, neighbor.assignments[idx1].timeslot
-
+            # Application du mouvement
+            if active_phase == 'hard':
+                # Mouvements génériques pour casser les conflits hard
+                idx, old_room, old_slot = self._apply_hard_move(schedule, unlocked)
+                saved_indices = [idx]
+                saved_states = [(old_room, old_slot)]
             else:
-                # MOVE 3 : Shift Room Only (changer seulement la salle)
-                idx = random.choice(unlocked_indices)
-                neighbor.assignments[idx].room = random.choice(self.dm.rooms)
+                # Mouvements spécialisés pour réduire les pénalités soft
+                saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
 
-            neighbor_fit = self.get_score(neighbor)
-            delta        = neighbor_fit - current_fit
+            # Invalider le cache et recalculer
+            schedule.fitness = None
+            neighbor_fit = self.get_score(schedule)
+            delta = neighbor_fit - current_fit
 
-            # Critere d acceptation de Metropolis
+            # Critère de Metropolis
             if delta < 0 or (temp > 0 and random.random() < math.exp(-delta / temp)):
-                current_sch = neighbor
+                # Acceptation
                 current_fit = neighbor_fit
                 if current_fit < best_fit:
-                    best_sch = neighbor
-                    best_fit = neighbor_fit
+                    best_fit = current_fit
+                    best_state = [(a.room, a.timeslot) for a in schedule.assignments]
+            else:
+                # REJET (P3 : Undo O(1))
+                for i, (r, s) in zip(saved_indices, saved_states):
+                    schedule.assignments[i].room = r
+                    schedule.assignments[i].timeslot = s
+                schedule.fitness = current_fit # Restaurer le score précédent
 
-            temp *= self.sa_cooling  # Refroidissement : T = T * Alpha | refroidissement géométrique continu
+            temp *= self.sa_cooling
 
-        return best_sch
+        # Restaurer le meilleur état trouvé
+        for i, (r, s) in enumerate(best_state):
+            schedule.assignments[i].room = r
+            schedule.assignments[i].timeslot = s
+        schedule.fitness = best_fit
+        
+        return schedule
+
+    def _apply_hard_move(self, schedule, unlocked):
+        """Mouvements génériques pour éliminer les violations Hard (H1-H4)."""
+        idx = random.choice(unlocked)
+        a = schedule.assignments[idx]
+        old_room, old_slot = a.room, a.timeslot
+        
+        r = random.random()
+        if r < 0.5:
+            # Shift Both
+            a.room = random.choice(self.dm.rooms)
+            a.timeslot = random.choice(self.dm.timeslots)
+        else:
+            # Shift Room Only
+            a.room = random.choice(self.dm.rooms)
+            
+        return idx, old_room, old_slot
+
+    def _apply_soft_move(self, schedule, unlocked):
+        """Mouvements spécialisés (P10) pour réduire les pénalités Soft."""
+        r = random.random()
+        changed_indices = []
+        old_states = []
+
+        if r < 0.35:
+            # S1: StabilizeRoom (Réduit S6_Stability)
+            # Aligner les salles pour un même module
+            mid = random.choice([a.module_part.module_id for i, a in enumerate(schedule.assignments) if i in unlocked])
+            target_room = random.choice(self.dm.rooms)
+            for i in unlocked:
+                if schedule.assignments[i].module_part.module_id == mid:
+                    changed_indices.append(i)
+                    old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
+                    schedule.assignments[i].room = target_room
+        
+        elif r < 0.65:
+            # S2: CompactDay (Réduit S3_Gaps)
+            # Rapprocher les séances d'un professeur sur le même jour
+            idx = random.choice(unlocked)
+            a = schedule.assignments[idx]
+            prof_id = a.module_part.teacher_id
+            prof_assigns = [schedule.assignments[i] for i in range(len(schedule.assignments)) if schedule.assignments[i].module_part.teacher_id == prof_id]
+            if prof_assigns:
+                ref_day = random.choice(prof_assigns).timeslot.day
+                target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
+                changed_indices.append(idx)
+                old_states.append((a.room, a.timeslot))
+                a.timeslot = target_slot
+        else:
+            # Move générique pour maintenir la diversité
+            idx, r, s = self._apply_hard_move(schedule, unlocked)
+            changed_indices = [idx]
+            old_states = [(r, s)]
+            
+        return changed_indices, old_states
