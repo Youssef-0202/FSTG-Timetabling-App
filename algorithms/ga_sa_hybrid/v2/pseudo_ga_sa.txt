@@ -1,0 +1,157 @@
+
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME HYBRIDE GA+SA 
+
+
+
+1. DESCRIPTION DE L'APPROCHE
+----------------------------
+Le probleme de generation d'emplois du temps est NP-Difficile. Pour le resoudre, 
+nous utilisons une approche hybride combinant :
+- Algorithme Genetique (GA) : Pour l'exploration globale. Il gere une population
+  de solutions et utilise le croisement/mutation pour explorer l'espace.
+- Recuit Simule (SA) : Pour l'exploitation locale (Polissage). Il intervient 
+  comme un operateur de recherche locale intensive pour ameliorer chaque individu.
+
+Cette combinaison est connue sous le nom d'Algorithme Memetique.
+
+2. FLUX GENERAL DU SYSTEME (Pipeline)
+-------------------------------------
+
+ ETAPE 1 : Chargement des donnees (DataManager)
+            |---> Recuperer Enseignants, Salles, Creneaux via API
+            |---> Preparer la liste des seances a placer (A_set)
+            v
+ ETAPE 2 : Initialisation (GA)
+            |---> Generer 100 individus (emplois du temps) aleatoires
+            v
+ ETAPE 3 : Boucle Evolutive (Moteur GA)
+            |---> Trier par Fitness (Score)
+            |---> Appliquer l'Elitisme (Garder les meilleurs)
+            |---> Reproduction : Selection par Tournoi + Croisement Uniforme
+            |---> Diversite   : Mutation Aleatoire 
+            v
+ ETAPE 4 : Polissage Local (Moteur SA) - Execute pour chaque enfant genere
+            |---> 400 iterations de perturbations (Shift, Swap)
+            |---> Refroidissement geometrique continu
+            v
+ ETAPE 5 : Arret Intelligent 
+            |---> Si 0 conflit (Hard=0) pendant 30 generations => STOP
+            |---> Export final vers generated_timetable.json
+
+
+3. DICTIONNAIRE DES PARAMETRES (Configuration)
+----------------------------------------------
+- POP_SIZE (100)        : Nombre de solutions traitees en parallele.
+- MUTATION_RATE (0.15)  : Force de l'exploration aleatoire.
+- ELITISM (2)           : Nombre de solutions parfaites preservees.
+- L_MAX (400)           : Budget de recherche locale (iterations SA).
+- T_Initial (50.0)      : Tolerance initiale aux mauvaises solutions.
+- Alpha (0.95)          : Vitesse de convergence de la recherche locale.
+- MAX_GEN_AFTER_H0 (30) : Seuil de stabilite avant l'arret final.
+
+
+4. PSEUDO-CODE FORMEL
+
+
+Procedure Principale : RUN_OPTIMIZATION()
+--------------------------------------------------------------------------------
+1:  A_set = LoadDataFromDatabase()
+2:  Initialize Engine with (A_set, POP_SIZE, MUTATION_RATE, ELITISM, SA_PARAMS)
+3:  Engine.CreateInitialPopulation()
+4:  
+5:  for Gen = 1 to MAX_GEN do
+6:      Engine.Evolve()  // Execute une generation GA complete (incluant SA)
+7:      Best_Candidate = Engine.Population[0] // Meilleur apres tri
+8:      Hard, Soft = Evaluate(Best_Candidate)
+9:
+10:     if Hard == 0 then
+11:         Generations_Since_H0 = Generations_Since_H0 + 1
+12:         if Generations_Since_H0 >= MAX_GEN_AFTER_H0 then
+13:             BREAK // Arret anticipe pour gagner du temps
+14:         end if
+15:     end if
+16: end for
+17: ExportToJSON(Best_Candidate)
+
+
+
+Procedure Evolutive : HYBRID_GA_SA_EVOLVE()
+--------------------------------------------------------------------------------
+1:  Sort Population by Fitness (Best at index 0)
+2:  New_Population = Copy(Population[0...ELITISM-1]) // Elitisme
+3:  
+4:  while size(New_Population) < POP_SIZE do
+5:      Parent1 = TournamentSelect(Population, size=5)
+6:      Parent2 = TournamentSelect(Population, size=5)
+7:      
+8:      Child = Crossover(Parent1, Parent2) // Melange uniforme des seances
+9:      
+10:     if Random(0,1) < MUTATION_RATE then
+11:         Child = Mutate(Child) // Mutation aleatoire (Exploration)
+12:     end if
+13:     
+14:     // Couche de Polissage (Local Search)
+15:     Child = SimulatedAnnealingLS(Child) 
+16:     
+17:     Add Child to New_Population
+18: end while
+19: Population = New_Population
+20: Sort Population by Fitness 
+
+
+
+Procedure de Recherche Locale : SimulatedAnnealingLS(Individu)
+--------------------------------------------------------------------------------
+1:  T = T_Initial
+2:  Best_Local = Individu
+3:  
+4:  for Iteration = 1 to L_MAX (400) do
+5:      Voisin = Appliquer_Mouvement_Aleatoire(Individu) // ShiftRoom, SwapTime, ou les deux
+6:      Delta = Fitness(Voisin) - Fitness(Individu)
+7:      
+8:      // Critere de Metropolis
+9:      if Delta < 0 OR Random(0,1) < Exp(-Delta / T) then
+10:         Individu = Voisin
+11:         if Fitness(Individu) < Fitness(Best_Local) then
+12:             Best_Local = Individu
+13:         end if
+14:     end if
+15:     
+16:     T = T * Alpha // Refroidissement geometrique continu
+17: end for
+18: return Best_Local
+
+
+--------------------------------------------------------------------------------
+PROCEDURE : SYNTHESE_ET_STATISTIQUES (SUMMARY_FUNCTION)
+--------------------------------------------------------------------------------
+1:  FIN_TEMPS = TEMPS_ACTUEL()
+2:  DUREE = FIN_TEMPS - DEBUT_TEMPS
+3:  
+4:  BEST = POPULATION[0]
+5:  SCORE_FINAL, HARD, SOFT = EVALUER(BEST)
+6:  
+7:  // Calcul des statistiques de population
+8:  FITNESSES = [individu.fitness for individu in POPULATION]
+9:  MOYENNE = CALCULER_MOYENNE(FITNESSES)
+10: ECART_TYPE = CALCULER_ECART_TYPE(FITNESSES)
+11: 
+12: // Calcul de la progression scientifique
+13: AMELIORATION = ((SCORE_INITIAL - SCORE_FINAL) / SCORE_INITIAL) * 100
+14: 
+15: // Rapport de Sortie (Uniquement si VERBOSE=VRAI)
+16: SI VERBOSE == VRAI ALORS
+17:     SI HARD > 0 ALORS
+18:         AFFICHER "Détails conflits : ", DETAILS_HARD(BEST)
+19:     SINON
+20:         AFFICHER "Détails qualité : ", DETAILS_SOFT(BEST)
+21:     FIN SI
+22:     AFFICHER "Total Temps : ", DUREE, "s | Amélioration : ", AMELIORATION, "%"
+23: FIN SI
+24: 
+25: // Journalisation (Log systématique)
+26: ECRIRE_DANS_FICHIER("last_run_report.txt", RAPPORT_COMPLET)
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT
+--------------------------------------------------------------------------------

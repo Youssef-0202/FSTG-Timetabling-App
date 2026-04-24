@@ -16,7 +16,7 @@ import time
 from datetime import datetime
 
 # Ajouter le chemin racine pour permettre les imports de 'commun'
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from commun.data_manager import DataManager
 from commun.models import Schedule

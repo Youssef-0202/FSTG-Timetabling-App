@@ -54,7 +54,7 @@ class Schedule : # un emploi du temps complet proposé par l'algo
     def __init__(self, data_manager, assignments=None):
         self.data_manager = data_manager
         self.assignments = assignments or []
-        self.fitness = 0.0
+        self.fitness = None
         
     def copy(self):
         # Crée une copie profonde manuelle pour éviter les conflits de mémoire
