@@ -2,10 +2,21 @@
 import time
 import statistics
 import os
+import sys
+
+def get_log_path():
+    """Détermine le chemin du fichier de log (à côté du script principal)."""
+    try:
+        main_dir = os.path.dirname(os.path.abspath(sys.modules['__main__'].__file__))
+        return os.path.join(main_dir, "last_run_report.txt")
+    except:
+        # Repli sur le dossier courant si __main__ n'est pas accessible
+        return os.path.join(os.getcwd(), "last_run_report.txt")
 
 def initialize_log_file(params, db_stats):
     """Cree l'en-tete du fichier de log avec les parametres et stats DB."""
-    log_path = os.path.join(os.getcwd(), "last_run_report.txt")
+    log_path = get_log_path()
+
     header = [
         "=" * 60,
         " RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS",
@@ -93,7 +104,7 @@ def generate_final_report(engine, total_duration, init_score, mask, verbose=True
         print(summary_text)
 
     # Sauvegarde automatique (Ajout a la fin du fichier existant)
-    log_path = os.path.join(os.getcwd(), "last_run_report.txt")
+    log_path = get_log_path()
     try:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(summary_text)
