@@ -12,6 +12,7 @@
 import os
 import sys
 import json
+import time
 from datetime import datetime
 
 # Ajouter le chemin racine pour permettre les imports de 'commun'
@@ -20,7 +21,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from commun.data_manager import DataManager
 from commun.models import Schedule
 from commun.constraints import calculate_fitness_full
-from .engine import HybridEngine
+from engine import HybridEngine
 
 
 # CONFIGURATION ET PARAMÈTRES 
@@ -57,6 +58,9 @@ CONSTRAINTS_MASK = {
     "S_PREFERENCES":   True,   # Eviter les creneaux sensibles (Samedi, fin de journee)
     "S_FREE_AFTERNOONS": True, # Favoriser au moins 2 apres-midis vides par semaine
 }
+
+# 4. Parametres d'affichage
+VERBOSE = True
 
 
 
@@ -165,7 +169,7 @@ def export_schedule_to_json(schedule):
             "room_id": a.room.id,
             "slot_id": a.timeslot.id,
             "section_id": a.module_part.section_id,
-            "td_groups": [{"id": g.id, "name": g.name} for g in a.module_part.td_groups]
+            "td_groups": [{"id": g_id} for g_id in a.module_part.td_group_ids]
         })
     
     file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 

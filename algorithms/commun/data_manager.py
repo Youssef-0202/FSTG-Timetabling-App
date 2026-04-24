@@ -1,5 +1,5 @@
 import requests 
-from models import Room, Teacher, Timeslot, Section, ModulePart
+from .models import Room, Teacher, Timeslot, Section, ModulePart
 
 API_BASE_URL = "http://localhost:8000" 
 
@@ -10,6 +10,7 @@ class DataManager:
         self.teachers = []
         self.teacher_map = {} # Direct access for performance
         self.timeslots = []
+        self.slot_map = {}    # Required for time-based constraints
         self.sections = []
         self.module_parts = []
 
@@ -39,7 +40,10 @@ class DataManager:
             # 3. Timeslots
             ts_data = requests.get(f"{API_BASE_URL}/timeslots").json()
             if isinstance(ts_data, list):
-                self.timeslots = [Timeslot(id=s['id'], day=s['day'], start_time=s['start_time'], end_time=s['end_time']) for s in ts_data]
+                for s in ts_data:
+                    ts = Timeslot(id=s['id'], day=s['day'], start_time=s['start_time'], end_time=s['end_time'])
+                    self.timeslots.append(ts)
+                    self.slot_map[s['id']] = ts
 
             # 4. Sections
             sec_data = requests.get(f"{API_BASE_URL}/sections").json()

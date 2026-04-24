@@ -75,6 +75,10 @@ class HybridEngine:
     def get_score(self, schedule):
         """Calculates scalar score for comparison (Total Penalty)"""
         score, h, s, details = calculate_fitness_full(schedule, mask=self.constraints_mask)
+        # On attache les scores a l'objet pour eviter de recalculer plus tard
+        schedule.fitness = score
+        schedule.h_violations = h
+        schedule.soft_penalty = s
         return score
 
     
