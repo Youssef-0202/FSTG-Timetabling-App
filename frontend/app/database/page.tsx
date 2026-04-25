@@ -103,8 +103,16 @@ function DatabaseContent() {
         let editData = { ...item };
         // Si c'est un assignment, on doit extraire les IDs des groupes TD (qui sont des objets dans 'td_groups') 
         // vers la liste d'IDs 'tdgroup_ids' que le Select du modal attend.
-        if (tab === "assignments" && item.td_groups && Array.isArray(item.td_groups)) {
-            editData.tdgroup_ids = item.td_groups.map((g: any) => g.id);
+        if (tab === "assignments") {
+            const gids = (item.td_groups || []).map((g: any) => g.id);
+            editData.tdgroup_ids = gids;
+
+            // On calcule les sections à cocher (soit via les groupes, soit via le champ section_id direct)
+            let sids = Array.from(new Set((item.td_groups || []).map((g: any) => g.section_id).filter(Boolean)));
+            if (sids.length === 0 && item.section_id) {
+                sids = [Number(item.section_id)];
+            }
+            editData.section_ids = sids;
         }
         setModal({ open: true, mode: "edit", data: editData });
     };
@@ -857,7 +865,19 @@ function DatabaseContent() {
                             {tab === "assignments" && (
                                 <>
                                     <div className="form-group full"><label>Partie de Module (Séance)</label>
-                                        <select value={String(modal.data.module_part_id || "")} onChange={(e) => setField("module_part_id", e.target.value)} style={{ minHeight: "40px" }}>
+                                        <select value={String(modal.data.module_part_id || "")} onChange={(e) => {
+                                            const pid = e.target.value;
+                                            setModal(m => ({
+                                                ...m,
+                                                data: {
+                                                    ...m.data,
+                                                    module_part_id: pid,
+                                                    section_id: null,
+                                                    section_ids: [],
+                                                    tdgroup_ids: []
+                                                }
+                                            }));
+                                        }} style={{ minHeight: "40px" }}>
                                             <option value="">-- Choisir une séance --</option>
                                             {modules.map(mod => {
                                                 const parts = moduleParts.filter(mp => mp.module_id === mod.id);
@@ -907,35 +927,80 @@ function DatabaseContent() {
                                     <div className="form-group full">
                                         <label style={{ fontSize: "0.8rem", color: "var(--navy)", fontWeight: 600 }}>Périmètre de cours (Cible)</label>
                                         <div style={{ padding: "10px", border: "1px dashed var(--border)", borderRadius: "6px", fontSize: "0.85rem" }}>
-                                            <i>Si c'est un CM : choisissez la Section (tout l'Amphi). Si c'est un TD/TP, tapez les ID(s) de GroupeTD séparés par virgule. (Simplification UI pour PFE).</i><br /><br />
-                                            <div className="form-group"><label>1. Cible Section (Pour CM)</label>
-                                                <select value={String(modal.data.section_id || "")} onChange={(e) => {
-                                                    setField("section_id", e.target.value);
-                                                    setField("tdgroup_ids", []); // Reset groups when section changes
-                                                }}>
-                                                    <option value="">Sélectionner une section</option>
-                                                    {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                                </select>
-                                            </div>
-                                            <div className="form-group">
-                                                <label>2. Cible Groupe TD (Pour TD/TP)</label>
-                                                <select
-                                                    disabled={!modal.data.section_id}
-                                                    value={Array.isArray(modal.data.tdgroup_ids) && modal.data.tdgroup_ids.length > 0 ? modal.data.tdgroup_ids[0] : ""}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value ? [parseInt(e.target.value)] : [];
-                                                        setField("tdgroup_ids", val);
-                                                    }}
-                                                >
-                                                    <option value="">-- {modal.data.section_id ? "Choisir le groupe" : "Choisissez d'abord une section"} --</option>
-                                                    {tdGroups
-                                                        .filter(g => Number(g.section_id) === Number(modal.data.section_id))
-                                                        .map(g => (
-                                                            <option key={g.id} value={g.id}>{g.name} (Cap: {g.size})</option>
-                                                        ))
-                                                    }
-                                                </select>
-                                            </div>
+                                            {(() => {
+                                                const mPart = moduleParts.find(mp => mp.id === Number(modal.data.module_part_id));
+                                                const isCM = mPart?.type === "CM";
+                                                if (isCM) {
+                                                    return (
+                                                        <div className="form-group">
+                                                            <label>Cibles Sections (Fusion pour CM)</label>
+                                                            <div style={{ maxHeight: "150px", overflowY: "auto", border: "1px solid var(--border)", padding: "8px", borderRadius: "4px", backgroundColor: "#fff" }}>
+                                                                {sections.sort((a, b) => a.name.localeCompare(b.name)).map(s => {
+                                                                    const currentIds = Array.isArray(modal.data.section_ids) ? modal.data.section_ids : (modal.data.section_id ? [Number(modal.data.section_id)] : []);
+                                                                    const checked = currentIds.includes(s.id);
+                                                                    return (
+                                                                        <label key={s.id} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", cursor: "pointer" }}>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={checked}
+                                                                                onChange={(e) => {
+                                                                                    let newIds = [...currentIds];
+                                                                                    if (e.target.checked) newIds.push(s.id);
+                                                                                    else newIds = newIds.filter(id => id !== s.id);
+
+                                                                                    const allGids = tdGroups.filter(g => newIds.includes(Number(g.section_id))).map(g => g.id);
+
+                                                                                    setModal(m => ({
+                                                                                        ...m,
+                                                                                        data: {
+                                                                                            ...m.data,
+                                                                                            section_ids: newIds,
+                                                                                            section_id: newIds.length > 0 ? newIds[0] : null,
+                                                                                            tdgroup_ids: allGids
+                                                                                        }
+                                                                                    }));
+                                                                                }}
+                                                                            />
+                                                                            {s.name} ({s.total_capacity} étu.)
+                                                                        </label>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                } else {
+                                                    return (
+                                                        <>
+                                                            <div className="form-group">
+                                                                <label>1. Cible Section (Parent)</label>
+                                                                <select value={String(modal.data.section_id || "")} onChange={(e) => {
+                                                                    setField("section_id", e.target.value);
+                                                                    setField("tdgroup_ids", []);
+                                                                }}>
+                                                                    <option value="">Sélectionner une section</option>
+                                                                    {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                                                </select>
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <label>2. Cible Groupes TD</label>
+                                                                <div style={{ maxHeight: "150px", overflowY: "auto", border: "1px solid var(--border)", padding: "8px", borderRadius: "4px", backgroundColor: "#fff" }}>
+                                                                    {tdGroups.filter(g => Number(g.section_id) === Number(modal.data.section_id)).map(g => (
+                                                                        <label key={g.id} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", cursor: "pointer" }}>
+                                                                            <input type="checkbox" checked={Array.isArray(modal.data.tdgroup_ids) && modal.data.tdgroup_ids.includes(g.id)} onChange={(e) => {
+                                                                                const current = Array.isArray(modal.data.tdgroup_ids) ? [...modal.data.tdgroup_ids] : [];
+                                                                                if (e.target.checked) current.push(g.id);
+                                                                                else { const idx = current.indexOf(g.id); if (idx > -1) current.splice(idx, 1); }
+                                                                                setField("tdgroup_ids", current);
+                                                                            }} />
+                                                                            {g.name} ({g.size} étu.)
+                                                                        </label>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    );
+                                                }
+                                            })()}
                                         </div>
                                     </div>
                                     <div className="form-group full">
@@ -1073,7 +1138,7 @@ function DatabaseContent() {
                             <button className="btn btn-outline" onClick={closeModal}>Annuler</button>
                             <button className="btn btn-primary" onClick={save}>{saving ? "En cours..." : "Valider"}</button>
                         </div>
-                    </div>
+                    </div >
                 </div >
             )
             }

@@ -27,9 +27,9 @@
  Temps total d'execution  : 2313.64 secondes
  Generations effectuees   : 100 (population size)
 ------------------------------------------------------------
- Score Initial (Best)     : 2146196.2
- Score Final   (Best)     : 9086.4
- Amelioration Totale      : 99.6 %
+ Score Initial (Best Individu)     : 2146196.2
+ Score Final   (Best Individu)     : 9086.4
+ Amelioration Totale               : 99.6 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
   - Meilleure Solution    : 9086.4

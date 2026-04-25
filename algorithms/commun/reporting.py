@@ -61,7 +61,7 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
         s_details = " → Soft: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('S') and v > 0])
         print(line + s_details)
 
-def generate_final_report(engine, total_duration, init_score, mask, verbose=True):
+def generate_final_report(engine, total_duration, init_score, mask, actual_generations=0, verbose=True):
     """Cree et affiche le rapport final, et le sauvegarde dans un fichier."""
     from .constraints import calculate_fitness_full
     
@@ -78,7 +78,7 @@ def generate_final_report(engine, total_duration, init_score, mask, verbose=True
         " ANALYSE FINALE DES PERFORMANCES ",
         "=" * 60,
         f" Temps total d'execution  : {total_duration:.2f} secondes",
-        f" Generations effectuees   : {len(final_fitnesses)} (population size)", # Note: actual gen count passed externally is better
+        f" Generations effectuees   : {actual_generations}", 
         "-" * 60,
         f" Score Initial (Best)     : {init_score}",
         f" Score Final   (Best)     : {final_score}",

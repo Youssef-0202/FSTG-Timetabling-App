@@ -49,6 +49,7 @@ class DataManager:
             sec_data = requests.get(f"{API_BASE_URL}/sections").json()
             section_caps = {}  # Pour calculer les contraintes de la capacité de  salles 
             if isinstance(sec_data, list):
+                self.sections = sec_data
                 def get_cap(s):
                     return s.get('total_capacity')  or 0
                 section_caps = {s['id']: get_cap(s) for s in sec_data}
@@ -92,15 +93,16 @@ class DataManager:
                     
                     real_size = 30 # Default
                     
-                    if m_type == "CM":
-                        # Pour un CM, l'effectif est celui de la section parente (Amphi)
-                        real_size = section_caps.get(sid, 200)
-                        if real_size == 0: real_size = 200
-                    else:
-                        # Pour un TD , l'effectif est la somme des groupes rattachés à cette séance
-                        # (Généralement 1 groupe, mais supporte les fusions de groupes)
-                        real_size = sum(g.get('size', 40) for g in a.get('td_groups', []))
-                        if real_size == 0: real_size = 40
+                    # Pour toutes les séances (CM fusionnés ou TD regroupés), 
+                    # l'effectif réel est la somme des tailles des groupes rattachés.
+                    real_size = sum(g.get('size', 0) for g in a.get('td_groups', []))
+                    
+                    if real_size == 0:
+                        if m_type == "CM":
+                            real_size = section_caps.get(sid, 200)
+                            if real_size == 0: real_size = 200
+                        else:
+                            real_size = 40 # Fallback TD
                     
                     mp = ModulePart(
                         id=a['id'],

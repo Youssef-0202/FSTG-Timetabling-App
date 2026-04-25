@@ -370,7 +370,10 @@ class HybridEngine:
         for i, (r, s) in enumerate(best_state):
             schedule.assignments[i].room = r
             schedule.assignments[i].timeslot = s
-        schedule.fitness = best_fit
+    
+        # Recalcul complet après restauration (important pour h_violations)
+        schedule.fitness = None
+        self.get_score(schedule)
         
         return schedule
 

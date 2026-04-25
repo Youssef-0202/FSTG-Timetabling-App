@@ -153,7 +153,7 @@ def run_optimization():
 
     # ── ETAPE 4 : Rapport Final et Statistiques ──
     duration = time.time() - start_time_exec
-    generate_final_report(engine, duration, init_score, CONSTRAINTS_MASK, verbose=VERBOSE)
+    generate_final_report(engine, duration, init_score, CONSTRAINTS_MASK, actual_generations=gen, verbose=VERBOSE)
 
     # ── ETAPE 5 : Export JSON final pour l'interface ──
     export_schedule_to_json(engine.population[0])
@@ -172,8 +172,9 @@ def export_schedule_to_json(schedule):
             "td_groups": [{"id": g_id} for g_id in a.module_part.td_group_ids]
         })
     
-    file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
-                             "backend", "generated_timetable.json")
+    # On remonte de 4 niveaux : main_solver.py -> v2 -> ga_sa_hybrid -> algorithms -> Racine/_Project_PFE
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    file_path = os.path.join(root_dir, "backend", "generated_timetable.json")
     
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=4)
