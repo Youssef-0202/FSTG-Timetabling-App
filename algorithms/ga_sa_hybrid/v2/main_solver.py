@@ -28,16 +28,16 @@ from engine import HybridEngine
 # ==============================================================================
 
 # 1. Parametres de l'Algorithme Genetique (GA)
-POP_SIZE = 100
+POP_SIZE = 50
 MAX_GEN = 150
-MUTATION_RATE = 0.15
+MUTATION_RATE = 0.1
 ELITISM = 2
-MAX_GEN_AFTER_H0 = 30 # Nombre de gens a faire apres avoir atteint 0 conflit
+MAX_GEN_AFTER_H0 = 40 # Augmenté pour laisser plus de temps au polissage soft
 
 # 2. Parametres du Recuit Simule (SA) - Recherche Locale
 SA_ITERATIONS = 400
 SA_TEMP = 50.0
-SA_COOLING = 0.95
+SA_COOLING = 0.90
 
 # 3. Masque des Contraintes (Activer/Desactiver des regles)
 CONSTRAINTS_MASK = {
