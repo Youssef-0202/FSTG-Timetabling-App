@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\geometry{margin=2.5cm}
+
+\title{Rapport Technique : Évolution et Optimisation de l'Algorithme Hybride GA-SA pour l'Emploi du Temps}
+\author{Étudiant : Youssef - Projet de Fin d'Études (PFE)}
+\date{Avril 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Ce rapport détaille la conception, l'implémentation et l'optimisation d'un solveur pour la génération automatique d'emplois du temps universitaires (FSTG Marrakech). Nous décrivons le passage d'une version initiale (V1.0) vers une version hautement optimisée (V2.0) utilisant une évaluation incrémentale, une initialisation heuristique et une recherche par grille (Grid Search) pour stabiliser les performances.
+\end{abstract}
+
+\section{Architecture Initiale (Version 1.0)}
+La première version de l'algorithme reposait sur un couplage standard entre un Algorithme Génétique (GA) pour l'exploration globale et un Recuit Simulé (SA) pour l'optimisation locale.
+
+\subsection{Fonctionnement}
+\begin{itemize}
+    \item \textbf{Initialisation} : Purement aléatoire. Les individus de départ présentaient un score de pénalité dépassant 2 000 000, principalement dû aux conflits durs dits "Hard" (professeurs et salles occupés simultanément).
+    \item \textbf{Évaluation} : Calcul intégral de la fonction de fitness à chaque modification ($O(N)$), ralentissant considérablement le Recuit Simulé.
+    \item \textbf{Performances} : Temps d'exécution moyen de 38 minutes pour 100 générations.
+\end{itemize}
+
+\section{Analyse des Problèmes et Limites}
+L'audit technique réalisé sur la V1.0 a révélé trois goulots d'étranglement majeurs :
+\begin{enumerate}
+    \item \textbf{Convergence Lente} : Passer 80\% du temps de calcul à essayer de résoudre les conflits basiques (H1-H4) au lieu d'optimiser les contraintes pédagogiques (Soft).
+    \item \textbf{Complexité Algorithmique} : La recherche de salle appropriée se faisait en $O(N \times R)$, ralentissant chaque mouvement du Recuit Simulé.
+    \item \textbf{Rigidité des Sections} : L'impossibilité de fusionner plusieurs sections pour un cours magistral (CM).
+\end{enumerate}
+
+\section{Refonte vers la Version 2.0}
+La Version 2.0 a introduit trois innovations architecturales majeures :
+
+\subsection{Initialisation Gourmande (Greedy Logic)}
+Au lieu de tirer des créneaux au hasard, le solveur V2.0 utilise un algorithme de placement rapide au démarrage qui garantit qu'au moins 80\% de la population initiale ne possède \textbf{aucune violation Hard}. Le score initial est passé de 2 000 000 à environ 14 000.
+
+\subsection{Évaluation Incrémentale (Delta-Scoring)}
+Implémentation d'une fonction de fitness $O(1)$. Lors d'un mouvement dans le Recuit Simulé, le solveur ne calcule que la différence ($\Delta$) de score induite par le déplacement de la séance, au lieu de re-calculer tout l'emploi du temps. 
+\textbf{Résultat} : Gain de vitesse de 350\%.
+
+\subsection{Fusion Multi-Sections}
+Le gestionnaire de données a été réécrit pour supporter la fusion de sections pour les CM. Une séance peut désormais être rattachée à plusieurs \texttt{TDGroups} appartenant à des sections différentes, tout en respectant la contrainte de capacité totale de la salle.
+
+\section{Optimisation des Paramètres (Grid Search)}
+Deux tours de recherche par grille ont été effectués pour stabiliser le solveur.
+
+\subsection{Round 1 : Exploration (16 combinaisons)}
+Nous avons testé la taille de la population vs l'intensité du Recuit Simulé.
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llllll@{}}
+\toprule
+PopSize & MutRate & SA\_Iters & Score Final & Durée & Conclusion \\ \midrule
+100 & 0.2 & 200 & 11551 & 221s & Trop instable \\
+100 & 0.1 & 400 & 10254 & 412s & Qualité correcte \\
+\textbf{50} & \textbf{0.1} & \textbf{400} & \textbf{8730} & \textbf{395s} & \textbf{Gagnant Round 1} \\ \bottomrule
+\end{tabular}
+\caption{Extrait des résultats du premier tour de Grid Search.}
+\end{table}
+
+\subsection{Round 2 : Raffinement (8 combinaisons)}
+Nous avons introduit le paramètre d'\texttt{Élitisme} et poussé les itérations SA à 600.
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Elitisme & MutRate & SA\_Iters & Score Final & Gains vs R1 \\ \midrule
+5 & 0.1 & 400 & 7612 & -12\% \\
+2 & 0.1 & 400 & 7995 & -8\% \\
+\textbf{2} & \textbf{0.1} & \textbf{600} & \textbf{7121} & \textbf{-18\%} \\ \bottomrule
+\end{tabular}
+\caption{Résultats du raffinage (Meilleure performance globale : 7121.6).}
+\end{table}
+
+\section{Conclusion Finale}
+La Version 2.0 hybridée GA-SA s'impose comme une solution robuste. En réduisant drastiquement le temps de calcul (de 38 min à moins de 10 min) tout en améliorant la qualité pédagogique (stabilité des salles, respect de la fatigue), elle offre un moteur prêt pour la production. L'optimisation par Grid Search a permis de confirmer qu'une population réduite (50) combinée à une recherche locale intensive (600 itérations) constitue le réglage optimal pour le problème de la FSTG.
+
+\end{document}

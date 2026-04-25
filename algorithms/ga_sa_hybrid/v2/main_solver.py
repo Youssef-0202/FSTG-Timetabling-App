@@ -32,10 +32,10 @@ POP_SIZE = 50
 MAX_GEN = 150
 MUTATION_RATE = 0.1
 ELITISM = 2
-MAX_GEN_AFTER_H0 = 40 # Augmenté pour laisser plus de temps au polissage soft
+MAX_GEN_AFTER_H0 = 50 # On pousse le polissage encore un peu plus loin
 
 # 2. Parametres du Recuit Simule (SA) - Recherche Locale
-SA_ITERATIONS = 400
+SA_ITERATIONS = 600
 SA_TEMP = 50.0
 SA_COOLING = 0.90
 
