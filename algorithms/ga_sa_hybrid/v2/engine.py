@@ -331,7 +331,7 @@ class HybridEngine:
             if not unlocked: break
 
             # P3 : Sauvegarde locale pour Undo O(1)
-            idx = random.choice(unlocked) if active_phase == 'hard' else None # pour certains moves soft
+            idx = random.choice(unlocked) if active_phase == 'hard' else None 
             saved_indices = []
             saved_states = []
 
@@ -342,7 +342,7 @@ class HybridEngine:
                 saved_indices = [idx]
                 saved_states = [(old_room, old_slot)]
             else:
-                # Mouvements spécialisés pour réduire les pénalités soft
+                # Mouvements spécialisés (GUIDÉ P6) pour réduire les pénalités soft
                 saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
 
             # Invalider le cache et recalculer
@@ -378,56 +378,79 @@ class HybridEngine:
         return schedule
 
     def _apply_hard_move(self, schedule, unlocked):
-        """Mouvements génériques pour éliminer les violations Hard (H1-H4)."""
+        """
+        Mouvements génériques (P6) pour casser les conflits physiques (H1-H4).
+        C'est la phase de 'Survie' : on déplace brutalement pour trouver une place libre.
+        """
         idx = random.choice(unlocked)
         a = schedule.assignments[idx]
         old_room, old_slot = a.room, a.timeslot
         
         r = random.random()
         if r < 0.5:
-            # Shift Both
+            # Shift Both : On change tout (Salle + Créneau) pour un nouveau départ
             a.room = random.choice(self.dm.rooms)
             a.timeslot = random.choice(self.dm.timeslots)
         else:
-            # Shift Room Only
+            # Shift Room Only : Le créneau est bon, mais la salle est en conflit
             a.room = random.choice(self.dm.rooms)
             
         return idx, old_room, old_slot
 
     def _apply_soft_move(self, schedule, unlocked):
-        """Mouvements spécialisés (P10) pour réduire les pénalités Soft."""
+        """
+        RECHERCHE LOCALE GUIDÉE (P6 & P10) : Mouvements spécialisés pour le confort.
+        Cette méthode n'est appelée qu'en 'Phase Soft'. Elle utilise une intelligence
+        métier pour regrouper les cours au lieu de simplement les déplacer au hasard.
+        """
         r = random.random()
-        changed_indices = []
-        old_states = []
+        changed_indices, old_states = [], []
 
+        # LOGIQUE 1 : STABILISATION DES SALLES (Réduit S6)
         if r < 0.35:
-            # S1: StabilizeRoom (Réduit S6_Stability)
-            # Aligner les salles pour un même module
-            mid = random.choice([a.module_part.module_id for i, a in enumerate(schedule.assignments) if i in unlocked])
+            # On choisit un module au hasard parmi ceux qui peuvent bouger
+            mid_options = [a.module_part.module_id for i, a in enumerate(schedule.assignments) if i in unlocked]
+            if not mid_options: return self._apply_hard_move(schedule, unlocked)
+            mid = random.choice(mid_options)
+            
+            # On choisit UNE SEULE salle cible pour tout le module
             target_room = random.choice(self.dm.rooms)
+            
+            # On aligne TOUTES les séances de ce module dans la même salle
+            # Cela évite aux étudiants et profs de changer de salle entre CM et TD
             for i in unlocked:
                 if schedule.assignments[i].module_part.module_id == mid:
                     changed_indices.append(i)
                     old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
                     schedule.assignments[i].room = target_room
         
+        # LOGIQUE 2 : COMPACTAGE DE LA JOURNÉE PROF (Réduit S3 - Gaps)
         elif r < 0.65:
-            # S2: CompactDay (Réduit S3_Gaps)
-            # Rapprocher les séances d'un professeur sur le même jour
+            # On choisit un cours au hasard
             idx = random.choice(unlocked)
             a = schedule.assignments[idx]
             prof_id = a.module_part.teacher_id
-            prof_assigns = [schedule.assignments[i] for i in range(len(schedule.assignments)) if schedule.assignments[i].module_part.teacher_id == prof_id]
+            
+            # On cherche les jours où ce professeur travaille déjà (C'est le GUIDAGE P6)
+            prof_assigns = [schedule.assignments[i] for i in range(len(schedule.assignments)) 
+                            if schedule.assignments[i].module_part.teacher_id == prof_id]
+            
             if prof_assigns:
+                # On choisit un jour de référence (un jour où il a déjà un cours)
                 ref_day = random.choice(prof_assigns).timeslot.day
+                
+                # On force la nouvelle position sur CE MÊME JOUR pour boucher les trous
+                # Au lieu de 80 slots possibles, on restreint à 16 slots (ceux du même jour)
                 target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
+                
                 changed_indices.append(idx)
                 old_states.append((a.room, a.timeslot))
                 a.timeslot = target_slot
+        
+        # LOGIQUE 3 : EXPLORATION RÉSIDUELLE
         else:
-            # Move générique pour maintenir la diversité
-            idx, r, s = self._apply_hard_move(schedule, unlocked)
-            changed_indices = [idx]
-            old_states = [(r, s)]
+            # Si on ne fait pas de mouvement spécialisé, on fait un mouvement classique
+            idx, r_old, s_old = self._apply_hard_move(schedule, unlocked)
+            changed_indices, old_states = [idx], [(r_old, s_old)]
             
         return changed_indices, old_states
