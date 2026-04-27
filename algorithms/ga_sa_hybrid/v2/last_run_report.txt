@@ -1,6 +1,6 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-04-25 22:44:18
+ Date : 2026-04-27 17:15:37
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
@@ -14,7 +14,7 @@
  - Nombre d'Enseignants : 74
  - Nombre de Salles     : 29
  - Nombre de Sections   : 10
- - Seances a placer     : 245
+ - Seances a placer     : 243
  - Creneaux disponibles : 30
 
 ============================================================

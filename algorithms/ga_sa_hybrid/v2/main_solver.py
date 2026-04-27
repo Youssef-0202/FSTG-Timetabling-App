@@ -163,8 +163,8 @@ def export_schedule_to_json(schedule):
     output = []
     for a in schedule.assignments:
         output.append({
-            "id": a.module_part.id,
-            "module_part_id": a.module_part.id,
+            "id": a.module_part.id, # ID de l'affectation
+            "module_part_id": a.module_part.module_id, # ID réel de la partie de module (DB)
             "teacher_id": a.module_part.teacher_id,
             "room_id": a.room.id,
             "slot_id": a.timeslot.id,

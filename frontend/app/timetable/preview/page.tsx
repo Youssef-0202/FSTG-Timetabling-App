@@ -10,7 +10,7 @@ import {
     getModules, Module,
     getModuleParts, ModulePart,
     getTimeslots, Timeslot,
-    getSections, Section
+    getSections, Section, getTDGroups
 } from "@/lib/api";
 
 const DAYS_ORDER = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
@@ -27,16 +27,19 @@ export default function TimetablePage() {
     const [viewMode, setViewMode] = useState<"section" | "teacher" | "master">("section");
     const [selectedId, setSelectedId] = useState<string>("");
 
+    const [tdGroups, setTdGroups] = useState<any[]>([]); // Ajouté pour le support multi-section
+
     const load = useCallback(async () => {
         setLoading(true);
         try {
-            const [a, t, r, m, mp, ts, sec] = await Promise.all([
+            const [a, t, r, m, mp, ts, sec, tdg] = await Promise.all([
                 getPreviewSchedule(), getTeachers(), getRooms(), getModules(),
-                getModuleParts(), getTimeslots(), getSections()
+                getModuleParts(), getTimeslots(), getSections(), getTDGroups()
             ]);
             console.log("Assignments loaded:", a.length);
             setAssignments(a); setTeachers(t); setRooms(r); setModules(m);
             setModuleParts(mp); setTimeslots(ts); setSections(sec);
+            setTdGroups(tdg); // Stocker les groupes TD
 
             if (sec.length > 0) {
                 const firstId = String(sec[0].id);
@@ -55,21 +58,23 @@ export default function TimetablePage() {
 
     const getCoursesAt = (day: string, startTime: string) => {
         return assignments.filter(a => {
-            // Find timeslot 
             const ts = timeslots.find(t => t.id === a.slot_id);
             if (!ts) return false;
 
-            // Day matching (case insensitive)
             const dayMatch = ts.day.toLowerCase().trim() === day.toLowerCase().trim();
             if (!dayMatch) return false;
 
-            // Time matching (starts with HH:MM)
             const timeMatch = ts.start_time.startsWith(startTime);
             if (!timeMatch) return false;
 
-            // Selected filter matching (Section or Teacher)
             if (viewMode === "section") {
-                return String(a.section_id) === String(selectedId);
+                // Direct match (Primary section)
+                if (String(a.section_id) === String(selectedId)) return true;
+                // Match via any attached TD Group
+                return a.td_groups?.some(g => {
+                    const fullGroup = tdGroups.find(tg => tg.id === g.id);
+                    return fullGroup && String(fullGroup.section_id) === String(selectedId);
+                });
             } else if (viewMode === "teacher") {
                 return String(a.teacher_id) === String(selectedId);
             }
@@ -140,17 +145,43 @@ export default function TimetablePage() {
                                                                             <div className="c-name">{mod?.name}</div>
                                                                             <div className="c-info-row">
                                                                                 <div className="c-room"><MapPin size={10} /> {room?.name}</div>
-                                                                                {viewMode === "section" && teacher && mp?.type === "CM" && (
-                                                                                    <div className="c-teacher"><UserIcon size={10} /> {teacher.name}</div>
+                                                                                {(viewMode === "section" || viewMode === "teacher") && teacher && (
+                                                                                    <div className="c-teacher" style={{ fontSize: "0.68rem", display: "flex", alignItems: "center", gap: "4px" }}>
+                                                                                        <Users size={10} /> {teacher.name}
+                                                                                    </div>
                                                                                 )}
                                                                                 {viewMode === "teacher" && mp?.type === "CM" && sectionTarget && (
                                                                                     <div className="c-teacher"><Users size={10} /> {sectionTarget.name}</div>
                                                                                 )}
                                                                                 {c.td_groups && c.td_groups.length > 0 && (
-                                                                                    <div className="c-groups">
-                                                                                        {c.td_groups.map(g => (
-                                                                                            <span key={g.id} className="group-tag">{g.name}</span>
-                                                                                        ))}
+                                                                                    <div className="c-groups" style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                                                                        {(() => {
+                                                                                            const bySection = new Map();
+                                                                                            c.td_groups.forEach((g: any) => {
+                                                                                                const fullG = tdGroups.find(tg => tg.id === g.id);
+                                                                                                if (fullG) {
+                                                                                                    const sec = sections.find(s => String(s.id) === String(fullG.section_id));
+                                                                                                    const secName = sec ? sec.name : 'Inconnu';
+                                                                                                    let shortG = fullG.name.replace(secName, '').trim() || fullG.name;
+                                                                                                    if (shortG.toLowerCase().startsWith('gr')) shortG = shortG.substring(2).trim();
+                                                                                                    if (!bySection.has(secName)) bySection.set(secName, { secId: fullG.section_id, groups: [] });
+                                                                                                    bySection.get(secName).groups.push(shortG);
+                                                                                                }
+                                                                                            });
+
+                                                                                            return Array.from(bySection.entries()).map(([secName, data]: any) => {
+                                                                                                const totalG = tdGroups.filter(tg => String(tg.section_id) === String(data.secId)).length;
+                                                                                                const isAll = (data.groups.length === totalG && totalG > 0);
+                                                                                                const label = isAll ? '' : `Gr ${data.groups.join(', ')}`;
+
+                                                                                                return (
+                                                                                                    <div key={secName} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px", marginTop: "2px", borderTop: (isAll && bySection.size === 1) ? "none" : "1px dashed rgba(0,0,0,0.05)", paddingTop: "2px" }}>
+                                                                                                        <span style={{ fontSize: "0.62rem", fontWeight: 800, opacity: 0.8 }}>{secName}</span>
+                                                                                                        {!isAll && <span className="group-tag" style={{ border: "none", background: "rgba(0,0,0,0.06)", padding: "1px 5px", fontSize: "0.6rem" }}>{label}</span>}
+                                                                                                    </div>
+                                                                                                );
+                                                                                            });
+                                                                                        })()}
                                                                                     </div>
                                                                                 )}
                                                                             </div>
@@ -219,7 +250,10 @@ export default function TimetablePage() {
                                                                         <td key={room.id} className="assignment-cell">
                                                                             <div className={`m-assignment ${mp?.type.toLowerCase()}`}>
                                                                                 <div className="m-mod">{modules.find(m => m.id === mp?.module_id)?.name}</div>
-                                                                                <div className="m-sec">{sections.find(s => s.id === assignment.section_id)?.name}</div>
+                                                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2px" }}>
+                                                                                    <div className="m-sec">{sections.find(s => s.id === assignment.section_id)?.name}</div>
+                                                                                    <div className="m-teacher" style={{ fontWeight: 600, opacity: 0.9 }}>{teachers.find(t => t.id === assignment.teacher_id)?.name}</div>
+                                                                                </div>
                                                                             </div>
                                                                         </td>
                                                                     );

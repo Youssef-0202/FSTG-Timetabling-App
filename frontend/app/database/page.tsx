@@ -429,19 +429,45 @@ function DatabaseContent() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    {mPart?.type !== "CM" ? (
-                                                        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                                                            {a.td_groups?.length > 0 ? a.td_groups.map(g => (
-                                                                <span key={g.id} className="badge" style={{ backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0", fontSize: "0.7rem" }}>
-                                                                    🟢 {g.name}
-                                                                </span>
-                                                            )) : (
-                                                                <span className="badge badge-amphi" style={{ fontSize: "0.7rem" }}>Section: {sec?.name}</span>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="badge badge-amphi" style={{ fontSize: "0.7rem" }}>Section: {sec?.name}</span>
-                                                    )}
+                                                    {(() => {
+                                                        const sids = new Set();
+                                                        if (a.section_id) sids.add(Number(a.section_id));
+                                                        if (a.td_groups) {
+                                                            a.td_groups.forEach(g => {
+                                                                const fullG = tdGroups.find(tg => tg.id === g.id);
+                                                                if (fullG) sids.add(Number(fullG.section_id));
+                                                            });
+                                                        }
+                                                        const detectedSections = Array.from(sids).map(id => sections.find(s => s.id === id)).filter(Boolean);
+
+                                                        if (mPart?.type === "CM") {
+                                                            return (
+                                                                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", alignItems: "center" }}>
+                                                                    {detectedSections.map(s => (
+                                                                        <span key={s.id} className="badge badge-amphi" style={{ fontSize: "0.7rem", backgroundColor: detectedSections.length > 1 ? "#e0f2fe" : "", border: detectedSections.length > 1 ? "1.5px solid #0ea5e9" : "" }}>
+                                                                            {s.name}
+                                                                        </span>
+                                                                    ))}
+                                                                    {detectedSections.length > 1 && <span style={{ fontSize: "0.62rem", color: "#0284c7", fontWeight: 800 }}>[FUSIONNÉ]</span>}
+                                                                </div>
+                                                            );
+                                                        } else {
+                                                            return (
+                                                                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", flexDirection: "column" }}>
+                                                                    <div style={{ display: "flex", gap: "3px", flexWrap: "wrap" }}>
+                                                                        {a.td_groups?.map(g => (
+                                                                            <span key={g.id} className="badge" style={{ backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0", fontSize: "0.65rem" }}>
+                                                                                {g.name}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                    <span style={{ fontSize: "0.6rem", opacity: 0.7 }}>
+                                                                        Section: {detectedSections.map(s => (s as any).name).join(' / ')}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        }
+                                                    })()}
                                                 </td>
                                                 <td>
                                                     {a.is_locked ? <span style={{ color: "var(--navy)", fontWeight: 600, fontSize: "0.8rem" }}>Fixée</span> : <span style={{ color: "var(--gold)", fontWeight: 600, fontSize: "0.8rem" }}>À placer</span>}

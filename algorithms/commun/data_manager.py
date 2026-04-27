@@ -57,16 +57,20 @@ class DataManager:
             # 5. TD Groups (needed for group-to-section mapping)
             tdg_data = requests.get(f"{API_BASE_URL}/td-groups").json()
             group_to_section = {}
+            section_to_groups = {} # Pour bloquer tous les groupes d'une section lors d'un CM
             if isinstance(tdg_data, list):
-                group_to_section = {g['id']: g['section_id'] for g in tdg_data}
+                for g in tdg_data:
+                    group_to_section[g['id']] = g['section_id']
+                    if g['section_id'] not in section_to_groups:
+                        section_to_groups[g['section_id']] = []
+                    section_to_groups[g['section_id']].append(g['id'])
             self.group_to_section = group_to_section 
 
             # 6. Module Parts
             mp_data = requests.get(f"{API_BASE_URL}/module-parts").json()
-            mp_lookup = {} # un dictionnaire d'indexation (lookup table) pour que l'accès aux données des modules se fasse en temps constant O(1)
+            mp_lookup = {}
             if isinstance(mp_data, list):
                 for p in mp_data:
-                    # On enregistre : p['id'] -> l'objet complet p
                     mp_lookup[p['id']] = p
 
             # 7. Assignments
@@ -77,11 +81,8 @@ class DataManager:
                     mp_id = a.get('module_part_id')
                     mp_info = mp_lookup.get(mp_id, {})
                     m_type = mp_info.get('type', 'TD').upper()
-                    
-                    # Logic for Teacher identification
                     t_id = a['teacher_id'] if m_type == "CM" else None
-                    
-                    # Determine real size for capacity constraint
+                    req_room_type = mp_info.get('required_room_type', 'SALLE_TD').upper()
                     sid = a.get('section_id')
                     
                     # Target real groups for TD conflict logic
@@ -91,7 +92,9 @@ class DataManager:
                     if m_type != "CM" and not sid and td_group_ids:
                         sid = group_to_section.get(td_group_ids[0])
                     
-                    real_size = 30 # Default
+                    # FIX: Un CM bloque toute la section (tous ses groupes)
+                    if m_type == "CM" and sid and not td_group_ids:
+                        td_group_ids = section_to_groups.get(sid, [])
                     
                     # Pour toutes les séances (CM fusionnés ou TD regroupés), 
                     # l'effectif réel est la somme des tailles des groupes rattachés.
@@ -110,6 +113,7 @@ class DataManager:
                         teacher_id=t_id,
                         section_id=sid,
                         type=m_type,
+                        required_room_type=req_room_type,
                         group_size=real_size,
                         td_group_ids=td_group_ids,
                         is_locked=a.get('is_locked', False),

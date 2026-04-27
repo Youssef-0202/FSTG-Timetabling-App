@@ -8,7 +8,7 @@ def calculate_fitness_full(schedule, mask=None):
     """
     if mask is None:
         mask = {
-            "H1": True, "H2": True, "H3": True, "H4": True, "H9": True,
+            "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H11": True,
             "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True,
             "S_BALANCE": True, "S_STABILITY": True, "S_EMPTY_DAYS": True,
             "S_PREFERENCES": True, "S_FREE_AFTERNOONS": True
@@ -43,6 +43,8 @@ def calculate_fitness_full(schedule, mask=None):
     h3_count = 0
     h4_count = 0
     h9_count = 0
+    h10_count = 0
+    h11_count = 0
 
     for a in schedule.assignments:
         # H1: Enseignant
@@ -75,17 +77,29 @@ def calculate_fitness_full(schedule, mask=None):
         if a.room.capacity < a.module_part.group_size:
             h4_count += 1
 
+        # H10: Type de Salle Requis (Ex: CM en Amphi uniquement)
+        if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
+            h10_count += 1
+            
+        # H11: Interdiction des CM à 12:30 (Pause Déjeuner)
+        if a.module_part.type == "CM" and a.timeslot.start_time and str(a.timeslot.start_time)[:5] == "12:30":
+            h11_count += 1
+
     if mask.get("H1", True): h_violations += h1_count
     if mask.get("H2", True): h_violations += h2_count
     if mask.get("H3", True): h_violations += h3_count
     if mask.get("H4", True): h_violations += h4_count
     if mask.get("H9", True): h_violations += h9_count
+    if mask.get("H10", True): h_violations += h10_count
+    if mask.get("H11", True): h_violations += h11_count
     
     details['H1'] = h1_count
     details['H2'] = h2_count
     details['H3'] = h3_count
     details['H4'] = h4_count
     details['H9'] = h9_count
+    details['H10'] = h10_count
+    details['H11'] = h11_count
 
     # ── CONTRAINTES SOUPLES (SOFT) ──
     

@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1295,
+    "module_part_id": 33,
+    "teacher_id": 193,
+    "room_id": 90,
+    "slot_id": 18,
+    "section_id": 4,
+    "td_groups": [
+      {
+        "id": 19
+      },
+      {
+        "id": 20
+      },
+      {
+        "id": 33
+      }
+    ]
+  },
+  {
+    "id": 1316,
+    "module_part_id": 39,
+    "teacher_id": 175,
+    "room_id": 89,
+    "slot_id": 18,
+    "section_id": 6,
+    "td_groups": [
+      {
+        "id": 23
+      }
+    ]
+  },
+  {
+    "id": 1330,
+    "module_part_id": 31,
+    "teacher_id": 164,
+    "room_id": 88,
+    "slot_id": 18,
+    "section_id": 10,
+    "td_groups": [
+      {
+        "id": 31
+      }
+    ]
+  }
+]
