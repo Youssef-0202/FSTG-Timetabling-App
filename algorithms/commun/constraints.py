@@ -14,7 +14,7 @@ def calculate_fitness_full(schedule, mask=None):
             "S_PREFERENCES": True, "S_FREE_AFTERNOONS": True
         }
 
-    M = 10000 # Big M pour les contraintes Dures
+    M = 1000000 # Big M massif pour interdire les erreurs Hard (Lexicographique)
     
     dm = schedule.data_manager
     h_violations = 0
@@ -91,9 +91,9 @@ def calculate_fitness_full(schedule, mask=None):
         # H12 & S10: Gestion du Samedi
         if a.timeslot.day == "SAMEDI":
             if a.module_part.type == "CM":
-                h_violations += 1 # Hard : Interdiction totale
+                h_violations += 1 # Hard : Interdiction totale pour les cours magistraux
             else:
-                s10_saturday_penalty += 200 # Soft : Forte pénalité
+                s10_saturday_penalty += 5000 # Soft : Très forte pénalité pour vider le samedi sauf cas critique
 
         # H3: Chevauchements des Groupes TD (Standard)
         is_gr6 = False

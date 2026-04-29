@@ -153,6 +153,11 @@ class HybridEngine:
         
         # 3. Placement glouton (Greedy)
         for mp in module_parts_shuffled:
+            # Attributs fixes de la séance à placer (Accessibles partout)
+            is_cm = (mp.type == "CM")
+            is_gr6 = any("Gr 6" in self.dm.group_map.get(gid, "") for gid in mp.td_group_ids)
+            sec_id = mp.section_id
+            
             if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
                 # Les séances verrouillées n'ont pas le choix
                 room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
@@ -164,11 +169,6 @@ class HybridEngine:
                 candidate_slots = random.sample(self.dm.timeslots, min(15, len(self.dm.timeslots)))
                 candidate_rooms = [r for r in self.dm.rooms if r.capacity >= mp.group_size]
                 if not candidate_rooms: candidate_rooms = self.dm.rooms
-                
-                # Attributs fixes de la séance à placer
-                is_cm = (mp.type == "CM")
-                is_gr6 = any("Gr 6" in self.dm.group_map.get(gid, "") for gid in mp.td_group_ids)
-                sec_id = mp.section_id
 
                 for slot in candidate_slots:
                     for room in candidate_rooms:
@@ -184,9 +184,10 @@ class HybridEngine:
                         if mp.required_room_type and room.type != mp.required_room_type: cost += 1000
                         
                         # --- H12: SAMEDI INTERDIT (Nouvelle contrainte !) ---
+                        # --- H12: SAMEDI (CM=Hard, TD=Soft cost) ---
                         if slot.day == "SAMEDI":
-                            if is_cm: cost += 10000  # Mur infranchissable pour les CM
-                            else:     cost += 500    # Fortement déconseillé pour les TDs
+                            if is_cm: cost += 100000 # Interdit
+                            else:     cost += 15000  # Très coûteux (eviter si possible)
                             
                         # --- H13/H14: NE PAS PLACER S2 et S4 EN MÊME TEMPS ---
                         if sec_id:
@@ -463,7 +464,7 @@ class HybridEngine:
         changed_indices, old_states = [], []
 
         # LOGIQUE 1 : STABILISATION DES SALLES (Réduit S6)
-        if r < 0.35:
+        if r < 0.25:
             # On choisit un module au hasard parmi ceux qui peuvent bouger
             mid_options = [a.module_part.module_id for i, a in enumerate(schedule.assignments) if i in unlocked]
             if not mid_options: return self._apply_hard_move(schedule, unlocked)
@@ -473,37 +474,50 @@ class HybridEngine:
             target_room = random.choice(self.dm.rooms)
             
             # On aligne TOUTES les séances de ce module dans la même salle
-            # Cela évite aux étudiants et profs de changer de salle entre CM et TD
             for i in unlocked:
                 if schedule.assignments[i].module_part.module_id == mid:
                     changed_indices.append(i)
                     old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
                     schedule.assignments[i].room = target_room
         
-        # LOGIQUE 2 : COMPACTAGE DE LA JOURNÉE PROF (Réduit S3 - Gaps)
-        elif r < 0.65:
-            # On choisit un cours au hasard
+        # LOGIQUE 2 : COMPACTAGE DE LA JOURNÉE PROF (Réduit S3 pour les profs)
+        elif r < 0.55:
             idx = random.choice(unlocked)
             a = schedule.assignments[idx]
             prof_id = a.module_part.teacher_id
             
-            # On cherche les jours où ce professeur travaille déjà (C'est le GUIDAGE P6)
-            prof_assigns = [schedule.assignments[i] for i in range(len(schedule.assignments)) 
-                            if schedule.assignments[i].module_part.teacher_id == prof_id]
+            prof_assigns = [schedule.assignments[i] for i in unlocked 
+                            if schedule.assignments[i].module_part.teacher_id == prof_id and i != idx]
             
             if prof_assigns:
-                # On choisit un jour de référence (un jour où il a déjà un cours)
                 ref_day = random.choice(prof_assigns).timeslot.day
-                
-                # On force la nouvelle position sur CE MÊME JOUR pour boucher les trous
-                # Au lieu de 80 slots possibles, on restreint à 16 slots (ceux du même jour)
                 target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
                 
                 changed_indices.append(idx)
                 old_states.append((a.room, a.timeslot))
                 a.timeslot = target_slot
+
+        # LOGIQUE 3 : COMPACTAGE DE LA JOURNÉE ÉTUDIANT (Réduit S3 - Gaps & S7 - Journée courte)
+        elif r < 0.85:
+            idx = random.choice(unlocked)
+            a = schedule.assignments[idx]
+            sec_id = a.module_part.section_id
+            
+            if sec_id:
+                # Chercher un autre cours de la MÊME section
+                sec_assigns = [schedule.assignments[i] for i in unlocked 
+                               if schedule.assignments[i].module_part.section_id == sec_id and i != idx]
+                
+                if sec_assigns:
+                    # Prendre le jour de cet autre cours et forcer le déplacement vers ce jour-là
+                    ref_day = random.choice(sec_assigns).timeslot.day
+                    target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
+                    
+                    changed_indices.append(idx)
+                    old_states.append((a.room, a.timeslot))
+                    a.timeslot = target_slot
         
-        # LOGIQUE 3 : EXPLORATION RÉSIDUELLE
+        # LOGIQUE 4 : EXPLORATION RÉSIDUELLE
         else:
             # Si on ne fait pas de mouvement spécialisé, on fait un mouvement classique
             idx, r_old, s_old = self._apply_hard_move(schedule, unlocked)

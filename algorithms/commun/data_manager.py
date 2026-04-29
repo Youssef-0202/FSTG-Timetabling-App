@@ -87,7 +87,7 @@ class DataManager:
                     mp_id = a.get('module_part_id')
                     mp_info = mp_lookup.get(mp_id, {})
                     m_type = mp_info.get('type', 'TD').upper()
-                    t_id = a['teacher_id'] if m_type == "CM" else None
+                    t_id = a.get('teacher_id') # Prise en compte du prof pour TOUS les types (CM/TD/TP)
                     req_room_type = mp_info.get('required_room_type', 'SALLE_TD').upper()
                     sid = a.get('section_id')
                     

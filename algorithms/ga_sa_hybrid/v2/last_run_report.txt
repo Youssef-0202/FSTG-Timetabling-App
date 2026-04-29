@@ -1,13 +1,13 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-04-29 12:19:07
+ Date : 2026-04-29 16:22:48
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Population Size      : 50
+ - Population Size      : 60
  - Max Generations      : 150
- - Mutation Rate        : 0.1
- - SA Iterations        : 600
+ - Mutation Rate        : 0.2
+ - SA Iterations        : 1200
  - SA Temp Initial      : 50.0
 
 2. STATISTIQUES DE LA BASE DE DONNEES :
@@ -19,36 +19,4 @@
 
 ============================================================
  SUIVI DES GENERATIONS :
-============================================================
-
-============================================================
- ANALYSE FINALE DES PERFORMANCES 
-============================================================
- Temps total d'execution  : 5641.62 secondes
- Generations effectuees   : 150
-------------------------------------------------------------
- Score Initial (Best)     : 12829783.8
- Score Final   (Best)     : 485524.0
- Amelioration Totale      : 96.2 %
-------------------------------------------------------------
- STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 485524.0
-  - Pire Solution         : 605673.0
-  - Moyenne Population    : 492901.2
-  - Ecart-type (Std Dev)  : 25186.4
-------------------------------------------------------------
- DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - H2                   : 3
-  - H3                   : 40
-  - H12_SAT_CM           : 4
-  - S1_Mixing            : 1620
-  - S2_Disp              : 0
-  - S3_Gaps              : 1510
-  - S4_Lunch             : 1800
-  - S5_Balance           : 254.0
-  - S6_Stability         : 2850
-  - S7_ShortDay          : 320
-  - S8_FreeApm           : 1120
-  - S9_Fatigue           : 1450
-  - S10_Sat_TD           : 4600
 ============================================================
