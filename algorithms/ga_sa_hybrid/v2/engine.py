@@ -118,37 +118,85 @@ class HybridEngine:
         return Schedule(self.dm, assignments)
 
     def _build_greedy_individual(self):
-        """Heuristique constructive Greedy (P9) : placement séance par séance sans conflit dur."""
+        """
+        Heuristique constructive Greedy (P9) : placement séance par séance de manière intelligente.
+        Objectif : Éviter les conflits durs (H1->H14) dès la naissance de l'horaire, 
+        pour donner une avance écrasante au Recuit Simulé.
+        """
         assignments = []
-        # Index de construction pour tracker l'occupation en temps réel
+        
+        # 1. Calendriers de suivi : on note ce qui est déjà occupé pour l'individu en cours de création
         teacher_slot_used = {}
         room_slot_used    = {}
         group_slot_used   = {}
+        sec_occupancy     = {}  # Tracking S2/S4 comme dans constraints.py
         
-        # Mélanger l'ordre des séances pour avoir des individus différents
+        # 2. Préparation des relations pour éviter S2/S4 (H13)
+        # Correction : Mappage inversé correct (Nom -> ID)
+        name_to_sid = {s['name']: s['id'] for s in self.dm.sections}
+        sid_to_name = self.dm.sec_id_to_name
+        related_sids = {}
+        for sid, name in sid_to_name.items():
+            related_sids[sid] = []
+            if " S2" in name:
+                for p in name.replace(" S2", "").split("-"):
+                    if f"{p} S4" in name_to_sid: related_sids[sid].append(name_to_sid[f"{p} S4"])            
+            elif " S4" in name:
+                prefix = name.replace(" S4", "")
+                for s2_name, s2_id in name_to_sid.items():
+                    if " S2" in s2_name and prefix in s2_name.replace(" S2", "").split("-"):
+                        related_sids[sid].append(s2_id)
+        
+        # Mélanger pour garantir la diversité génétique des individus
         module_parts_shuffled = list(self.dm.module_parts)
         random.shuffle(module_parts_shuffled)
         
+        # 3. Placement glouton (Greedy)
         for mp in module_parts_shuffled:
             if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
+                # Les séances verrouillées n'ont pas le choix
                 room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
                 slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id), random.choice(self.dm.timeslots))
             else:
                 best_room, best_slot, best_cost = None, None, float('inf')
                 
-                # Échantillonnage pour la performance et la diversité
+                # Échantillonnage : On teste 15 créneaux au hasard pour aller vite
                 candidate_slots = random.sample(self.dm.timeslots, min(15, len(self.dm.timeslots)))
                 candidate_rooms = [r for r in self.dm.rooms if r.capacity >= mp.group_size]
                 if not candidate_rooms: candidate_rooms = self.dm.rooms
                 
+                # Attributs fixes de la séance à placer
+                is_cm = (mp.type == "CM")
+                is_gr6 = any("Gr 6" in self.dm.group_map.get(gid, "") for gid in mp.td_group_ids)
+                sec_id = mp.section_id
+
                 for slot in candidate_slots:
                     for room in candidate_rooms:
                         cost = 0
-                        if (mp.teacher_id, slot.id) in teacher_slot_used: cost += 1000
+                        
+                        # --- H1, H2, H3: Base de l'emploi du temps ---
+                        if mp.teacher_id and (mp.teacher_id, slot.id) in teacher_slot_used: cost += 1000
                         if (room.id, slot.id) in room_slot_used: cost += 1000
                         for gid in mp.td_group_ids:
                             if (gid, slot.id) in group_slot_used: cost += 1000
                         
+                        # --- H10: Type de Salle ---
+                        if mp.required_room_type and room.type != mp.required_room_type: cost += 1000
+                        
+                        # --- H12: SAMEDI INTERDIT (Nouvelle contrainte !) ---
+                        if slot.day == "SAMEDI":
+                            if is_cm: cost += 10000  # Mur infranchissable pour les CM
+                            else:     cost += 500    # Fortement déconseillé pour les TDs
+                            
+                        # --- H13/H14: NE PAS PLACER S2 et S4 EN MÊME TEMPS ---
+                        if sec_id:
+                            for r_sid in related_sids.get(sec_id, []):
+                                r_status = sec_occupancy.get((r_sid, slot.id))
+                                if r_status:
+                                    if (is_cm or is_gr6) and r_status['any']: cost += 3000
+                                    elif r_status['cm'] or r_status['gr6']: cost += 3000
+
+                        # Si on trouve une solution parfaite (coût 0), on s'arrête immédiatement
                         if cost < best_cost:
                             best_cost = cost
                             best_room, best_slot = room, slot
@@ -157,10 +205,19 @@ class HybridEngine:
                 
                 room, slot = best_room, best_slot
             
-            # Enregistrer l'occupation
-            teacher_slot_used[(mp.teacher_id, slot.id)] = True
+            # 4. ENREGISTREMENT: Le meilleur choix est acté, on verrouille le calendrier
+            if mp.teacher_id: teacher_slot_used[(mp.teacher_id, slot.id)] = True
             room_slot_used[(room.id, slot.id)] = True
             for gid in mp.td_group_ids: group_slot_used[(gid, slot.id)] = True
+            
+            # Enregistrement chirurgical S2/S4
+            if sec_id:
+                key_sec = (sec_id, slot.id)
+                if key_sec not in sec_occupancy: 
+                    sec_occupancy[key_sec] = {'cm': False, 'gr6': False, 'any': False}
+                sec_occupancy[key_sec]['any'] = True
+                if is_cm:  sec_occupancy[key_sec]['cm'] = True
+                if is_gr6: sec_occupancy[key_sec]['gr6'] = True
             
             assignments.append(Assignment(mp, room, slot))
             
@@ -315,7 +372,6 @@ class HybridEngine:
         # P5 : Température adaptive (5% du score courant)
         temp = max(self.sa_temp, current_fit * 0.05)
         
-        # Snapshot de départ
         best_fit = current_fit
         best_state = [(a.room, a.timeslot) for a in schedule.assignments]
         
@@ -454,3 +510,24 @@ class HybridEngine:
             changed_indices, old_states = [idx], [(r_old, s_old)]
             
         return changed_indices, old_states
+
+    # ==========================================================================
+    # SECTION G : PERSPECTIVES & OPTIMISATIONS (P1 - DELTA SCORING)
+    # ==========================================================================
+
+    def _calculate_hard_delta_score(self, assignment, old_room, old_slot, new_room, new_slot, occupancy_maps):
+        """
+        [PROTOTYPE P1] : Algorithme de calcul incrémental en O(1).
+        
+        Rationnel : Au lieu de scanner les 245 séances (O(N)), cette méthode regarde
+        uniquement l'impact local du déplacement d'un cours.
+        
+        Fonctionnement :
+        1. On soustrait les conflits potentiels générés par l'ancienne position.
+        2. On ajoute les nouveaux conflits potentiels générés par la nouvelle position.
+        3. Le score total est mis à jour par simple addition (Delta).
+        """
+        delta = 0
+        # Cette logique sera branchée lors de la phase de montée en charge (Large Scale)
+        # pour garantir des performances fluides sur des milliers de séances.
+        pass

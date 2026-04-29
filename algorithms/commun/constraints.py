@@ -29,14 +29,34 @@ def calculate_fitness_full(schedule, mask=None):
     s9_fatigue_penalty = 0
     s8_free_afternoon_penalty = 0
     
+    s10_saturday_penalty = 0
+    
     details = {}
+
+    # ── PRÉ-CALCUL GÉNÉRATIF (H13-H14) ──
+    # On construit l'arbre de parenté dynamiquement à partir des noms
+    name_to_sid = {s['name']: s['id'] for s in dm.sections}
+    sid_to_name = dm.sec_id_to_name
+    all_s4_sids = [sid for sid, name in sid_to_name.items() if " S4" in name]
+    
+    related_sids = {}
+    for sid, name in sid_to_name.items():
+        related_sids[sid] = []
+        if " S2" in name: # Parent: Ex "GB-GEG S2" -> Enfants = "GB S4", "GEG S4"
+            for p in name.replace(" S2", "").split("-"):
+                if f"{p} S4" in name_to_sid: related_sids[sid].append(name_to_sid[f"{p} S4"])
+        elif " S4" in name: # Enfant: Ex "GI S4" -> Parent = "GP-GI S2"
+            prefix = name.replace(" S4", "")
+            for s2_name, s2_id in name_to_sid.items():
+                if " S2" in s2_name and prefix in s2_name.replace(" S2", "").split("-"):
+                    related_sids[sid].append(s2_id)
 
     # ── CONTRAINTES DURES (HARD) ──
     
-    # H1, H2, H3 (Conflits de ressources)
     prof_slots = {}
     room_slots = {}
     group_slots = {}
+    sec_occupancy = {} # Tracking chirurgical pour H13-H14: (sec_id, time_id) -> {'cm': bool, 'gr6': bool, 'any': bool}
     
     h1_count = 0
     h2_count = 0
@@ -44,7 +64,6 @@ def calculate_fitness_full(schedule, mask=None):
     h4_count = 0
     h9_count = 0
     h10_count = 0
-    h11_count = 0
 
     for a in schedule.assignments:
         # H1: Enseignant
@@ -54,7 +73,7 @@ def calculate_fitness_full(schedule, mask=None):
                 h1_count += 1
             prof_slots[key] = True
             
-            # H9: Indisponibilites (Unavailability)
+            # H9: Indisponibilites
             prof_obj = dm.teacher_map.get(a.module_part.teacher_id)
             if prof_obj and a.timeslot.id in prof_obj.unavailable_slots:
                 h9_count += 1
@@ -65,25 +84,55 @@ def calculate_fitness_full(schedule, mask=None):
             h2_count += 1
         room_slots[key_r] = True
         
-        # H3: Groupe (Sections et Groupes TD)
-        # On verifie pour chaque groupe TD impacte
+        # H10: Type de Salle Requis
+        if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
+            h10_count += 1
+
+        # H12 & S10: Gestion du Samedi
+        if a.timeslot.day == "SAMEDI":
+            if a.module_part.type == "CM":
+                h_violations += 1 # Hard : Interdiction totale
+            else:
+                s10_saturday_penalty += 200 # Soft : Forte pénalité
+
+        # H3: Chevauchements des Groupes TD (Standard)
+        is_gr6 = False
         for g_id in a.module_part.td_group_ids:
             key_g = (g_id, a.timeslot.id)
             if key_g in group_slots:
                 h3_count += 1
             group_slots[key_g] = True
+            if "Gr 6" in dm.group_map.get(g_id, ""):
+                is_gr6 = True
+
+        # H13 & H14: Chevauchements Parents-Enfants (S2 vs S4)
+        sec_id = a.module_part.section_id
+        if sec_id:
+            key_sec = (sec_id, a.timeslot.id)
+            if key_sec not in sec_occupancy:
+                sec_occupancy[key_sec] = {'cm': False, 'gr6': False, 'any': False}
+                
+            is_cm = (a.module_part.type == "CM")
             
+            # Vérifier les sections liées (Ex: si je suis GB-GEG S2, je regarde GB S4 et GEG S4)
+            for r_sid in related_sids.get(sec_id, []):
+                r_status = sec_occupancy.get((r_sid, a.timeslot.id))
+                if r_status:
+                    # Je suis un CM ou Gr 6 S2, et l'autre section a déjà un cours placé
+                    if (is_cm or is_gr6) and r_status['any']:
+                        h3_count += 3
+                    # L'autre section est déjà un CM ou Gr 6 S2, et moi je viens m'ajouter par dessus
+                    elif r_status['cm'] or r_status['gr6']:
+                        h3_count += 3
+
+            # Mise à jour du statut pour les prochaines séances de la boucle
+            sec_occupancy[key_sec]['any'] = True
+            if is_cm:  sec_occupancy[key_sec]['cm'] = True
+            if is_gr6: sec_occupancy[key_sec]['gr6'] = True
+
         # H4: Capacite
         if a.room.capacity < a.module_part.group_size:
             h4_count += 1
-
-        # H10: Type de Salle Requis (Ex: CM en Amphi uniquement)
-        if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
-            h10_count += 1
-            
-        # H11: Interdiction des CM à 12:30 (Pause Déjeuner)
-        if a.module_part.type == "CM" and a.timeslot.start_time and str(a.timeslot.start_time)[:5] == "12:30":
-            h11_count += 1
 
     if mask.get("H1", True): h_violations += h1_count
     if mask.get("H2", True): h_violations += h2_count
@@ -91,7 +140,6 @@ def calculate_fitness_full(schedule, mask=None):
     if mask.get("H4", True): h_violations += h4_count
     if mask.get("H9", True): h_violations += h9_count
     if mask.get("H10", True): h_violations += h10_count
-    if mask.get("H11", True): h_violations += h11_count
     
     details['H1'] = h1_count
     details['H2'] = h2_count
@@ -99,7 +147,7 @@ def calculate_fitness_full(schedule, mask=None):
     details['H4'] = h4_count
     details['H9'] = h9_count
     details['H10'] = h10_count
-    details['H11'] = h11_count
+    details['H12_SAT_CM'] = sum(1 for a in schedule.assignments if a.timeslot.day == "SAMEDI" and a.module_part.type == "CM")
 
     # ── CONTRAINTES SOUPLES (SOFT) ──
     
@@ -202,7 +250,8 @@ def calculate_fitness_full(schedule, mask=None):
         (s5_balance_penalty if mask.get("S_BALANCE", True) else 0) +
         (s4_lunch_penalty if mask.get("S_PREFERENCES", True) else 0) +
         (s8_free_afternoon_penalty if mask.get("S_FREE_AFTERNOONS", True) else 0) +
-        (s9_fatigue_penalty if mask.get("S_PREFERENCES", True) else 0)
+        (s9_fatigue_penalty if mask.get("S_PREFERENCES", True) else 0) +
+        s10_saturday_penalty
     )
 
     total_score = (M * h_violations) + total_soft
@@ -217,7 +266,8 @@ def calculate_fitness_full(schedule, mask=None):
         'S6_Stability': stability_penalty,
         'S7_ShortDay': s7_empty_day_penalty,
         'S8_FreeApm': s8_free_afternoon_penalty,
-        'S9_Fatigue': s9_fatigue_penalty
+        'S9_Fatigue': s9_fatigue_penalty,
+        'S10_Sat_TD': s10_saturday_penalty
     })
 
     return total_score, h_violations, total_soft, details

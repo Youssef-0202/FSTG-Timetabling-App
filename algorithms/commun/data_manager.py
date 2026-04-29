@@ -12,7 +12,10 @@ class DataManager:
         self.timeslots = []
         self.slot_map = {}    # Required for time-based constraints
         self.sections = []
+        self.sec_id_to_name = {} # Map ID -> Nom de section
         self.module_parts = []
+        self.group_to_section = {}
+        self.group_map = {}      # Map ID -> Nom de groupe (ex: GP-GI S2 Gr 6)
 
     def fetch_all_data(self):
         print("--- Chargement des données  ---")
@@ -50,6 +53,7 @@ class DataManager:
             section_caps = {}  # Pour calculer les contraintes de la capacité de  salles 
             if isinstance(sec_data, list):
                 self.sections = sec_data
+                self.sec_id_to_name = {s['id']: s['name'] for s in sec_data}
                 def get_cap(s):
                     return s.get('total_capacity')  or 0
                 section_caps = {s['id']: get_cap(s) for s in sec_data}
@@ -61,8 +65,10 @@ class DataManager:
             if isinstance(tdg_data, list):
                 for g in tdg_data:
                     group_to_section[g['id']] = g['section_id']
+                    self.group_map[g['id']] = g.get('name', '')
                     if g['section_id'] not in section_to_groups:
                         section_to_groups[g['section_id']] = []
+                        
                     section_to_groups[g['section_id']].append(g['id'])
             self.group_to_section = group_to_section 
 

@@ -1,6 +1,6 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-04-27 17:15:37
+ Date : 2026-04-29 12:19:07
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
@@ -24,27 +24,31 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 1690.12 secondes
- Generations effectuees   : 86
+ Temps total d'execution  : 5641.62 secondes
+ Generations effectuees   : 150
 ------------------------------------------------------------
- Score Initial (Best)     : 713937.8
- Score Final   (Best)     : 6126.2
- Amelioration Totale      : 99.1 %
+ Score Initial (Best)     : 12829783.8
+ Score Final   (Best)     : 485524.0
+ Amelioration Totale      : 96.2 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 6126.2
-  - Pire Solution         : 36491.6
-  - Moyenne Population    : 13429.1
-  - Ecart-type (Std Dev)  : 9500.1
+  - Meilleure Solution    : 485524.0
+  - Pire Solution         : 605673.0
+  - Moyenne Population    : 492901.2
+  - Ecart-type (Std Dev)  : 25186.4
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
+  - H2                   : 3
+  - H3                   : 40
+  - H12_SAT_CM           : 4
   - S1_Mixing            : 1620
   - S2_Disp              : 0
-  - S3_Gaps              : 140
-  - S4_Lunch             : 160
-  - S5_Balance           : 176.20000000000005
-  - S6_Stability         : 1900
-  - S7_ShortDay          : 80
-  - S8_FreeApm           : 640
-  - S9_Fatigue           : 1410
+  - S3_Gaps              : 1510
+  - S4_Lunch             : 1800
+  - S5_Balance           : 254.0
+  - S6_Stability         : 2850
+  - S7_ShortDay          : 320
+  - S8_FreeApm           : 1120
+  - S9_Fatigue           : 1450
+  - S10_Sat_TD           : 4600
 ============================================================
