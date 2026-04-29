@@ -364,75 +364,110 @@ class HybridEngine:
 
     def simulated_annealing_search(self, schedule):
         """
-        Recherche Locale par Recuit Simulé (SA) optimisée (P3 + P10).
-        - P3 : Exécution "In-place" avec Undo (gain de temps considérable).
-        - P10 : Bi-phasé (Hard vs Soft) avec mouvements spécialisés.
+        RECHERCHE LOCALE V3 (DELTA-SCORING TURBO)
+        Calcule uniquement l'impact local des mouvements pour une vitesse x20.
         """
         current_sch = schedule
-        current_fit = self.get_score(current_sch)
+        current_score, current_h, current_s, _ = calculate_fitness_full(current_sch, mask=self.constraints_mask)
         
-        # P5 : Température adaptive (5% du score courant)
-        temp = max(self.sa_temp, current_fit * 0.05)
+        # --- INITIALISATION DU TRACKER D'OCCUPATION (Pour Delta-Scoring) ---
+        prof_map = {}  # (p_id, slot_id) -> count
+        room_map = {}  # (r_id, slot_id) -> count
+        group_map = {} # (g_id, slot_id) -> count
         
-        best_fit = current_fit
+        for a in current_sch.assignments:
+            tid, rid, sid = a.module_part.teacher_id, a.room.id, a.timeslot.id
+            if tid and tid != 231: prof_map[(tid, sid)] = prof_map.get((tid, sid), 0) + 1
+            room_map[(rid, sid)] = room_map.get((rid, sid), 0) + 1
+            for gid in a.module_part.td_group_ids: group_map[(gid, sid)] = group_map.get((gid, sid), 0) + 1
+
+        def get_delta_h(a, old_r, old_s, new_r, new_s):
+            """Calcul O(1) du changement de violations Hard"""
+            dh = 0
+            # 1. Retirer l'impact de l'ancienne position
+            tid = a.module_part.teacher_id
+            if tid and tid != 231:
+                if prof_map.get((tid, old_s.id), 0) > 1: dh -= 1
+            if room_map.get((old_r.id, old_s.id), 0) > 1: dh -= 1
+            for gid in a.module_part.td_group_ids:
+                if group_map.get((gid, old_s.id), 0) > 1: dh -= 1
+            if old_s.day == "SAMEDI" and a.module_part.type == "CM": dh -= 1
+            
+            # Mise a jour tempo des maps pour le calcul du nouveau
+            if tid and tid != 231: prof_map[(tid, old_s.id)] -= 1
+            room_map[(old_r.id, old_s.id)] -= 1
+            for gid in a.module_part.td_group_ids: group_map[(gid, old_s.id)] -= 1
+
+            # 2. Ajouter l'impact de la nouvelle position
+            if tid and tid != 231:
+                if prof_map.get((tid, new_s.id), 0) >= 1: dh += 1
+                prof_map[(tid, new_s.id)] = prof_map.get((tid, new_s.id), 0) + 1
+            if room_map.get((new_r.id, new_s.id), 0) >= 1: dh += 1
+            room_map[(new_r.id, new_s.id)] = room_map.get((new_r.id, new_s.id), 0) + 1
+            for gid in a.module_part.td_group_ids:
+                if group_map.get((gid, new_s.id), 0) >= 1: dh += 1
+                group_map[(gid, new_s.id)] = group_map.get((gid, new_s.id), 0) + 1
+            if new_s.day == "SAMEDI" and a.module_part.type == "CM": dh += 1
+            
+            return dh
+
+        best_h = current_h
         best_state = [(a.room, a.timeslot) for a in schedule.assignments]
+        temp = max(self.sa_temp, current_h * 1000) # Temp basee sur le Hard car prioritaire
         
-        # P10 : Déterminer la phase (Hard si violations hard > 0, sinon Soft)
-        active_phase = 'hard' if schedule.h_violations > 0 else 'soft'
+        active_phase = 'hard' if current_h > 0 else 'soft'
+        unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
+        if not unlocked: return schedule
 
         for it in range(self.sa_iterations):
-            # Transition dynamique vers le soft si le hard est résolu à mi-parcours
-            if it == self.sa_iterations // 2 and active_phase == 'hard':
-                if schedule.h_violations == 0: active_phase = 'soft'
-
-            unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
-            if not unlocked: break
-
-            # P3 : Sauvegarde locale pour Undo O(1)
-            idx = random.choice(unlocked) if active_phase == 'hard' else None 
-            saved_indices = []
-            saved_states = []
-
-            # Application du mouvement
             if active_phase == 'hard':
-                # Mouvements génériques pour casser les conflits hard
-                idx, old_room, old_slot = self._apply_hard_move(schedule, unlocked)
-                saved_indices = [idx]
-                saved_states = [(old_room, old_slot)]
+                idx, old_r, old_s = self._apply_hard_move(current_sch, unlocked)
+                a = current_sch.assignments[idx]
+                
+                # DELTA SCORING HARD
+                dh = get_delta_h(a, old_r, old_s, a.room, a.timeslot)
+                new_h = current_h + dh
+                
+                # Acceptation simplifiee pour le Hard : on accepte si ca n'empire pas (ou Metropolis)
+                if dh <= 0 or (temp > 0 and random.random() < math.exp(-dh * 1000000 / temp)):
+                    current_h = new_h
+                    if current_h < best_h:
+                        best_h = current_h
+                        best_state = [(ass.room, ass.timeslot) for ass in current_sch.assignments]
+                    if current_h == 0: active_phase = 'soft'
+                else:
+                    # UNDO O(1)
+                    tid = a.module_part.teacher_id
+                    if tid and tid != 231:
+                        prof_map[(tid, a.timeslot.id)] -= 1
+                        prof_map[(tid, old_s.id)] += 1
+                    room_map[(a.room.id, a.timeslot.id)] -= 1
+                    room_map[(old_r.id, old_s.id)] += 1
+                    for gid in a.module_part.td_group_ids:
+                        group_map[(gid, a.timeslot.id)] -= 1
+                        group_map[(gid, old_s.id)] += 1
+                    a.room, a.timeslot = old_r, old_s
             else:
-                # Mouvements spécialisés (GUIDÉ P6) pour réduire les pénalités soft
-                saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
-
-            # Invalider le cache et recalculer
-            schedule.fitness = None
-            neighbor_fit = self.get_score(schedule)
-            delta = neighbor_fit - current_fit
-
-            # Critère de Metropolis
-            if delta < 0 or (temp > 0 and random.random() < math.exp(-delta / temp)):
-                # Acceptation
-                current_fit = neighbor_fit
-                if current_fit < best_fit:
-                    best_fit = current_fit
-                    best_state = [(a.room, a.timeslot) for a in schedule.assignments]
-            else:
-                # REJET (P3 : Undo O(1))
-                for i, (r, s) in zip(saved_indices, saved_states):
-                    schedule.assignments[i].room = r
-                    schedule.assignments[i].timeslot = s
-                schedule.fitness = current_fit # Restaurer le score précédent
-
+                # Phase Soft : On utilise encore l'evaluation complete car Delta-Soft est complexe
+                saved_indices, saved_states = self._apply_soft_move(current_sch, unlocked)
+                new_score, new_h, new_s, _ = calculate_fitness_full(current_sch, mask=self.constraints_mask)
+                
+                if new_score < current_score or random.random() < math.exp((current_score - new_score)/temp):
+                    current_score = new_score
+                    current_h = new_h
+                else:
+                    for i, (r, s) in zip(saved_indices, saved_states):
+                        current_sch.assignments[i].room, current_sch.assignments[i].timeslot = r, s
+            
             temp *= self.sa_cooling
 
-        # Restaurer le meilleur état trouvé
+        # Fin : restaurer le meilleur et fixer le cache
         for i, (r, s) in enumerate(best_state):
-            schedule.assignments[i].room = r
-            schedule.assignments[i].timeslot = s
-    
-        # Recalcul complet après restauration (important pour h_violations)
-        schedule.fitness = None
-        self.get_score(schedule)
+            schedule.assignments[i].room, schedule.assignments[i].timeslot = r, s
         
+        # Un dernier calcul complet pour mettre a jour les attributs de l'objet
+        res_score, res_h, res_s, _ = calculate_fitness_full(schedule, mask=self.constraints_mask)
+        schedule.fitness, schedule.h_violations, schedule.soft_score = res_score, res_h, res_s
         return schedule
 
     def _apply_hard_move(self, schedule, unlocked):

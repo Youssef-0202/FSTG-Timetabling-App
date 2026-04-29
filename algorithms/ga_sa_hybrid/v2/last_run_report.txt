@@ -1,6 +1,6 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-04-29 16:36:03
+ Date : 2026-04-29 21:05:08
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
@@ -19,65 +19,4 @@
 
 ============================================================
  SUIVI DES GENERATIONS :
-============================================================
-
-============================================================
- ANALYSE FINALE DES PERFORMANCES 
-============================================================
- Temps total d'execution  : 15347.88 secondes
- Generations effectuees   : 150
-------------------------------------------------------------
- Score Initial (Best)     : 67011863.2
- Score Final   (Best)     : 2064165.5
- Amelioration Totale      : 96.9 %
-------------------------------------------------------------
- STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 2064165.5
-  - Pire Solution         : 5074309.5
-  - Moyenne Population    : 2481557.9
-  - Ecart-type (Std Dev)  : 766034.0
-------------------------------------------------------------
- DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - H3                   : 1
-  - H12_SAT_CM           : 1
-  - S1_Mixing            : 1410
-  - S2_Disp              : 0
-  - S3_Gaps              : 1345
-  - S4_Lunch             : 1720
-  - S5_Balance           : 260.5
-  - S6_Stability         : 2000
-  - S7_ShortDay          : 400
-  - S8_FreeApm           : 640
-  - S9_Fatigue           : 1390
-  - S10_Sat_TD           : 55000
-============================================================
-============================================================
- ANALYSE FINALE DES PERFORMANCES 
-============================================================
- Temps total d'execution  : 15311.63 secondes
- Generations effectuees   : 150
-------------------------------------------------------------
- Score Initial (Best)     : 59012687.2
- Score Final   (Best)     : 6074668.8
- Amelioration Totale      : 89.7 %
-------------------------------------------------------------
- STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 6074668.8
-  - Pire Solution         : 12079800.0
-  - Moyenne Population    : 6424863.4
-  - Ecart-type (Std Dev)  : 917864.2
-------------------------------------------------------------
- DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - H1                   : 1
-  - H12_SAT_CM           : 5
-  - S1_Mixing            : 1560
-  - S2_Disp              : 0
-  - S3_Gaps              : 1570
-  - S4_Lunch             : 1920
-  - S5_Balance           : 278.7999999999999
-  - S6_Stability         : 1850
-  - S7_ShortDay          : 320
-  - S8_FreeApm           : 800
-  - S9_Fatigue           : 1370
-  - S10_Sat_TD           : 65000
 ============================================================
