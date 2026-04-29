@@ -115,7 +115,8 @@ def run_optimization():
     
     best_cm = None
     for gen in range(1, 41): 
-        best_cm = engine_cm.evolve()
+        engine_cm.evolve()
+        best_cm = engine_cm.population[0]
         print(f" Phase 1 - Gen {gen:02d} | H: {best_cm.h_violations}")
         if best_cm.h_violations == 0:
             print(f" [SUCCÈS] Squelette CM terminé à Gen {gen} avec 0 conflit !")
@@ -123,8 +124,9 @@ def run_optimization():
     
     # --- PHASE 2 : REMPLISSAGE (PLACEMENT DES TD) ---
     print("\n>>> PHASE 2 : Placement des Travaux Dirigés (TD)...")
-    # On fige les CM trouvés en Phase 1
-    for a in best_cm.assignments:
+    # On fige les CM trouvés en Phase 1 (S'ils existent, sinon on prend le meilleur trouvé)
+    target_cm = best_cm if best_cm else engine_cm.population[0]
+    for a in target_cm.assignments:
         a.module_part.is_locked = True
         a.module_part.fixed_room_id = a.room.id
         a.module_part.fixed_slot_id = a.timeslot.id
@@ -137,8 +139,9 @@ def run_optimization():
     best_final = None
     start_time_exec = time.time()
     for gen in range(1, MAX_GEN + 1):
-        best_final = engine_td.evolve()
-        print(f" Phase 2 - Gen {gen:03d} | H: {best_final.h_violations} | S: {best_final.soft_score}")
+        engine_td.evolve()
+        best_final = engine_td.population[0]
+        print(f" Phase 2 - Gen {gen:03d} | H: {best_final.h_violations} | S: {best_final.soft_score if hasattr(best_final, 'soft_score') else best_final.soft_penalty}")
         if best_final.h_violations == 0:
              print(f" [SUCCÈS] Emploi du temps complet terminé à Gen {gen} !")
              break

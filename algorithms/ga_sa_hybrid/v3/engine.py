@@ -131,8 +131,20 @@ class HybridEngine:
         group_slot_used   = {}
         sec_occupancy     = {}  # Tracking S2/S4 comme dans constraints.py
         
-        # 2. Préparation des relations pour éviter S2/S4 (H13)
-        # Correction : Mappage inversé correct (Nom -> ID)
+        # 2. Pré-remplissage avec les séances VERROUILLÉES (Crucial pour Phase 2)
+        for mp in self.dm.module_parts:
+            if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
+                rid, sid = mp.fixed_room_id, mp.fixed_slot_id
+                if mp.teacher_id and mp.teacher_id != 231: teacher_slot_used[(mp.teacher_id, sid)] = True
+                room_slot_used[(rid, sid)] = True
+                for gid in mp.td_group_ids: group_slot_used[(gid, sid)] = True
+                if mp.section_id:
+                    key_sec = (mp.section_id, sid)
+                    if key_sec not in sec_occupancy: sec_occupancy[key_sec] = {'cm': False, 'gr6': False, 'any': False}
+                    sec_occupancy[key_sec]['any'] = True
+                    if mp.type == "CM": sec_occupancy[key_sec]['cm'] = True
+
+        # 2b. Préparation des relations pour éviter S2/S4 (H13)
         name_to_sid = {s['name']: s['id'] for s in self.dm.sections}
         sid_to_name = self.dm.sec_id_to_name
         related_sids = {}
@@ -147,7 +159,7 @@ class HybridEngine:
                     if " S2" in s2_name and prefix in s2_name.replace(" S2", "").split("-"):
                         related_sids[sid].append(s2_id)
         
-        # Mélanger pour garantir la diversité génétique des individus
+        # Mélanger pour garantir la diversité
         module_parts_shuffled = list(self.dm.module_parts)
         random.shuffle(module_parts_shuffled)
         
