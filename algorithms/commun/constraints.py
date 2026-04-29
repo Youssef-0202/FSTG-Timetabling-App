@@ -66,15 +66,16 @@ def calculate_fitness_full(schedule, mask=None):
     h10_count = 0
 
     for a in schedule.assignments:
-        # H1: Enseignant
-        if a.module_part.teacher_id:
-            key = (a.module_part.teacher_id, a.timeslot.id)
+        # H1: Enseignant (Ignorer si c'est le prof générique ID 231)
+        t_id = a.module_part.teacher_id
+        if t_id and t_id != 231:
+            key = (t_id, a.timeslot.id)
             if key in prof_slots:
                 h1_count += 1
             prof_slots[key] = True
             
             # H9: Indisponibilites
-            prof_obj = dm.teacher_map.get(a.module_part.teacher_id)
+            prof_obj = dm.teacher_map.get(t_id)
             if prof_obj and a.timeslot.id in prof_obj.unavailable_slots:
                 h9_count += 1
                 

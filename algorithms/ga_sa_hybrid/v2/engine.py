@@ -175,7 +175,8 @@ class HybridEngine:
                         cost = 0
                         
                         # --- H1, H2, H3: Base de l'emploi du temps ---
-                        if mp.teacher_id and (mp.teacher_id, slot.id) in teacher_slot_used: cost += 1000
+                        t_id = mp.teacher_id
+                        if t_id and t_id != 231 and (t_id, slot.id) in teacher_slot_used: cost += 1000
                         if (room.id, slot.id) in room_slot_used: cost += 1000
                         for gid in mp.td_group_ids:
                             if (gid, slot.id) in group_slot_used: cost += 1000
@@ -207,7 +208,7 @@ class HybridEngine:
                 room, slot = best_room, best_slot
             
             # 4. ENREGISTREMENT: Le meilleur choix est acté, on verrouille le calendrier
-            if mp.teacher_id: teacher_slot_used[(mp.teacher_id, slot.id)] = True
+            if mp.teacher_id and mp.teacher_id != 231: teacher_slot_used[(mp.teacher_id, slot.id)] = True
             room_slot_used[(room.id, slot.id)] = True
             for gid in mp.td_group_ids: group_slot_used[(gid, slot.id)] = True
             
