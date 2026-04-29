@@ -1,0 +1,111 @@
+
+DOCUMENTATION SCIENTIFIQUE : ÉVOLUTION DE L'ALGORITHME HYBRIDE GA+SA (V1 -> V2)
+
+1. TRANSITION DE LA V1 À LA V2 : QUEL CHANGEMENT ?
+--------------------------------------------------
+La Version 1 était une implémentation académique standard servant de preuve de concept. 
+La Version 2 est une refonte orientée "Performance et Heuristique Guidée", ciblant les 
+10 goulots d'étranglement identifiés lors de l'audit stratégique.
+
+Les 4 piliers du changement sont :
+- INITIALISATION : De l'aléatoire pur vers une construction "Greedy" (Gloutonne).
+- PERFORMANCE : De la copie profonde (Slow Copy) vers la modification en place avec "Undo" (Fast In-place).
+- RECHERCHE LOCALE : D'une phase unique vers une approche bi-phasée (Hard vs Soft).
+- GÉNÉTIQUE : Du croisement uniforme vers un croisement préservant les modules (Modulaire).
+
+2. COMPARAISON TECHNIQUE DES PIPELINES
+--------------------------------------
+
+| Composant          | Version 1 (Naive)             | Version 2 (Optimisée)            |
+|--------------------|-------------------------------|----------------------------------|
+| Population Initiale| 100% Aléatoire (H > 2 Millions)| 80% Greedy / 20% Rand (H < 100k) |
+| Performance Eval.  | Calcul complet systématique   | Cache Fitness (P4) + Invalidation |
+| Mémoire (SA)       | schedule.copy() (960M objets) | Move + Undo (0 allocations)      |
+| Température (SA)   | T0 fixe (Indépendant du score)| T0 Adaptive (5% du score initial)|
+| Crossover          | Gène par gène (Destructeur)   | Par Module (Préserve les blocs)  |
+| Heuristique        | Mouvements uniformes aveugles | Bi-phasé (Moves spécialisés Soft)|
+
+
+3. NOUVEAU PSEUDO-CODE (V2.0)
+
+Procedure CREER_POPULATION_INITIALE()
+-------------------------------------
+1:  Pour k = 1 à (POP_SIZE * 0.8) :
+2:      // Heuristique Constructive Greedy (P9)
+3:      Individu = Créer_Vide()
+4:      Pour chaque Séance s dans Ordre_Aléatoire(A_set) :
+5:          Attribuer (Salle, Créneau) minimisant les conflits H1/H2/H3 immédiats
+6:      Fin Pour
+7:      Ajouter Individu à Population
+8:  Pour k = 1 à (POP_SIZE * 0.2) :
+9:      Ajouter Individu_Aléatoire() à Population // Maintenance de la diversité
+10: Fin Pour
+
+
+Procedure EVOLVE_V2()
+---------------------
+1:  Trier Population par fitness (Lecture Cache si disponible)
+2:  New_Population = Elitisme(Population)
+3:
+4:  Tant que Taille(New_Population) < POP_SIZE :
+5:      P1, P2 = TournamentSelect_x2(Population, key=x.fitness)
+6:      
+7:      // Crossover Modulaire (P7)
+8:      Child = Crossover_Par_Module(P1, P2) 
+9:      Child.fitness = NULL // Invalidation Cache
+10:     
+11:     Si Random() < MUTATION_RATE :
+12:         Mutate_Pondérée(Child) // Cible les gènes en conflit (P8)
+13:         Child.fitness = NULL
+14:     Fin Si
+15:
+16:     Child = SA_Recherche_Locale_V2(Child) // Pattern In-place + Undo
+17:     Ajouter Child à New_Population
+18: Fin Tant que
+
+
+Procedure SA_RECHERCHE_LOCALE_V2(Individu)
+------------------------------------------
+1:  Calculer Score_Initial et Attacher Fitness
+2:  Temp = Max(T_Base, Score_Initial * 0.05) // Adaptive T0 (P5)
+3:  Phase = (Individu.H_Violations > 0) ? "HARD" : "SOFT"
+4:  Best_State = Snapshot(Individu) // Copie légère des références
+5:
+6:  Pour itération = 1 à L_MAX (400) :
+7:      // P10 : Choix du mouvement selon la phase
+8:      Si Phase == "HARD" : 
+9:          Move = Choix(ShiftBoth, SwapTime, ShiftRoom)
+10:     Sinon :
+11:         Move = Choix(StabilizeRoom, ClusterModule, CompactDay)
+12:     Fin Si
+13:
+14:     // P3 : Application IN-PLACE (Pas de copie)
+15:     Vieux_Etat = Appliquer_Mouvement(Individu, Move)
+16:     Nouveau_Score = Calculer_Score(Individu)
+17:     Delta = Nouveau_Score - Score_Précédent
+18:
+19:     // Critère de Metropolis
+20:     Si Delta < 0 OU Random() < Exp(-Delta / Temp) :
+21:         Si Nouveau_Score < Best_Score :
+22:             Best_State = Snapshot(Individu)
+23:         Fin Si
+24:     Sinon :
+25:         Restaurer(Individu, Vieux_Etat) // UNDO O(1)
+26:     Fin Si
+27:
+28:     Temp = Temp * Alpha
+29: Fin Pour
+30:
+31: Restaurer(Individu, Best_State)
+32: Retourner Individu
+
+
+4. IMPACT ATTENDU (V1 vs V2)
+----------------------------
+- Temps d'exécution : Réduction de 38 min à < 5 min (Estimé d'après P1/P3/P4/P9).
+- Qualité (Score Final) : Réduction des pénalités Soft de ~40% (Estimé d'après P10/P7).
+- Fiabilité : Initialisation Greedy garantit un Hard=0 quasi-instantané.
+
+--------------------------------------------------------------------------------
+FIN DE LA DOCUMENTATION V2
+--------------------------------------------------------------------------------
