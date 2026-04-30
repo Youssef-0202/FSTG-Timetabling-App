@@ -36,23 +36,21 @@ def calculate_fitness_full(schedule, mask=None):
     # ── PRÉ-CALCUL GÉNÉRATIF (H13-H14) ──
     # On construit l'arbre de parenté dynamiquement à partir des noms
     name_to_sid = {s['name']: s['id'] for s in dm.sections}
-    sid_to_name = dm.sec_id_to_name
-    all_s4_sids = [sid for sid, name in sid_to_name.items() if " S4" in name]
-    
-    # --- Mapping de Parenté Structurale V3.16 ---
-    # Deux sections partagent les mêmes étudiants si elles ont au moins un GroupeFiliere en commun
+    # --- Mapping de Parenté Structurale V3.17 (par Filière) ---
     related_sids = {}
-    sec_to_base_groups = {}
+    sec_to_filieres = {}
     for s in schedule.data_manager.sections:
-        sec_to_base_groups[s['id']] = set(g['id'] for g in s.get('groupes', []))
+        sec_to_filieres[s['id']] = set(g.get('filiere_id') for g in s.get('groupes', []) if g.get('filiere_id'))
         
     for s1 in schedule.data_manager.sections:
         sid1 = s1['id']
         related_sids[sid1] = []
+        fils1 = sec_to_filieres.get(sid1, set())
+        if not fils1: continue
         for s2 in schedule.data_manager.sections:
             sid2 = s2['id']
             if sid1 == sid2: continue
-            if sec_to_base_groups[sid1].intersection(sec_to_base_groups.get(sid2, set())):
+            if fils1.intersection(sec_to_filieres.get(sid2, set())):
                 related_sids[sid1].append(sid2)
 
     # ── CONTRAINTES DURES (HARD) ──

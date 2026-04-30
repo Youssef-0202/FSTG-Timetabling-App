@@ -444,8 +444,8 @@ function DatabaseContent() {
                                                             return (
                                                                 <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", alignItems: "center" }}>
                                                                     {detectedSections.map(s => (
-                                                                        <span key={s.id} className="badge badge-amphi" style={{ fontSize: "0.7rem", backgroundColor: detectedSections.length > 1 ? "#e0f2fe" : "", border: detectedSections.length > 1 ? "1.5px solid #0ea5e9" : "" }}>
-                                                                            {s.name}
+                                                                        <span key={(s as any).id} className="badge badge-amphi" style={{ fontSize: "0.7rem", backgroundColor: detectedSections.length > 1 ? "#e0f2fe" : "", border: detectedSections.length > 1 ? "1.5px solid #0ea5e9" : "" }}>
+                                                                            {(s as any).name}
                                                                         </span>
                                                                     ))}
                                                                     {detectedSections.length > 1 && <span style={{ fontSize: "0.62rem", color: "#0284c7", fontWeight: 800 }}>[FUSIONNÉ]</span>}
@@ -512,7 +512,7 @@ function DatabaseContent() {
                                         <td><span className="badge badge-cm">{s.semestre}</span></td>
                                         <td>{s.total_capacity} étudiants</td>
                                         <td><div className="actions-cell" style={{ display: 'flex', gap: '8px' }}>
-                                            <button className="btn btn-secondary btn-sm" onClick={() => setModal({ open: true, mode: "edit", data: s })} style={{ backgroundColor: '#e2e8f0', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer' }} title="Modifier"><Pencil size={13} color="#475569" /></button>
+                                            <button className="btn btn-secondary btn-sm" onClick={() => setModal({ open: true, mode: "edit", data: s as any })} style={{ backgroundColor: '#e2e8f0', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer' }} title="Modifier"><Pencil size={13} color="#475569" /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(s.id)}><Trash2 size={13} /></button>
                                         </div></td>
                                     </tr>
@@ -886,7 +886,7 @@ function DatabaseContent() {
                                         <input value={String(modal.data.name || "")} onChange={(e) => setField("name", e.target.value)} placeholder="Généré automatiquement..." />
                                     </div>
                                     <div className="form-group full">
-                                        <label>Filières/Groupes rattachés ({modal.data.semestre || "Choisir semestre d'abord"})</label>
+                                        <label>Filières/Groupes rattachés ({String(modal.data.semestre || "Choisir semestre d'abord")})</label>
                                         <Select
                                             isMulti
                                             isDisabled={!modal.data.semestre}
