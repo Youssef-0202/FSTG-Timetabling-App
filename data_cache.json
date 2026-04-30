@@ -1,0 +1,5426 @@
+{
+    "rooms": [
+        {
+            "name": "Salle 5",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 91
+        },
+        {
+            "name": "Salle 7",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 93
+        },
+        {
+            "name": "Salle 8",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 94
+        },
+        {
+            "name": "Salle 9",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 95
+        },
+        {
+            "name": "Salle 10",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 96
+        },
+        {
+            "name": "Salle 11",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 97
+        },
+        {
+            "name": "Salle 12",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 98
+        },
+        {
+            "name": "Salle 13",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 99
+        },
+        {
+            "name": "Salle 14",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 100
+        },
+        {
+            "name": "Salle 15",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 101
+        },
+        {
+            "name": "Salle 16",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 102
+        },
+        {
+            "name": "Salle 17",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 103
+        },
+        {
+            "name": "Salle 18",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 104
+        },
+        {
+            "name": "Salle 19",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 105
+        },
+        {
+            "name": "Salle 20",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 106
+        },
+        {
+            "name": "Salle 21",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 107
+        },
+        {
+            "name": "Salle 23",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 108
+        },
+        {
+            "name": "Salle 24",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 109
+        },
+        {
+            "name": "Salle 25",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 110
+        },
+        {
+            "name": "Salle 26",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 111
+        },
+        {
+            "name": "Salle 27",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 112
+        },
+        {
+            "name": "Salle 28",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 113
+        },
+        {
+            "name": "Salle 29",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 114
+        },
+        {
+            "name": "Salle 30",
+            "capacity": 90,
+            "type": "SALLE_TD",
+            "id": 115
+        },
+        {
+            "name": "Salle 6",
+            "capacity": 48,
+            "type": "SALLE_TD",
+            "id": 92
+        },
+        {
+            "name": "Amphi 1",
+            "capacity": 430,
+            "type": "AMPHI",
+            "id": 87
+        },
+        {
+            "name": "Amphi 2",
+            "capacity": 430,
+            "type": "AMPHI",
+            "id": 88
+        },
+        {
+            "name": "Amphi 3",
+            "capacity": 250,
+            "type": "AMPHI",
+            "id": 89
+        },
+        {
+            "name": "Amphi 4",
+            "capacity": 430,
+            "type": "AMPHI",
+            "id": 90
+        }
+    ],
+    "teachers": [
+        {
+            "name": "KREIT Karim",
+            "email": "kreit.karim@fstm.ma",
+            "availabilities": {},
+            "id": 160
+        },
+        {
+            "name": "IBANNAIN Mohamed",
+            "email": "ibannain.mohamed@fstm.ma",
+            "availabilities": {},
+            "id": 162
+        },
+        {
+            "name": "RHATAY Khadija",
+            "email": "rhatay.khadija@fstm.ma",
+            "availabilities": {},
+            "id": 163
+        },
+        {
+            "name": "El HASNAOUI Nadia",
+            "email": "el hasnaoui.nadia@fstm.ma",
+            "availabilities": {},
+            "id": 164
+        },
+        {
+            "name": "BELKYAL Imane",
+            "email": "belkyal.imane@fstm.ma",
+            "availabilities": {},
+            "id": 166
+        },
+        {
+            "name": "BOUMAGGARD El hassane",
+            "email": "boumaggard.el hassane@fstm.ma",
+            "availabilities": {},
+            "id": 167
+        },
+        {
+            "name": "KHIRI Rachid",
+            "email": "khiri.rachid@fstm.ma",
+            "availabilities": {},
+            "id": 168
+        },
+        {
+            "name": "MIMOUNI Zineb",
+            "email": "mimouni.zineb@fstm.ma",
+            "availabilities": {},
+            "id": 169
+        },
+        {
+            "name": "EL MOTASSEDK Abdellah",
+            "email": "el motassedk.abdellah@fstm.ma",
+            "availabilities": {},
+            "id": 170
+        },
+        {
+            "name": "ERRAMLI ABDELLAH",
+            "email": "erramli.abdellah@fstm.ma",
+            "availabilities": {},
+            "id": 171
+        },
+        {
+            "name": "MAHIR Khaddouj",
+            "email": "mahir.khaddouj@fstm.ma",
+            "availabilities": {},
+            "id": 172
+        },
+        {
+            "name": "BELLANI Naima",
+            "email": "bellani.naima@fstm.ma",
+            "availabilities": {},
+            "id": 173
+        },
+        {
+            "name": "MANSOURI Mohammed",
+            "email": "mansouri.mohammed@fstm.ma",
+            "availabilities": {},
+            "id": 174
+        },
+        {
+            "name": "OUAARAB Aziz",
+            "email": "ouaarab.aziz@fstm.ma",
+            "availabilities": {},
+            "id": 175
+        },
+        {
+            "name": "CHOUKRI  Khalid",
+            "email": "choukri .khalid@fstm.ma",
+            "availabilities": {},
+            "id": 176
+        },
+        {
+            "name": "ES SEBBAR  Brahim",
+            "email": "es sebbar .brahim@fstm.ma",
+            "availabilities": {},
+            "id": 177
+        },
+        {
+            "name": "ZRIOUEL Sanae",
+            "email": "zriouel.sanae@fstm.ma",
+            "availabilities": {},
+            "id": 178
+        },
+        {
+            "name": "ER-RAKI Salah",
+            "email": "er-raki.salah@fstm.ma",
+            "availabilities": {},
+            "id": 179
+        },
+        {
+            "name": "SADOUK  Leila",
+            "email": "sadouk .leila@fstm.ma",
+            "availabilities": {},
+            "id": 180
+        },
+        {
+            "name": "CHERIFI Ouafa",
+            "email": "cherifi.ouafa@fstm.ma",
+            "availabilities": {},
+            "id": 181
+        },
+        {
+            "name": "EL MAKHFOUK Mohammed",
+            "email": "el makhfouk.mohammed@fstm.ma",
+            "availabilities": {},
+            "id": 182
+        },
+        {
+            "name": "IGMOULLAN Brahim",
+            "email": "igmoullan.brahim@fstm.ma",
+            "availabilities": {},
+            "id": 183
+        },
+        {
+            "name": "ED-DAOUDI Rachid",
+            "email": "ed-daoudi.rachid@fstm.ma",
+            "availabilities": {},
+            "id": 184
+        },
+        {
+            "name": "CHEHOUANI Hassan",
+            "email": "chehouani.hassan@fstm.ma",
+            "availabilities": {},
+            "id": 185
+        },
+        {
+            "name": "MDARHRI Ahmed",
+            "email": "mdarhri.ahmed@fstm.ma",
+            "availabilities": {},
+            "id": 186
+        },
+        {
+            "name": "ELHICHOU Ahmed",
+            "email": "elhichou.ahmed@fstm.ma",
+            "availabilities": {},
+            "id": 187
+        },
+        {
+            "name": "BANOUAR Oumayma",
+            "email": "banouar.oumayma@fstm.ma",
+            "availabilities": {},
+            "id": 188
+        },
+        {
+            "name": "METRANE Abdelmoutalib",
+            "email": "metrane.abdelmoutalib@fstm.ma",
+            "availabilities": {},
+            "id": 189
+        },
+        {
+            "name": "BENYOUCEF Mustafa",
+            "email": "benyoucef.mustafa@fstm.ma",
+            "availabilities": {},
+            "id": 190
+        },
+        {
+            "name": "AOUZALE Noureddine",
+            "email": "aouzale.noureddine@fstm.ma",
+            "availabilities": {},
+            "id": 191
+        },
+        {
+            "name": "CHITNALAH Ahmed",
+            "email": "chitnalah.ahmed@fstm.ma",
+            "availabilities": {},
+            "id": 192
+        },
+        {
+            "name": "KOURAD Hanane",
+            "email": "kourad.hanane@fstm.ma",
+            "availabilities": {},
+            "id": 193
+        },
+        {
+            "name": "AMRAOUI Hakima",
+            "email": "amraoui.hakima@fstm.ma",
+            "availabilities": {},
+            "id": 194
+        },
+        {
+            "name": "GHANIMA Abderrazzak",
+            "email": "ghanima.abderrazzak@fstm.ma",
+            "availabilities": {},
+            "id": 195
+        },
+        {
+            "name": "BOUAMAMA Najah",
+            "email": "bouamama.najah@fstm.ma",
+            "availabilities": {},
+            "id": 196
+        },
+        {
+            "name": "JALAL Rachid",
+            "email": "jalal.rachid@fstm.ma",
+            "availabilities": {},
+            "id": 197
+        },
+        {
+            "name": "WAHBI Mustapha",
+            "email": "wahbi.mustapha@fstm.ma",
+            "availabilities": {},
+            "id": 198
+        },
+        {
+            "name": "HAMDAOUI Bassou",
+            "email": "hamdaoui.bassou@fstm.ma",
+            "availabilities": {},
+            "id": 199
+        },
+        {
+            "name": "ABKHAR Zahra",
+            "email": "abkhar.zahra@fstm.ma",
+            "availabilities": {},
+            "id": 200
+        },
+        {
+            "name": "SOUMHI El Hassan",
+            "email": "soumhi.el hassan@fstm.ma",
+            "availabilities": {},
+            "id": 201
+        },
+        {
+            "name": "CHAFIKI Driss",
+            "email": "chafiki.driss@fstm.ma",
+            "availabilities": {},
+            "id": 202
+        },
+        {
+            "name": "SAIDI Mohamed Elmehdi",
+            "email": "saidi.mohamed elmehdi@fstm.ma",
+            "availabilities": {},
+            "id": 203
+        },
+        {
+            "name": "MAACH Fatna",
+            "email": "maach.fatna@fstm.ma",
+            "availabilities": {},
+            "id": 204
+        },
+        {
+            "name": "ABOUQATEB Abdelhak",
+            "email": "abouqateb.abdelhak@fstm.ma",
+            "availabilities": {},
+            "id": 205
+        },
+        {
+            "name": "KZAZ Mustapha",
+            "email": "kzaz.mustapha@fstm.ma",
+            "availabilities": {},
+            "id": 206
+        },
+        {
+            "name": "AKDIM Khadija",
+            "email": "akdim.khadija@fstm.ma",
+            "availabilities": {},
+            "id": 207
+        },
+        {
+            "name": "ALIMOUSSA Abdelhadi",
+            "email": "alimoussa.abdelhadi@fstm.ma",
+            "availabilities": {},
+            "id": 208
+        },
+        {
+            "name": "ANDALOUSSI Chafik",
+            "email": "andaloussi.chafik@fstm.ma",
+            "availabilities": {},
+            "id": 209
+        },
+        {
+            "name": "MELHAOUI Mustapha",
+            "email": "melhaoui.mustapha@fstm.ma",
+            "availabilities": {},
+            "id": 210
+        },
+        {
+            "name": "Amir Laila",
+            "email": "amir.laila@fstm.ma",
+            "availabilities": {},
+            "id": 211
+        },
+        {
+            "name": "BOURIAL Abdellatif",
+            "email": "bourial.abdellatif@fstm.ma",
+            "availabilities": {},
+            "id": 212
+        },
+        {
+            "name": "CHAKIR EL ALAOUI  Elhoucine",
+            "email": "chakir el alaoui .elhoucine@fstm.ma",
+            "availabilities": {},
+            "id": 213
+        },
+        {
+            "name": "BELLANI Naima El HASNAOUI Nadia",
+            "email": "bellani naima.el hasnaoui nadia@fstm.ma",
+            "availabilities": {},
+            "id": 214
+        },
+        {
+            "name": "SEDDIQI Nadia",
+            "email": "seddiqi.nadia@fstm.ma",
+            "availabilities": {},
+            "id": 215
+        },
+        {
+            "name": "TADLAOUI OUAFI AHmed",
+            "email": "tadlaoui ouafi.ahmed@fstm.ma",
+            "availabilities": {},
+            "id": 216
+        },
+        {
+            "name": "ELHACHIMI Mly Youssef",
+            "email": "elhachimi.mly youssef@fstm.ma",
+            "availabilities": {},
+            "id": 217
+        },
+        {
+            "name": "ELAZHARI Mohammed",
+            "email": "elazhari.mohammed@fstm.ma",
+            "availabilities": {},
+            "id": 218
+        },
+        {
+            "name": "ELABOUDI Ilham",
+            "email": "elaboudi.ilham@fstm.ma",
+            "availabilities": {},
+            "id": 219
+        },
+        {
+            "name": "EDDARIR Said",
+            "email": "eddarir.said@fstm.ma",
+            "availabilities": {},
+            "id": 220
+        },
+        {
+            "name": "SAADI Latifa",
+            "email": "saadi.latifa@fstm.ma",
+            "availabilities": {},
+            "id": 221
+        },
+        {
+            "name": "MGHAZLI SAFAE",
+            "email": "mghazli.safae@fstm.ma",
+            "availabilities": {},
+            "id": 222
+        },
+        {
+            "name": "BOURKOUKOU Othman",
+            "email": "bourkoukou.othman@fstm.ma",
+            "availabilities": {
+                "unavailable_slots": [
+                    1,
+                    2,
+                    3,
+                    4
+                ]
+            },
+            "id": 158
+        },
+        {
+            "name": "BOUAMAMA Hafida",
+            "email": "bouamama.hafida@fstm.ma",
+            "availabilities": {
+                "unavailable_slots": [
+                    22,
+                    23,
+                    24,
+                    21,
+                    20,
+                    19
+                ]
+            },
+            "id": 165
+        },
+        {
+            "name": "HAJJI Lahoucine",
+            "email": "hajji.lahoucine@fstm.ma",
+            "availabilities": {
+                "unavailable_slots": [
+                    13,
+                    14,
+                    15,
+                    16,
+                    18,
+                    20,
+                    19,
+                    22,
+                    23,
+                    24,
+                    17,
+                    21
+                ]
+            },
+            "id": 161
+        },
+        {
+            "name": "AYOUCH  Chahid",
+            "email": "ayouch .chahid@fstm.ma",
+            "availabilities": {
+                "unavailable_slots": [
+                    1,
+                    2,
+                    3,
+                    4
+                ]
+            },
+            "id": 159
+        },
+        {
+            "name": "El Wahidi Farid",
+            "email": "el wahidi.farid@fstm.ma",
+            "availabilities": {},
+            "id": 223
+        },
+        {
+            "name": "Touil Ahmed",
+            "email": "touil.ahmed@fstm.ma",
+            "availabilities": {},
+            "id": 224
+        },
+        {
+            "name": "Ait Addi Abdellah",
+            "email": "ait addi.abdellah@fstm.ma",
+            "availabilities": {},
+            "id": 225
+        },
+        {
+            "name": "BOUCETTA Mohamed",
+            "email": "boucetta.mohamed@fstm.ma",
+            "availabilities": {},
+            "id": 226
+        },
+        {
+            "name": "AIT BABRAH Mohamed",
+            "email": "ait babrah.mohamed@fstm.ma",
+            "availabilities": {},
+            "id": 227
+        },
+        {
+            "name": "DOUGE Lahcen",
+            "email": "douge.lahcen@fstm.ma",
+            "availabilities": {},
+            "id": 228
+        },
+        {
+            "name": "RAJIRA Amal",
+            "email": "rajira.amal@fstm.ma",
+            "availabilities": {},
+            "id": 229
+        },
+        {
+            "name": "ABOUNADI Abdelhadi",
+            "email": "abounadi.abdelhadi@fstm.ma",
+            "availabilities": {},
+            "id": 230
+        },
+        {
+            "name": "PROF",
+            "email": "prof@fstg-marrakech.ac.ma",
+            "availabilities": {
+                "unavailable_slots": []
+            },
+            "id": 231
+        }
+    ],
+    "timeslots": [
+        {
+            "day": "LUNDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 1
+        },
+        {
+            "day": "LUNDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 2
+        },
+        {
+            "day": "LUNDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 3
+        },
+        {
+            "day": "LUNDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 4
+        },
+        {
+            "day": "MARDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 5
+        },
+        {
+            "day": "MARDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 6
+        },
+        {
+            "day": "MARDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 7
+        },
+        {
+            "day": "MARDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 8
+        },
+        {
+            "day": "MERCREDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 9
+        },
+        {
+            "day": "MERCREDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 10
+        },
+        {
+            "day": "MERCREDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 11
+        },
+        {
+            "day": "MERCREDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 12
+        },
+        {
+            "day": "JEUDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 13
+        },
+        {
+            "day": "JEUDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 14
+        },
+        {
+            "day": "JEUDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 15
+        },
+        {
+            "day": "JEUDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 16
+        },
+        {
+            "day": "VENDREDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 17
+        },
+        {
+            "day": "VENDREDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 18
+        },
+        {
+            "day": "VENDREDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 19
+        },
+        {
+            "day": "VENDREDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 20
+        },
+        {
+            "day": "SAMEDI",
+            "start_time": "08:30:00",
+            "end_time": "10:25:00",
+            "id": 21
+        },
+        {
+            "day": "SAMEDI",
+            "start_time": "10:35:00",
+            "end_time": "12:30:00",
+            "id": 22
+        },
+        {
+            "day": "SAMEDI",
+            "start_time": "14:30:00",
+            "end_time": "16:25:00",
+            "id": 23
+        },
+        {
+            "day": "SAMEDI",
+            "start_time": "16:35:00",
+            "end_time": "18:30:00",
+            "id": 24
+        },
+        {
+            "day": "LUNDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 25
+        },
+        {
+            "day": "MARDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 26
+        },
+        {
+            "day": "MERCREDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 27
+        },
+        {
+            "day": "JEUDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 28
+        },
+        {
+            "day": "VENDREDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 29
+        },
+        {
+            "day": "SAMEDI",
+            "start_time": "12:30:00",
+            "end_time": "14:25:00",
+            "id": 30
+        }
+    ],
+    "sections": [
+        {
+            "name": "GP-GI S2",
+            "semestre": "S2",
+            "total_capacity": 430,
+            "id": 3,
+            "groupes": [
+                {
+                    "filiere_id": 6,
+                    "semestre": "S2",
+                    "academic_year": "2025-2026",
+                    "total_students": 305,
+                    "id": 6
+                },
+                {
+                    "filiere_id": 7,
+                    "semestre": "S2",
+                    "academic_year": "2025-2026",
+                    "total_students": 146,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "name": "GI S4",
+            "semestre": "S4",
+            "total_capacity": 184,
+            "id": 4,
+            "groupes": [
+                {
+                    "filiere_id": 6,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "name": "GP S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 5,
+            "groupes": [
+                {
+                    "filiere_id": 7,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "name": "GC S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 6,
+            "groupes": [
+                {
+                    "filiere_id": 4,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "name": "GESE S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 7,
+            "groupes": [
+                {
+                    "filiere_id": 5,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "name": "MSD S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 8,
+            "groupes": [
+                {
+                    "filiere_id": 3,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "name": "GB S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 9,
+            "groupes": [
+                {
+                    "filiere_id": 1,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "name": "GEG S4",
+            "semestre": "S4",
+            "total_capacity": 63,
+            "id": 10,
+            "groupes": [
+                {
+                    "filiere_id": 2,
+                    "semestre": "S4",
+                    "academic_year": "2025-2026",
+                    "total_students": 63,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "name": "GB-GEG S2",
+            "semestre": "S2",
+            "total_capacity": 427,
+            "id": 1,
+            "groupes": []
+        },
+        {
+            "name": "MSD-GC-GESE S2",
+            "semestre": "S2",
+            "total_capacity": 422,
+            "id": 2,
+            "groupes": [
+                {
+                    "filiere_id": 4,
+                    "semestre": "S2",
+                    "academic_year": "2025-2026",
+                    "total_students": 164,
+                    "id": 4
+                },
+                {
+                    "filiere_id": 5,
+                    "semestre": "S2",
+                    "academic_year": "2025-2026",
+                    "total_students": 165,
+                    "id": 5
+                }
+            ]
+        }
+    ],
+    "td-groups": [
+        {
+            "name": "GP-GI S2 Gr 1",
+            "section_id": 3,
+            "size": 70,
+            "id": 13
+        },
+        {
+            "name": "GP-GI S2 Gr 2",
+            "section_id": 3,
+            "size": 70,
+            "id": 14
+        },
+        {
+            "name": "GP-GI S2 Gr 3",
+            "section_id": 3,
+            "size": 70,
+            "id": 15
+        },
+        {
+            "name": "GP-GI S2 Gr 4",
+            "section_id": 3,
+            "size": 70,
+            "id": 16
+        },
+        {
+            "name": "GP-GI S2 Gr 5",
+            "section_id": 3,
+            "size": 70,
+            "id": 17
+        },
+        {
+            "name": "GP-GI S2 Gr 6",
+            "section_id": 3,
+            "size": 80,
+            "id": 18
+        },
+        {
+            "name": "GI S4 Gr 1",
+            "section_id": 4,
+            "size": 63,
+            "id": 19
+        },
+        {
+            "name": "GI S4 Gr 2",
+            "section_id": 4,
+            "size": 63,
+            "id": 20
+        },
+        {
+            "name": "GI S4 Gr 3",
+            "section_id": 4,
+            "size": 58,
+            "id": 33
+        },
+        {
+            "name": "GP S4 Gr 1",
+            "section_id": 5,
+            "size": 63,
+            "id": 21
+        },
+        {
+            "name": "GC S4 Gr 1",
+            "section_id": 6,
+            "size": 63,
+            "id": 23
+        },
+        {
+            "name": "GESE S4 Gr 1",
+            "section_id": 7,
+            "size": 63,
+            "id": 25
+        },
+        {
+            "name": "MSD S4 Gr 1",
+            "section_id": 8,
+            "size": 63,
+            "id": 27
+        },
+        {
+            "name": "GB S4 Gr 1",
+            "section_id": 9,
+            "size": 63,
+            "id": 29
+        },
+        {
+            "name": "GEG S4 Gr 1",
+            "section_id": 10,
+            "size": 63,
+            "id": 31
+        },
+        {
+            "name": "GB-GEG S2 Gr 1",
+            "section_id": 1,
+            "size": 70,
+            "id": 1
+        },
+        {
+            "name": "GB-GEG S2 Gr 2",
+            "section_id": 1,
+            "size": 70,
+            "id": 2
+        },
+        {
+            "name": "GB-GEG S2 Gr 3",
+            "section_id": 1,
+            "size": 70,
+            "id": 3
+        },
+        {
+            "name": "GB-GEG S2 Gr 4",
+            "section_id": 1,
+            "size": 70,
+            "id": 4
+        },
+        {
+            "name": "GB-GEG S2 Gr 5",
+            "section_id": 1,
+            "size": 70,
+            "id": 5
+        },
+        {
+            "name": "GB-GEG S2 Gr 6",
+            "section_id": 1,
+            "size": 77,
+            "id": 6
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 1",
+            "section_id": 2,
+            "size": 70,
+            "id": 7
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 2",
+            "section_id": 2,
+            "size": 69,
+            "id": 8
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 3",
+            "section_id": 2,
+            "size": 70,
+            "id": 9
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 4",
+            "section_id": 2,
+            "size": 68,
+            "id": 10
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 5",
+            "section_id": 2,
+            "size": 68,
+            "id": 11
+        },
+        {
+            "name": "MSD-GC-GESE S2 Gr 6",
+            "section_id": 2,
+            "size": 77,
+            "id": 12
+        }
+    ],
+    "module-parts": [
+        {
+            "module_id": 1,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 1
+        },
+        {
+            "module_id": 1,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 2
+        },
+        {
+            "module_id": 2,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 3
+        },
+        {
+            "module_id": 2,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 4
+        },
+        {
+            "module_id": 3,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 5
+        },
+        {
+            "module_id": 3,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 6
+        },
+        {
+            "module_id": 4,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 7
+        },
+        {
+            "module_id": 4,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 8
+        },
+        {
+            "module_id": 5,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 9
+        },
+        {
+            "module_id": 5,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 10
+        },
+        {
+            "module_id": 6,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 11
+        },
+        {
+            "module_id": 6,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 12
+        },
+        {
+            "module_id": 7,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 13
+        },
+        {
+            "module_id": 7,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 14
+        },
+        {
+            "module_id": 8,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 15
+        },
+        {
+            "module_id": 8,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 16
+        },
+        {
+            "module_id": 9,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 17
+        },
+        {
+            "module_id": 9,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 18
+        },
+        {
+            "module_id": 10,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 19
+        },
+        {
+            "module_id": 10,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 20
+        },
+        {
+            "module_id": 11,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 21
+        },
+        {
+            "module_id": 11,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 22
+        },
+        {
+            "module_id": 12,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 23
+        },
+        {
+            "module_id": 12,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 24
+        },
+        {
+            "module_id": 13,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 25
+        },
+        {
+            "module_id": 13,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 26
+        },
+        {
+            "module_id": 14,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 27
+        },
+        {
+            "module_id": 14,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 28
+        },
+        {
+            "module_id": 15,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 29
+        },
+        {
+            "module_id": 15,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 30
+        },
+        {
+            "module_id": 16,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 31
+        },
+        {
+            "module_id": 16,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 32
+        },
+        {
+            "module_id": 17,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 33
+        },
+        {
+            "module_id": 17,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 34
+        },
+        {
+            "module_id": 18,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 35
+        },
+        {
+            "module_id": 18,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 36
+        },
+        {
+            "module_id": 19,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 37
+        },
+        {
+            "module_id": 19,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 38
+        },
+        {
+            "module_id": 20,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 39
+        },
+        {
+            "module_id": 20,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 40
+        },
+        {
+            "module_id": 21,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 41
+        },
+        {
+            "module_id": 21,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 42
+        },
+        {
+            "module_id": 22,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 43
+        },
+        {
+            "module_id": 22,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 44
+        },
+        {
+            "module_id": 23,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 45
+        },
+        {
+            "module_id": 23,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 46
+        },
+        {
+            "module_id": 24,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 47
+        },
+        {
+            "module_id": 24,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 48
+        },
+        {
+            "module_id": 25,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 49
+        },
+        {
+            "module_id": 25,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 50
+        },
+        {
+            "module_id": 26,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 51
+        },
+        {
+            "module_id": 26,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 52
+        },
+        {
+            "module_id": 27,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 53
+        },
+        {
+            "module_id": 27,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 54
+        },
+        {
+            "module_id": 28,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 55
+        },
+        {
+            "module_id": 28,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 56
+        },
+        {
+            "module_id": 29,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 57
+        },
+        {
+            "module_id": 29,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 58
+        },
+        {
+            "module_id": 30,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 59
+        },
+        {
+            "module_id": 30,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 60
+        },
+        {
+            "module_id": 31,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 61
+        },
+        {
+            "module_id": 31,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 62
+        },
+        {
+            "module_id": 32,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 63
+        },
+        {
+            "module_id": 32,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 64
+        },
+        {
+            "module_id": 33,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 65
+        },
+        {
+            "module_id": 33,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 66
+        },
+        {
+            "module_id": 34,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 67
+        },
+        {
+            "module_id": 34,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 68
+        },
+        {
+            "module_id": 35,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 69
+        },
+        {
+            "module_id": 35,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 70
+        },
+        {
+            "module_id": 36,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 71
+        },
+        {
+            "module_id": 36,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 72
+        },
+        {
+            "module_id": 37,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 73
+        },
+        {
+            "module_id": 37,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 74
+        },
+        {
+            "module_id": 38,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 75
+        },
+        {
+            "module_id": 38,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 76
+        },
+        {
+            "module_id": 39,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 77
+        },
+        {
+            "module_id": 39,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 78
+        },
+        {
+            "module_id": 40,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 79
+        },
+        {
+            "module_id": 40,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 80
+        },
+        {
+            "module_id": 41,
+            "type": "CM",
+            "weekly_hours": 2.0,
+            "required_room_type": "AMPHI",
+            "id": 81
+        },
+        {
+            "module_id": 41,
+            "type": "TD",
+            "weekly_hours": 2.0,
+            "required_room_type": "SALLE_TD",
+            "id": 82
+        }
+    ],
+    "assignments": [
+        {
+            "id": 1326,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1247,
+            "module_part_id": 21,
+            "teacher_id": 174,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1248,
+            "module_part_id": 21,
+            "teacher_id": 174,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1249,
+            "module_part_id": 11,
+            "teacher_id": 175,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1250,
+            "module_part_id": 11,
+            "teacher_id": 175,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1251,
+            "module_part_id": 11,
+            "teacher_id": 175,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1252,
+            "module_part_id": 17,
+            "teacher_id": 176,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1253,
+            "module_part_id": 17,
+            "teacher_id": 176,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1254,
+            "module_part_id": 15,
+            "teacher_id": 177,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1255,
+            "module_part_id": 15,
+            "teacher_id": 177,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1256,
+            "module_part_id": 19,
+            "teacher_id": 178,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1257,
+            "module_part_id": 3,
+            "teacher_id": 179,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1258,
+            "module_part_id": 9,
+            "teacher_id": 180,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1259,
+            "module_part_id": 9,
+            "teacher_id": 180,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1261,
+            "module_part_id": 1,
+            "teacher_id": 181,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1262,
+            "module_part_id": 7,
+            "teacher_id": 182,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1263,
+            "module_part_id": 5,
+            "teacher_id": 183,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1264,
+            "module_part_id": 47,
+            "teacher_id": 185,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1265,
+            "module_part_id": 25,
+            "teacher_id": 186,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1266,
+            "module_part_id": 23,
+            "teacher_id": 187,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1278,
+            "module_part_id": 29,
+            "teacher_id": 211,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1279,
+            "module_part_id": 29,
+            "teacher_id": 211,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1280,
+            "module_part_id": 29,
+            "teacher_id": 211,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1281,
+            "module_part_id": 27,
+            "teacher_id": 160,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1282,
+            "module_part_id": 27,
+            "teacher_id": 160,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1283,
+            "module_part_id": 27,
+            "teacher_id": 160,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1284,
+            "module_part_id": 27,
+            "teacher_id": 160,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1285,
+            "module_part_id": 61,
+            "teacher_id": 212,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1286,
+            "module_part_id": 57,
+            "teacher_id": 191,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1287,
+            "module_part_id": 59,
+            "teacher_id": 213,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1295,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1296,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1297,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1298,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1299,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1301,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1302,
+            "module_part_id": 71,
+            "teacher_id": 215,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1303,
+            "module_part_id": 67,
+            "teacher_id": 216,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1304,
+            "module_part_id": 73,
+            "teacher_id": 217,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1305,
+            "module_part_id": 49,
+            "teacher_id": 218,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1306,
+            "module_part_id": 55,
+            "teacher_id": 219,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1307,
+            "module_part_id": 53,
+            "teacher_id": 220,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1308,
+            "module_part_id": 51,
+            "teacher_id": 221,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1309,
+            "module_part_id": 69,
+            "teacher_id": 222,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1310,
+            "module_part_id": 69,
+            "teacher_id": 222,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1311,
+            "module_part_id": 79,
+            "teacher_id": 223,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1312,
+            "module_part_id": 81,
+            "teacher_id": 224,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1313,
+            "module_part_id": 75,
+            "teacher_id": 225,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1327,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1316,
+            "module_part_id": 39,
+            "teacher_id": 175,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1317,
+            "module_part_id": 43,
+            "teacher_id": 184,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1318,
+            "module_part_id": 37,
+            "teacher_id": 226,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1319,
+            "module_part_id": 37,
+            "teacher_id": 226,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1320,
+            "module_part_id": 39,
+            "teacher_id": 227,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1321,
+            "module_part_id": 63,
+            "teacher_id": 228,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1322,
+            "module_part_id": 41,
+            "teacher_id": 189,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1323,
+            "module_part_id": 47,
+            "teacher_id": 185,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1324,
+            "module_part_id": 45,
+            "teacher_id": 229,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1329,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1330,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1331,
+            "module_part_id": 39,
+            "teacher_id": 175,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1332,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1269,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1292,
+            "module_part_id": 31,
+            "teacher_id": 164,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1242,
+            "module_part_id": 9,
+            "teacher_id": 180,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1335,
+            "module_part_id": 13,
+            "teacher_id": 184,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": []
+        },
+        {
+            "id": 1353,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1355,
+            "module_part_id": 72,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1356,
+            "module_part_id": 68,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1385,
+            "module_part_id": 40,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1337,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1338,
+            "module_part_id": 30,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1339,
+            "module_part_id": 30,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1340,
+            "module_part_id": 30,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1341,
+            "module_part_id": 28,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1343,
+            "module_part_id": 28,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1344,
+            "module_part_id": 28,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1345,
+            "module_part_id": 62,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1346,
+            "module_part_id": 58,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1347,
+            "module_part_id": 60,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1348,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1349,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1350,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1351,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1352,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1354,
+            "module_part_id": 34,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1357,
+            "module_part_id": 74,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1359,
+            "module_part_id": 56,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1360,
+            "module_part_id": 54,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1361,
+            "module_part_id": 52,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1362,
+            "module_part_id": 70,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1363,
+            "module_part_id": 70,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1364,
+            "module_part_id": 80,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1365,
+            "module_part_id": 82,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1366,
+            "module_part_id": 76,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1367,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1368,
+            "module_part_id": 36,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1369,
+            "module_part_id": 40,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1370,
+            "module_part_id": 44,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1372,
+            "module_part_id": 38,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1373,
+            "module_part_id": 40,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1374,
+            "module_part_id": 64,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1375,
+            "module_part_id": 42,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1376,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1377,
+            "module_part_id": 46,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1378,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 9,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB S4 Gr 1",
+                    "section_id": 9,
+                    "size": 63,
+                    "id": 29
+                }
+            ]
+        },
+        {
+            "id": 1379,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1380,
+            "module_part_id": 40,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 10,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GEG S4 Gr 1",
+                    "section_id": 10,
+                    "size": 63,
+                    "id": 31
+                }
+            ]
+        },
+        {
+            "id": 1381,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1382,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 5,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP S4 Gr 1",
+                    "section_id": 5,
+                    "size": 63,
+                    "id": 21
+                }
+            ]
+        },
+        {
+            "id": 1383,
+            "module_part_id": 32,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1386,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1387,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1388,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1389,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1390,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1391,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1392,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1393,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1394,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1395,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1396,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1397,
+            "module_part_id": 22,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1399,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1400,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1401,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1402,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1403,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1404,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1405,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1406,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1407,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1408,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1409,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1410,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1412,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1413,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1414,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1415,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1416,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1417,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1418,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1419,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1420,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1300,
+            "module_part_id": 33,
+            "teacher_id": 193,
+            "room_id": 87,
+            "slot_id": 1,
+            "section_id": 9,
+            "is_locked": true,
+            "td_groups": []
+        },
+        {
+            "id": 1342,
+            "module_part_id": 28,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 7,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GESE S4 Gr 1",
+                    "section_id": 7,
+                    "size": 63,
+                    "id": 25
+                }
+            ]
+        },
+        {
+            "id": 1358,
+            "module_part_id": 50,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 6,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GC S4 Gr 1",
+                    "section_id": 6,
+                    "size": 63,
+                    "id": 23
+                }
+            ]
+        },
+        {
+            "id": 1371,
+            "module_part_id": 38,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 8,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        },
+        {
+            "id": 1384,
+            "module_part_id": 36,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 4,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                }
+            ]
+        },
+        {
+            "id": 1398,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1411,
+            "module_part_id": 12,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1421,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1422,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1423,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1424,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1425,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1426,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1427,
+            "module_part_id": 18,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1428,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1429,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1430,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1431,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1432,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1433,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1434,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1435,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1436,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1437,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1438,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1439,
+            "module_part_id": 16,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1440,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1441,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1442,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1443,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1444,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1445,
+            "module_part_id": 20,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1446,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1447,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1448,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1449,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1450,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1451,
+            "module_part_id": 4,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1452,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1453,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1454,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1455,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1456,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1457,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1458,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1459,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1460,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1461,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1462,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1463,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1464,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1465,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1466,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1467,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1468,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1469,
+            "module_part_id": 2,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1470,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1471,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1472,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1473,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1474,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1475,
+            "module_part_id": 8,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1476,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1477,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1478,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1479,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1480,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1481,
+            "module_part_id": 6,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1482,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1483,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1484,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1485,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1486,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1487,
+            "module_part_id": 48,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1488,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1489,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1490,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1491,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1492,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1493,
+            "module_part_id": 26,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1494,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 1",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 13
+                }
+            ]
+        },
+        {
+            "id": 1495,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 2",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 14
+                }
+            ]
+        },
+        {
+            "id": 1496,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 3",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 15
+                }
+            ]
+        },
+        {
+            "id": 1497,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 4",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 16
+                }
+            ]
+        },
+        {
+            "id": 1498,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 5",
+                    "section_id": 3,
+                    "size": 70,
+                    "id": 17
+                }
+            ]
+        },
+        {
+            "id": 1499,
+            "module_part_id": 24,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 3,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GP-GI S2 Gr 6",
+                    "section_id": 3,
+                    "size": 80,
+                    "id": 18
+                }
+            ]
+        },
+        {
+            "id": 1500,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 1",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 7
+                }
+            ]
+        },
+        {
+            "id": 1501,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 2",
+                    "section_id": 2,
+                    "size": 69,
+                    "id": 8
+                }
+            ]
+        },
+        {
+            "id": 1502,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 3",
+                    "section_id": 2,
+                    "size": 70,
+                    "id": 9
+                }
+            ]
+        },
+        {
+            "id": 1503,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 4",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 10
+                }
+            ]
+        },
+        {
+            "id": 1504,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 5",
+                    "section_id": 2,
+                    "size": 68,
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "id": 1505,
+            "module_part_id": 10,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 2,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "MSD-GC-GESE S2 Gr 6",
+                    "section_id": 2,
+                    "size": 77,
+                    "id": 12
+                }
+            ]
+        },
+        {
+            "id": 1506,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 1",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "id": 1507,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 2",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "id": 1508,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 3",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "id": 1509,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 4",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "id": 1510,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 5",
+                    "section_id": 1,
+                    "size": 70,
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "id": 1511,
+            "module_part_id": 14,
+            "teacher_id": 231,
+            "room_id": null,
+            "slot_id": null,
+            "section_id": 1,
+            "is_locked": false,
+            "td_groups": [
+                {
+                    "name": "GB-GEG S2 Gr 6",
+                    "section_id": 1,
+                    "size": 77,
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "id": 1515,
+            "module_part_id": 35,
+            "teacher_id": 175,
+            "room_id": 87,
+            "slot_id": 7,
+            "section_id": 8,
+            "is_locked": true,
+            "td_groups": [
+                {
+                    "name": "GI S4 Gr 1",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 19
+                },
+                {
+                    "name": "GI S4 Gr 2",
+                    "section_id": 4,
+                    "size": 63,
+                    "id": 20
+                },
+                {
+                    "name": "GI S4 Gr 3",
+                    "section_id": 4,
+                    "size": 58,
+                    "id": 33
+                },
+                {
+                    "name": "MSD S4 Gr 1",
+                    "section_id": 8,
+                    "size": 63,
+                    "id": 27
+                }
+            ]
+        }
+    ]
+}

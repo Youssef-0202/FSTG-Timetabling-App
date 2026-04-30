@@ -51,14 +51,29 @@ class Assignment:
         self.room = room                # The chosen room
         self.timeslot= timeslot          # The chosen slot
 
+    def to_dict(self):
+        return {
+            "id": self.module_part.id,
+            "module_part_id": self.module_part.module_id,
+            "teacher_id": self.module_part.teacher_id,
+            "room_id": self.room.id,
+            "slot_id": self.timeslot.id,
+            "section_id": self.module_part.section_id,
+            "td_groups": [{"id": gid} for gid in self.module_part.td_group_ids]
+        }
+
 class Schedule : # un emploi du temps complet proposé par l'algo 
     def __init__(self, data_manager, assignments=None):
         self.data_manager = data_manager
         self.assignments = assignments or []
         self.fitness = None
+        self.h_violations = 0
+        self.soft_score = 0
+        
+    def to_dict(self):
+        return [a.to_dict() for a in self.assignments]
         
     def copy(self):
-        # Crée une copie profonde manuelle pour éviter les conflits de mémoire
         new_assignments = []
         for a in self.assignments:
             new_as = Assignment(a.module_part, a.room, a.timeslot)
@@ -66,7 +81,10 @@ class Schedule : # un emploi du temps complet proposé par l'algo
             
         new_sched = Schedule(self.data_manager, new_assignments)
         new_sched.fitness = self.fitness
+        new_sched.h_violations = self.h_violations
+        new_sched.soft_score = self.soft_score
         return new_sched
+
     def __str__(self):
-        return f"Schedule: {len(self.assignments)} assignments, Fitness: {self.fitness}"
+        return f"Schedule: {len(self.assignments)} assignments, H: {self.h_violations}"
 

@@ -124,7 +124,6 @@ def run_optimization():
     
     # --- PHASE 2 : REMPLISSAGE (PLACEMENT DES TD) ---
     print("\n>>> PHASE 2 : Placement des Travaux Dirigés (TD)...")
-    # On fige les CM trouvés en Phase 1 (S'ils existent, sinon on prend le meilleur trouvé)
     target_cm = best_cm if best_cm else engine_cm.population[0]
     for a in target_cm.assignments:
         a.module_part.is_locked = True
@@ -133,22 +132,49 @@ def run_optimization():
     
     # On remet tout le monde pour la Phase 2
     dm.module_parts = all_mps
-    engine_td = HybridEngine(dm, pop_size=POP_SIZE, sa_iterations=SA_ITERATIONS, constraints_mask=CONSTRAINTS_MASK)
+    # MODE GOLDEN : POP PETITE MAIS SA MASSIF ET REEL
+    engine_td = HybridEngine(dm, pop_size=10, sa_iterations=5000, constraints_mask=CONSTRAINTS_MASK)
+    engine_td.crossover_prob = 0.0 
     engine_td.create_initial_population()
     
     best_final = None
     start_time_exec = time.time()
-    for gen in range(1, MAX_GEN + 1):
+    for gen in range(1, 401): # Plus de generations
         engine_td.evolve()
         best_final = engine_td.population[0]
-        print(f" Phase 2 - Gen {gen:03d} | H: {best_final.h_violations} | S: {best_final.soft_score if hasattr(best_final, 'soft_score') else best_final.soft_penalty}")
+        
+        # Diagnostic Detaille V3.8
+        _, _, _, details = calculate_fitness_full(best_final, mask=CONSTRAINTS_MASK)
+        h_breakdown = ", ".join([f"{k}:{v}" for k, v in details.items() if k.startswith("H") and v > 0])
+        
+        # Trouver un exemple de conflit H3
+        h3_example = ""
+        if details.get('H3_Group', 0) > 0:
+            # On cherche grossièrement qui est en conflit
+            group_slots = {}
+            for a in best_final.assignments:
+                for gid in a.module_part.td_group_ids:
+                    gk = (gid, a.timeslot.id)
+                    if gk in group_slots: 
+                        h3_example = f" (Ex: Gr {gid} @ {a.timeslot.id})"
+                        break
+                    group_slots[gk] = True
+                if h3_example: break
+
+        print(f" Phase 2 - Gen {gen:03d} | H: {best_final.h_violations} ({h_breakdown}){h3_example} | S: {best_final.soft_score if hasattr(best_final, 'soft_score') else best_final.soft_penalty}")
+        
         if best_final.h_violations == 0:
              print(f" [SUCCÈS] Emploi du temps complet terminé à Gen {gen} !")
              break
              
+        # SAUVEGARDE INTERMÉDIAIRE (V3.14)
+        inter_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "backend", "generated_timetable.json")
+        with open(inter_path, "w", encoding="utf-8") as f:
+            json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
+             
     # Étape finale : Exportation
     try:
-        output_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "backend", "generated_timetable.json")
+        output_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "backend", "generated_timetable.json")
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
         print(f"\n[EXPORT] Solution V3 sauvegardée : {output_path}")

@@ -1,4 +1,6 @@
 import requests 
+import json
+import os
 from .models import Room, Teacher, Timeslot, Section, ModulePart
 
 API_BASE_URL = "http://localhost:8000" 
@@ -18,16 +20,37 @@ class DataManager:
         self.group_map = {}      # Map ID -> Nom de groupe (ex: GP-GI S2 Gr 6)
 
     def fetch_all_data(self):
-        print("--- Chargement des données  ---")
+        print("--- Chargement des données ---")
+        CACHE_FILE = os.path.join(os.path.dirname(__file__), "data_cache.json")
+        
         try:
+            if os.path.exists(CACHE_FILE):
+                print(" [CACHE] Chargement depuis data_cache.json...")
+                with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                    cache_data = json.load(f)
+                r_data = cache_data.get("rooms", [])
+                t_data = cache_data.get("teachers", [])
+                ts_data = cache_data.get("timeslots", [])
+                sec_data = cache_data.get("sections", [])
+                tdg_data = cache_data.get("td-groups", [])
+                mp_lookup = {p['id']: p for p in cache_data.get("module-parts", [])}
+                a_data = cache_data.get("assignments", [])
+            else:
+                print(" [API] Récupération en direct sur " + API_BASE_URL + "...")
+                r_data = requests.get(f"{API_BASE_URL}/rooms").json()
+                t_data = requests.get(f"{API_BASE_URL}/teachers").json()
+                ts_data = requests.get(f"{API_BASE_URL}/timeslots").json()
+                sec_data = requests.get(f"{API_BASE_URL}/sections").json()
+                tdg_data = requests.get(f"{API_BASE_URL}/td-groups").json()
+                mp_data = requests.get(f"{API_BASE_URL}/module-parts").json()
+                mp_lookup = {p['id']: p for p in mp_data}
+                a_data = requests.get(f"{API_BASE_URL}/assignments").json()
+
             # 1. Rooms
-            r_data = requests.get(f"{API_BASE_URL}/rooms").json()
-            if isinstance(r_data, list):
-                self.rooms = [Room(id=r['id'], name=r['name'], capacity=r.get('capacity', 0), type=r.get('type', 'TD')) for r in r_data]
+            self.rooms = [Room(id=r['id'], name=r['name'], capacity=r.get('capacity', 0), type=r.get('type', 'TD')) for r in r_data]
             
-            # 1. Teachers
-            resp_t = requests.get(f"{API_BASE_URL}/teachers")
-            for t in resp_t.json():
+            # 2. Teachers
+            for t in t_data:
                 # Extraire les indisponibilités depuis le JSONB
                 avail = t.get("availabilities") or {}
                 un_slots = avail.get("unavailable_slots", [])
@@ -128,6 +151,10 @@ class DataManager:
                     )
                     self.module_parts.append(mp)
 
+            # --- INDEX DE RECHERCHE RAPIDE (V3.5) ---
+            self.room_id_to_idx = {r.id: i for i, r in enumerate(self.rooms)}
+            self.slot_id_to_idx = {s.id: i for i, s in enumerate(self.timeslots)}
+            
             print("-" * 50)
             print("STATISTIQUES DU CHARGEMENT DES DONNÉES")
             print("-" * 50)

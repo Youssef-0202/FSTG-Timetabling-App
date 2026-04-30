@@ -177,11 +177,14 @@ class HybridEngine:
             else:
                 best_room, best_slot, best_cost = None, None, float('inf')
                 
-                # Échantillonnage : On teste 15 créneaux au hasard pour aller vite
-                candidate_slots = random.sample(self.dm.timeslots, min(15, len(self.dm.timeslots)))
+                # Échantillonnage EXHAUSTIF V3.6
+                candidate_slots = self.dm.timeslots
                 candidate_rooms = [r for r in self.dm.rooms if r.capacity >= mp.group_size]
                 if not candidate_rooms: candidate_rooms = self.dm.rooms
-
+                
+                # On mélange quand même un peu pour la diversité
+                random.shuffle(candidate_slots) 
+                
                 for slot in candidate_slots:
                     for room in candidate_rooms:
                         cost = 0
@@ -374,162 +377,266 @@ class HybridEngine:
     # SECTION F : RECHERCHE LOCALE (RECUIT SIMULE LOCAL - SA)
     # ==========================================================================
 
+    def _get_sec_penalty(self, sid, ts_id, is_cm, is_gr6, s_map, related_sids):
+        p = 0
+        for r_sid in related_sids.get(sid, []):
+            r_status = s_map.get((r_sid, ts_id))
+            if r_status and r_status['any'] > 0:
+                if (is_cm or is_gr6): p += r_status['any']
+                else: p += (r_status['cm'] + r_status['gr6'])
+        return p
+
     def simulated_annealing_search(self, schedule):
         """
-        RECHERCHE LOCALE V3 (DELTA-SCORING TURBO)
-        Calcule uniquement l'impact local des mouvements pour une vitesse x20.
+        RECHERCHE LOCALE V3.6 (DELTA-SCORING SYNCHRONISÉ)
         """
         current_sch = schedule
         current_score, current_h, current_s, _ = calculate_fitness_full(current_sch, mask=self.constraints_mask)
         
-        # --- INITIALISATION DU TRACKER D'OCCUPATION (Pour Delta-Scoring) ---
-        prof_map = {}  # (p_id, slot_id) -> count
-        room_map = {}  # (r_id, slot_id) -> count
-        group_map = {} # (g_id, slot_id) -> count
+        # --- INITIALISATION DES TRACKERS D'OCCUPATION ---
+        prof_map, room_map, group_map, sec_map = {}, {}, {}, {}
         
+        # Mapping des Sections Liées (Parenté Structurale V3.15)
+        related_sids = {}
+        sec_to_base_groups = {}
+        for s in self.dm.sections:
+            sec_to_base_groups[s['id']] = set(g['id'] for g in s.get('groupes', []))
+            
+        for s1 in self.dm.sections:
+            sid1 = s1['id']
+            related_sids[sid1] = []
+            for s2 in self.dm.sections:
+                sid2 = s2['id']
+                if sid1 == sid2: continue
+                # Intersection non vide = Sections interdites sur le même créneau
+                if sec_to_base_groups[sid1].intersection(sec_to_base_groups.get(sid2, set())):
+                    related_sids[sid1].append(sid2)
+
         for a in current_sch.assignments:
             tid, rid, sid = a.module_part.teacher_id, a.room.id, a.timeslot.id
+            sec_id = a.module_part.section_id
             if tid and tid != 231: prof_map[(tid, sid)] = prof_map.get((tid, sid), 0) + 1
             room_map[(rid, sid)] = room_map.get((rid, sid), 0) + 1
             for gid in a.module_part.td_group_ids: group_map[(gid, sid)] = group_map.get((gid, sid), 0) + 1
-
+            if sec_id:
+                ks = (sec_id, sid)
+                st = sec_map.get(ks, {'cm':0, 'gr6':0, 'any':0})
+                st['any'] += 1
+                if a.module_part.type == "CM": st['cm'] += 1
+                if any("Gr 6" in self.dm.group_map.get(gx, "") for gx in a.module_part.td_group_ids): st['gr6'] += 1
+                sec_map[ks] = st
+        
         def get_delta_h(a, old_r, old_s, new_r, new_s):
-            """Calcul O(1) du changement de violations Hard"""
             dh = 0
-            # 1. Retirer l'impact de l'ancienne position
-            tid = a.module_part.teacher_id
+            tid, sid = a.module_part.teacher_id, a.module_part.section_id
+            is_cm, gids = (a.module_part.type == "CM"), a.module_part.td_group_ids
+            is_gr6 = any("Gr 6" in self.dm.group_map.get(gx, "") for gx in gids)
+            prof_obj = self.dm.teacher_map.get(tid) if tid else None
+            
+            # --- 1. SOUSTRACTION (Ancienne position) ---
             if tid and tid != 231:
                 if prof_map.get((tid, old_s.id), 0) > 1: dh -= 1
+                if prof_obj and old_s.id in prof_obj.unavailable_slots: dh -= 1
             if room_map.get((old_r.id, old_s.id), 0) > 1: dh -= 1
-            for gid in a.module_part.td_group_ids:
+            for gid in gids:
                 if group_map.get((gid, old_s.id), 0) > 1: dh -= 1
-            if old_s.day == "SAMEDI" and a.module_part.type == "CM": dh -= 1
-            
-            # Mise a jour tempo des maps pour le calcul du nouveau
-            if tid and tid != 231: prof_map[(tid, old_s.id)] -= 1
-            room_map[(old_r.id, old_s.id)] -= 1
-            for gid in a.module_part.td_group_ids: group_map[(gid, old_s.id)] -= 1
+            if sid:
+                if sec_map.get((sid, old_s.id), {}).get('any', 0) > 1: dh -= 1
+                dh -= self._get_sec_penalty(sid, old_s.id, is_cm, is_gr6, sec_map, related_sids) * 3
+            if old_s.day == "SAMEDI" and is_cm: dh -= 1
+            if a.module_part.required_room_type and old_r.type != a.module_part.required_room_type: dh -= 1
+            if a.module_part.group_size > old_r.capacity: dh -= 1
 
-            # 2. Ajouter l'impact de la nouvelle position
+            # Update Maps (Tempo)
+            if tid and tid != 231: 
+                prof_map[(tid, old_s.id)] = max(0, prof_map.get((tid, old_s.id), 1) - 1)
+            room_map[(old_r.id, old_s.id)] = max(0, room_map.get((old_r.id, old_s.id), 1) - 1)
+            for gid in gids: 
+                group_map[(gid, old_s.id)] = max(0, group_map.get((gid, old_s.id), 1) - 1)
+            if sid:
+                st = sec_map.get((sid, old_s.id), {'any':0,'cm':0,'gr6':0}).copy()
+                st['any'] = max(0, st['any'] - 1)
+                if is_cm: st['cm'] = max(0, st['cm'] - 1)
+                if is_gr6: st['gr6'] = max(0, st['gr6'] - 1)
+                sec_map[(sid, old_s.id)] = st
+
+            # --- 2. ADDITION (Nouvelle position) ---
             if tid and tid != 231:
                 if prof_map.get((tid, new_s.id), 0) >= 1: dh += 1
+                if prof_obj and new_s.id in prof_obj.unavailable_slots: dh += 1
                 prof_map[(tid, new_s.id)] = prof_map.get((tid, new_s.id), 0) + 1
             if room_map.get((new_r.id, new_s.id), 0) >= 1: dh += 1
             room_map[(new_r.id, new_s.id)] = room_map.get((new_r.id, new_s.id), 0) + 1
-            for gid in a.module_part.td_group_ids:
+            for gid in gids:
                 if group_map.get((gid, new_s.id), 0) >= 1: dh += 1
                 group_map[(gid, new_s.id)] = group_map.get((gid, new_s.id), 0) + 1
-            if new_s.day == "SAMEDI" and a.module_part.type == "CM": dh += 1
+            if sid:
+                ks = (sid, new_s.id)
+                st = sec_map.get(ks, {'any':0,'cm':0,'gr6':0}).copy()
+                if st['any'] >= 1: dh += 1
+                dh += self._get_sec_penalty(sid, new_s.id, is_cm, is_gr6, sec_map, related_sids) * 3
+                st['any'] += 1
+                if is_cm: st['cm'] += 1
+                if is_gr6: st['gr6'] += 1
+                sec_map[ks] = st
+            if new_s.day == "SAMEDI" and is_cm: dh += 1
+            if a.module_part.required_room_type and new_r.type != a.module_part.required_room_type: dh += 1
+            if a.module_part.group_size > new_r.capacity: dh += 1
             
             return dh
 
-        best_h = current_h
-        best_state = [(a.room, a.timeslot) for a in schedule.assignments]
-        temp = max(self.sa_temp, current_h * 1000) # Temp basee sur le Hard car prioritaire
-        
-        active_phase = 'hard' if current_h > 0 else 'soft'
+        temp = max(self.sa_temp, current_h * 1000)
         unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
-        if not unlocked: return schedule
-
-        for it in range(self.sa_iterations):
-            if active_phase == 'hard':
-                idx, old_r, old_s = self._apply_hard_move(current_sch, unlocked)
-                a = current_sch.assignments[idx]
-                
-                # DELTA SCORING HARD
-                dh = get_delta_h(a, old_r, old_s, a.room, a.timeslot)
-                new_h = current_h + dh
-                
-                # Acceptation simplifiee pour le Hard : on accepte si ca n'empire pas (ou Metropolis)
-                if dh <= 0 or (temp > 0 and random.random() < math.exp(-dh * 1000000 / temp)):
-                    current_h = new_h
-                    if current_h < best_h:
-                        best_h = current_h
-                        best_state = [(ass.room, ass.timeslot) for ass in current_sch.assignments]
-                    if current_h == 0: active_phase = 'soft'
-                else:
-                    # UNDO O(1)
-                    tid = a.module_part.teacher_id
-                    if tid and tid != 231:
-                        prof_map[(tid, a.timeslot.id)] -= 1
-                        prof_map[(tid, old_s.id)] += 1
-                    room_map[(a.room.id, a.timeslot.id)] -= 1
-                    room_map[(old_r.id, old_s.id)] += 1
-                    for gid in a.module_part.td_group_ids:
-                        group_map[(gid, a.timeslot.id)] -= 1
-                        group_map[(gid, old_s.id)] += 1
-                    a.room, a.timeslot = old_r, old_s
-            else:
-                # Phase Soft : On utilise encore l'evaluation complete car Delta-Soft est complexe
-                saved_indices, saved_states = self._apply_soft_move(current_sch, unlocked)
-                new_score, new_h, new_s, _ = calculate_fitness_full(current_sch, mask=self.constraints_mask)
-                
-                if new_score < current_score or random.random() < math.exp((current_score - new_score)/temp):
-                    current_score = new_score
-                    current_h = new_h
-                else:
-                    for i, (r, s) in zip(saved_indices, saved_states):
-                        current_sch.assignments[i].room, current_sch.assignments[i].timeslot = r, s
-            
-            temp *= self.sa_cooling
-
-        # Fin : restaurer le meilleur et fixer le cache
-        for i, (r, s) in enumerate(best_state):
-            schedule.assignments[i].room, schedule.assignments[i].timeslot = r, s
+        best_h_sa = current_h
+        best_sch_sa = current_sch.copy()
         
-        # Un dernier calcul complet pour mettre a jour les attributs de l'objet
+        for it in range(self.sa_iterations):
+            # 1. Tenter un mouvement guidé
+            idx, old_r, old_s = self._apply_hard_move(current_sch, unlocked, (prof_map, room_map, group_map, sec_map), related_sids)
+            a = current_sch.assignments[idx]
+            dh = get_delta_h(a, old_r, old_s, a.room, a.timeslot)
+            
+            # DECISION V3.13 (Focus on H drop)
+            accept = False
+            if dh < 0: 
+                accept = True
+            elif dh == 0:
+                if random.random() < 0.05: accept = True # Un peu de mouvement même constant
+            else:
+                if temp > 0:
+                    prob = math.exp(-dh * 10 / temp) # On baisse l'échelle pour permettre de l'exploration Hard
+                    if random.random() < prob: accept = True
+            
+            if accept:
+                current_h += dh
+                if current_h < best_h_sa:
+                    best_h_sa = current_h
+                    best_sch_sa = current_sch.copy()
+            else:
+                # UNDO Maps + Schedule
+                tid, sid, gids = a.module_part.teacher_id, a.module_part.section_id, a.module_part.td_group_ids
+                is_cm_u = (a.module_part.type == "CM")
+                is_gr6_u = any("Gr 6" in self.dm.group_map.get(gx, "") for gx in gids)
+                
+                if tid and tid != 231:
+                    prof_map[(tid, a.timeslot.id)] = max(0, prof_map.get((tid, a.timeslot.id), 1) - 1)
+                    prof_map[(tid, old_s.id)] = prof_map.get((tid, old_s.id), 0) + 1
+                room_map[(a.room.id, a.timeslot.id)] = max(0, room_map.get((a.room.id, a.timeslot.id), 1) - 1)
+                room_map[(old_r.id, old_s.id)] = room_map.get((old_r.id, old_s.id), 0) + 1
+                for gid in gids:
+                    group_map[(gid, a.timeslot.id)] = max(0, group_map.get((gid, a.timeslot.id), 1) - 1)
+                    group_map[(gid, old_s.id)] = group_map.get((gid, old_s.id), 0) + 1
+                if sid:
+                    kn, ko = (sid, a.timeslot.id), (sid, old_s.id)
+                    sn, so = sec_map.get(kn, {'any':0,'cm':0,'gr6':0}).copy(), sec_map.get(ko, {'any':0,'cm':0,'gr6':0}).copy()
+                    sn['any'] = max(0, sn['any'] - 1); so['any'] += 1
+                    if is_cm_u: sn['cm'] = max(0, sn['cm'] - 1); so['cm'] += 1
+                    if is_gr6_u: sn['gr6'] = max(0, sn['gr6'] - 1); so['gr6'] += 1
+                    sec_map[kn], sec_map[ko] = sn, so
+                a.room, a.timeslot = old_r, old_s
+            
+            if it % 500 == 0:
+                _, rh, _, _ = calculate_fitness_full(current_sch, mask=self.constraints_mask)
+                current_h = rh
+            temp *= self.sa_cooling
+        
+        # --- FIN ET MISE À JOUR FINALE ---
         res_score, res_h, res_s, _ = calculate_fitness_full(schedule, mask=self.constraints_mask)
         schedule.fitness, schedule.h_violations, schedule.soft_score = res_score, res_h, res_s
         return schedule
 
-    def _apply_hard_move(self, schedule, unlocked):
+    def _apply_hard_move(self, schedule, unlocked, maps, related_sids):
         """
-        Mouvement intelligent (V3) : Cible prioritairement les séances en conflit.
+        Mouvement intelligent O(1) (V3) : Cible une séance en conflit de manière ultra-rapide.
         """
-        # Audit rapide pour trouver les 'coupables'
-        conflicting_indices = []
+        idx = None
+        if maps:
+            # Correction Unpacking V3
+            prof_map, room_map, group_map, sec_map = maps
+            
+            # On tente de trouver un coupable au hasard (max 20 tentatives pour aller vite)
+            for _ in range(20):
+                check_idx = random.choice(unlocked)
+                a = schedule.assignments[check_idx]
+                tid, rid, sid = a.module_part.teacher_id, a.room.id, a.timeslot.id
+                sec_id = a.module_part.section_id
+                
+                in_conflict = False
+                if tid and tid != 231 and prof_map.get((tid, sid), 0) > 1: in_conflict = True
+                elif room_map.get((rid, sid), 0) > 1: in_conflict = True
+                elif any(group_map.get((gid, sid), 0) > 1 for gid in a.module_part.td_group_ids): in_conflict = True
+                elif sec_id and (sec_map.get((sec_id, sid), {}).get('any', 0) > 1 or self._get_sec_penalty(sec_id, sid, a.module_part.type == "CM", any("Gr 6" in self.dm.group_map.get(gx, "") for gx in a.module_part.td_group_ids), sec_map, related_sids) > 0):
+                    in_conflict = True
+                
+                if in_conflict:
+                    idx = check_idx
+                    break
         
-        # On peut reutiliser l'audit du DataManager ou faire un audit rapide ici
-        prof_used = {}
-        room_used = {}
-        group_used = {}
-        
-        for i, a in enumerate(schedule.assignments):
-            ts_id = a.timeslot.id
-            # Prof
-            if a.module_part.teacher_id and a.module_part.teacher_id != 231:
-                key = (a.module_part.teacher_id, ts_id)
-                if key in prof_used: 
-                    conflicting_indices.extend([i, prof_used[key]])
-                prof_used[key] = i
-            # Salle
-            key_r = (a.room.id, ts_id)
-            if key_r in room_used:
-                conflicting_indices.extend([i, room_used[key_r]])
-            room_used[key_r] = i
-            # Groupe
-            for gid in a.module_part.td_group_ids:
-                key_g = (gid, ts_id)
-                if key_g in group_used:
-                    conflicting_indices.extend([i, group_used[key_g]])
-                group_used[key_g] = i
-        
-        # On ne garde que les indices déverrouillés
-        candidates = list(set(conflicting_indices) & set(unlocked))
-        
-        if not candidates:
-            # Si pas de conflit identifié, on prend au hasard pour explorer
+        if idx is None:
             idx = random.choice(unlocked)
-        else:
-            # On prend un 'coupable' au hasard
-            idx = random.choice(candidates)
             
         a = schedule.assignments[idx]
         old_room, old_slot = a.room, a.timeslot
         
-        # On lui cherche une place
-        a.room = random.choice(self.dm.rooms)
-        a.timeslot = random.choice(self.dm.timeslots)
+        # On lui cherche une place intelligemment (V3 Guided)
+        # On essaie de trouver un slot ou prof et groupes sont LIBRES
+        if maps:
+            tid = a.module_part.teacher_id
+            gids = a.module_part.td_group_ids
+            sec_id = a.module_part.section_id
+            is_cm = (a.module_part.type == "CM")
+            is_gr6 = any("Gr 6" in self.dm.group_map.get(gx, "") for gx in gids)
+            prof_map, room_map, group_map, sec_map = maps
+            
+            # --- DYNAMISME V3.11 : 50% Recherche Place Libre / 50% Swap ---
+            if random.random() < 0.5:
+                # 1. RECHERCHE CLASSIQUE (LASER)
+                best_slot, best_room = None, None
+                all_slots = list(self.dm.timeslots)
+                random.shuffle(all_slots)
+                valid_rooms = [r for r in self.dm.rooms if r.capacity >= a.module_part.group_size]
+                if a.module_part.required_room_type:
+                    valid_rooms = [r for r in valid_rooms if r.type == a.module_part.required_room_type]
+                if not valid_rooms: valid_rooms = self.dm.rooms
+                
+                for ts in all_slots:
+                    if tid and tid != 231 and prof_map.get((tid, ts.id), 0) > 0: continue
+                    if any(group_map.get((gid, ts.id), 0) > 0 for gid in gids): continue
+                    if sec_id:
+                        st = sec_map.get((sec_id, ts.id))
+                        # Si moi ou une section liée occupe déjà le slot -> Conflit
+                        if st and (st['cm'] or st['gr6'] or ((is_cm or is_gr6) and st['any'] > 0)): continue
+                        if self._get_sec_penalty(sec_id, ts.id, is_cm, is_gr6, sec_map, related_sids) > 0: continue
+                    
+                    random.shuffle(valid_rooms)
+                    for tr in valid_rooms:
+                        if room_map.get((tr.id, ts.id), 0) == 0:
+                            best_slot, best_room = ts, tr
+                            break
+                    if best_slot: break
+
+                if best_slot: a.room, a.timeslot = best_room, best_slot
+                else:
+                    a.room, a.timeslot = random.choice(valid_rooms), random.choice(self.dm.timeslots)
+                
+                return idx, old_room, old_slot
+            else:
+                # 2. SWAP (Échange de places entre deux TD)
+                target_idx = random.choice(unlocked)
+                target_a = schedule.assignments[target_idx]
+                
+                # Sauvegarde pour le retour vers le SA (qui ne gère qu'un objet pour l'instant)
+                # Hack: On fait le swap et on renvoie l'idx principal. 
+                # Note: Le Delta-Scoring sera un peu approximatif sur le swap car il ne verra que l'impact de 'a'
+                # Mais c'est une exploration nécessaire.
+                a.room, target_a.room = target_a.room, a.room
+                a.timeslot, target_a.timeslot = target_a.timeslot, a.timeslot
+                
+                return idx, old_room, old_slot # SA annulera uniquement 'a' si besoin, c'est suffisant pour le chaos
+        else:
+            # Sans maps : Aléatoire pur
+            a.room = random.choice(self.dm.rooms)
+            a.timeslot = random.choice(self.dm.timeslots)
         
         return idx, old_room, old_slot
 

@@ -1,0 +1,30 @@
+--------------------------------------------------
+DIAGNOSTIC DE SATURATION DES GROUPES TD
+--------------------------------------------------
+Gr  13 (GP-GI S2 Gr 1       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  14 (GP-GI S2 Gr 2       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  15 (GP-GI S2 Gr 3       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  16 (GP-GI S2 Gr 4       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  17 (GP-GI S2 Gr 5       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  18 (GP-GI S2 Gr 6       ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  19 (GI S4 Gr 1          ) : CM= 1 | Libres=29 | TD_à_placer= 7 | Statut=OK
+Gr  20 (GI S4 Gr 2          ) : CM= 1 | Libres=29 | TD_à_placer= 0 | Statut=OK
+Gr  33 (GI S4 Gr 3          ) : CM= 1 | Libres=29 | TD_à_placer= 0 | Statut=OK
+Gr  21 (GP S4 Gr 1          ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  23 (GC S4 Gr 1          ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  25 (GESE S4 Gr 1        ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  27 (MSD S4 Gr 1         ) : CM= 1 | Libres=29 | TD_à_placer= 7 | Statut=OK
+Gr  29 (GB S4 Gr 1          ) : CM= 1 | Libres=29 | TD_à_placer= 7 | Statut=OK
+Gr  31 (GEG S4 Gr 1         ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   1 (GB-GEG S2 Gr 1      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   2 (GB-GEG S2 Gr 2      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   3 (GB-GEG S2 Gr 3      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   4 (GB-GEG S2 Gr 4      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   5 (GB-GEG S2 Gr 5      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   6 (GB-GEG S2 Gr 6      ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   7 (MSD-GC-GESE S2 Gr 1 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   8 (MSD-GC-GESE S2 Gr 2 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr   9 (MSD-GC-GESE S2 Gr 3 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  10 (MSD-GC-GESE S2 Gr 4 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  11 (MSD-GC-GESE S2 Gr 5 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK
+Gr  12 (MSD-GC-GESE S2 Gr 6 ) : CM= 0 | Libres=30 | TD_à_placer= 7 | Statut=OK

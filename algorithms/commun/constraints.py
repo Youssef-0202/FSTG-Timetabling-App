@@ -39,17 +39,21 @@ def calculate_fitness_full(schedule, mask=None):
     sid_to_name = dm.sec_id_to_name
     all_s4_sids = [sid for sid, name in sid_to_name.items() if " S4" in name]
     
+    # --- Mapping de Parenté Structurale V3.16 ---
+    # Deux sections partagent les mêmes étudiants si elles ont au moins un GroupeFiliere en commun
     related_sids = {}
-    for sid, name in sid_to_name.items():
-        related_sids[sid] = []
-        if " S2" in name: # Parent: Ex "GB-GEG S2" -> Enfants = "GB S4", "GEG S4"
-            for p in name.replace(" S2", "").split("-"):
-                if f"{p} S4" in name_to_sid: related_sids[sid].append(name_to_sid[f"{p} S4"])
-        elif " S4" in name: # Enfant: Ex "GI S4" -> Parent = "GP-GI S2"
-            prefix = name.replace(" S4", "")
-            for s2_name, s2_id in name_to_sid.items():
-                if " S2" in s2_name and prefix in s2_name.replace(" S2", "").split("-"):
-                    related_sids[sid].append(s2_id)
+    sec_to_base_groups = {}
+    for s in schedule.data_manager.sections:
+        sec_to_base_groups[s['id']] = set(g['id'] for g in s.get('groupes', []))
+        
+    for s1 in schedule.data_manager.sections:
+        sid1 = s1['id']
+        related_sids[sid1] = []
+        for s2 in schedule.data_manager.sections:
+            sid2 = s2['id']
+            if sid1 == sid2: continue
+            if sec_to_base_groups[sid1].intersection(sec_to_base_groups.get(sid2, set())):
+                related_sids[sid1].append(sid2)
 
     # ── CONTRAINTES DURES (HARD) ──
     
@@ -241,6 +245,9 @@ def calculate_fitness_full(schedule, mask=None):
         if len(rooms) > 1:
             stability_penalty += (len(rooms) - 1) * 50
 
+    # Aggregation des Hard
+    h_violations = h1_count + h2_count + h3_count + h4_count + h9_count + h10_count
+
     # FINAL CALCULATION
     total_soft = (
         (total_gaps if mask.get("S_GAPS", True) else 0) +
@@ -257,8 +264,14 @@ def calculate_fitness_full(schedule, mask=None):
 
     total_score = (M * h_violations) + total_soft
     
-    # Detail des penalties soft pour le reporting
+    # Detail complet pour le reporting
     details.update({
+        'H1_Teacher': h1_count,
+        'H2_Room': h2_count,
+        'H3_Group': h3_count,
+        'H4_Cap': h4_count,
+        'H9_Unavail': h9_count,
+        'H10_RoomType': h10_count,
         'S1_Mixing': mixing_penalty,
         'S2_Disp': dispersion_penalty,
         'S3_Gaps': total_gaps,
