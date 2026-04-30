@@ -493,15 +493,26 @@ function DatabaseContent() {
 
                     {tab === "sections" && (
                         <table>
-                            <thead><tr><th>ID</th><th>Nom Section (CM)</th><th>Semestre</th><th>Capacité Active</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Nom Section (CM)</th><th>Groupes/Filières rattachés (Parenté)</th><th>Semestre</th><th>Capacité Active</th><th>Actions</th></tr></thead>
                             <tbody>
                                 {!loading && sections.filter(s => !filterVal || s.semestre.includes(filterVal)).map((s) => (
                                     <tr key={s.id}>
                                         <td><code style={{ fontSize: "0.78rem" }}>#{s.id}</code></td>
                                         <td><b>{s.name}</b></td>
+                                        <td>
+                                            {((s as any).groupes && (s as any).groupes.length > 0) ? (
+                                                (s as any).groupes.map((g: any) => {
+                                                    const f = filieres.find(fx => fx.id === g.filiere_id);
+                                                    return <span key={g.id} className="badge" style={{ marginRight: '4px', fontSize: '0.7rem', padding: '2px 6px', backgroundColor: '#e2e8f0', color: '#475569' }}>{(f ? f.name : "Fil") + " " + g.semestre}</span>
+                                                })
+                                            ) : (
+                                                <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Aucun groupe (Isolé)</span>
+                                            )}
+                                        </td>
                                         <td><span className="badge badge-cm">{s.semestre}</span></td>
                                         <td>{s.total_capacity} étudiants</td>
-                                        <td><div className="actions-cell">
+                                        <td><div className="actions-cell" style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn btn-secondary btn-sm" onClick={() => setModal({ open: true, mode: "edit", data: s })} style={{ backgroundColor: '#e2e8f0', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer' }} title="Modifier"><Pencil size={13} color="#475569" /></button>
                                             <button className="btn btn-danger btn-sm" onClick={() => del(s.id)}><Trash2 size={13} /></button>
                                         </div></td>
                                     </tr>
@@ -861,14 +872,48 @@ function DatabaseContent() {
                             )}
                             {tab === "sections" && (
                                 <>
-                                    <div className="form-group full"><label>Nom Section</label>
-                                        <input value={String(modal.data.name || "")} onChange={(e) => setField("name", e.target.value)} placeholder="Ex: GP-GI S1" />
-                                    </div>
                                     <div className="form-group"><label>Semestre</label>
-                                        <input value={String(modal.data.semestre || "")} onChange={(e) => setField("semestre", e.target.value)} placeholder="S1" />
+                                        <input
+                                            value={String(modal.data.semestre || "")}
+                                            onChange={(e) => setField("semestre", e.target.value.toUpperCase())}
+                                            placeholder="Ex: S1, S2..."
+                                        />
                                     </div>
                                     <div className="form-group"><label>Capacité (Amphi)</label>
                                         <input type="number" value={String(modal.data.total_capacity || "")} onChange={(e) => setField("total_capacity", e.target.value)} />
+                                    </div>
+                                    <div className="form-group full"><label>Nom Section (Auto)</label>
+                                        <input value={String(modal.data.name || "")} onChange={(e) => setField("name", e.target.value)} placeholder="Généré automatiquement..." />
+                                    </div>
+                                    <div className="form-group full">
+                                        <label>Filières/Groupes rattachés ({modal.data.semestre || "Choisir semestre d'abord"})</label>
+                                        <Select
+                                            isMulti
+                                            isDisabled={!modal.data.semestre}
+                                            placeholder={modal.data.semestre ? "Sélectionnez les cohortes..." : "Remplissez le semestre d'abord"}
+                                            options={cohortes
+                                                .filter(c => !modal.data.semestre || c.semestre === modal.data.semestre)
+                                                .map(c => {
+                                                    const f = filieres.find(f => f.id === c.filiere_id);
+                                                    return { value: c.id, label: (f ? f.name : "Filière") + " " + c.semestre };
+                                                })
+                                            }
+                                            value={((modal.data.groupe_ids as number[]) || (modal.data.groupes as any[])?.map(g => g.id) || []).map(gid => {
+                                                const c = cohortes.find(x => x.id === gid);
+                                                if (!c) return { value: gid, label: String(gid) };
+                                                const f = filieres.find(fx => fx.id === c.filiere_id);
+                                                return { value: c.id, label: (f ? f.name : "Filière") + " " + c.semestre };
+                                            })}
+                                            onChange={(selected) => {
+                                                const ids = selected.map((s: any) => s.value);
+                                                const names = selected.map((s: any) => s.label.split(" ")[0]);
+                                                const autoName = names.length > 0 ? names.join("-") + " " + (modal.data.semestre || "") : "";
+                                                setModal({
+                                                    ...modal,
+                                                    data: { ...modal.data, groupe_ids: ids, name: autoName }
+                                                });
+                                            }}
+                                        />
                                     </div>
                                 </>
                             )}
