@@ -1,0 +1,17 @@
+MON-FRI Slots: 25
+Total AMPHI slots/week: 100
+Total CMs required: 68
+
+-- Heaviest Groups --
+Group GP-GI S2 Gr 1 (ID 13): 14 classes
+Group GP-GI S2 Gr 2 (ID 14): 14 classes
+Group GP-GI S2 Gr 3 (ID 15): 14 classes
+Group GP-GI S2 Gr 4 (ID 16): 14 classes
+Group GP-GI S2 Gr 5 (ID 17): 14 classes
+
+-- Section CM Counts --
+Section GP-GI S2: 7 CMs
+Section GP S4: 7 CMs
+Section GC S4: 7 CMs
+Section GESE S4: 7 CMs
+Section MSD S4: 7 CMs

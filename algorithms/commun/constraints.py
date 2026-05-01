@@ -66,6 +66,7 @@ def calculate_fitness_full(schedule, mask=None):
     h4_count = 0
     h9_count = 0
     h10_count = 0
+    h12_count = 0  # CMs placés le Samedi (Hard)
 
     for a in schedule.assignments:
         # H1: Enseignant (Ignorer si c'est le prof générique ID 231)
@@ -94,9 +95,9 @@ def calculate_fitness_full(schedule, mask=None):
         # H12 & S10: Gestion du Samedi
         if a.timeslot.day == "SAMEDI":
             if a.module_part.type == "CM":
-                h_violations += 1 # Hard : Interdiction totale pour les cours magistraux
+                h12_count += 1  # FIX: compteur propre, ne sera pas écrasé ligne 247
             else:
-                s10_saturday_penalty += 5000 # Soft : Très forte pénalité pour vider le samedi sauf cas critique
+                s10_saturday_penalty += 5000  # Soft : Très forte pénalité pour vider le samedi
 
         # H3: Chevauchements des Groupes TD (Standard)
         is_gr6 = False
@@ -143,6 +144,7 @@ def calculate_fitness_full(schedule, mask=None):
     if mask.get("H4", True): h_violations += h4_count
     if mask.get("H9", True): h_violations += h9_count
     if mask.get("H10", True): h_violations += h10_count
+    if mask.get("H12", True): h_violations += h12_count
     
     details['H1'] = h1_count
     details['H2'] = h2_count
@@ -150,7 +152,7 @@ def calculate_fitness_full(schedule, mask=None):
     details['H4'] = h4_count
     details['H9'] = h9_count
     details['H10'] = h10_count
-    details['H12_SAT_CM'] = sum(1 for a in schedule.assignments if a.timeslot.day == "SAMEDI" and a.module_part.type == "CM")
+    details['H12_SAT_CM'] = h12_count  # FIX: utiliser le compteur propre
 
     # ── CONTRAINTES SOUPLES (SOFT) ──
     
@@ -244,7 +246,7 @@ def calculate_fitness_full(schedule, mask=None):
             stability_penalty += (len(rooms) - 1) * 50
 
     # Aggregation des Hard
-    h_violations = h1_count + h2_count + h3_count + h4_count + h9_count + h10_count
+    # FIX CRITIQUE: ne pas réassigner h_violations ici, déjà calculé correctement ci-dessus
 
     # FINAL CALCULATION
     total_soft = (

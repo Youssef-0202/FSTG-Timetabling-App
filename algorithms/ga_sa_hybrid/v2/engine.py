@@ -65,6 +65,7 @@ class HybridEngine:
         # ── Masque des contraintes actives ──
         self.constraints_mask = constraints_mask or {
             "H1": True, "H2": True, "H3": True, "H4": True,
+            "H9": True, "H10": True, "H12": True,
             "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True
         }
 
@@ -134,18 +135,21 @@ class HybridEngine:
         # 2. Préparation des relations pour éviter S2/S4 (H13)
         # Correction : Mappage inversé correct (Nom -> ID)
         name_to_sid = {s['name']: s['id'] for s in self.dm.sections}
-        sid_to_name = self.dm.sec_id_to_name
+        # BUG 3 FIX: Utiliser filiere_id intersection (comme constraints.py) au lieu du parsing de noms
+        sec_to_filieres = {}
+        for s in self.dm.sections:
+            sec_to_filieres[s['id']] = set(g.get('filiere_id') for g in s.get('groupes', []) if g.get('filiere_id'))
         related_sids = {}
-        for sid, name in sid_to_name.items():
-            related_sids[sid] = []
-            if " S2" in name:
-                for p in name.replace(" S2", "").split("-"):
-                    if f"{p} S4" in name_to_sid: related_sids[sid].append(name_to_sid[f"{p} S4"])            
-            elif " S4" in name:
-                prefix = name.replace(" S4", "")
-                for s2_name, s2_id in name_to_sid.items():
-                    if " S2" in s2_name and prefix in s2_name.replace(" S2", "").split("-"):
-                        related_sids[sid].append(s2_id)
+        for s1 in self.dm.sections:
+            sid1 = s1['id']
+            related_sids[sid1] = []
+            fils1 = sec_to_filieres.get(sid1, set())
+            if not fils1: continue
+            for s2 in self.dm.sections:
+                sid2 = s2['id']
+                if sid1 == sid2: continue
+                if fils1.intersection(sec_to_filieres.get(sid2, set())):
+                    related_sids[sid1].append(sid2)
         
         # Mélanger pour garantir la diversité génétique des individus
         module_parts_shuffled = list(self.dm.module_parts)
@@ -166,7 +170,8 @@ class HybridEngine:
                 best_room, best_slot, best_cost = None, None, float('inf')
                 
                 # Échantillonnage : On teste 15 créneaux au hasard pour aller vite
-                candidate_slots = random.sample(self.dm.timeslots, min(15, len(self.dm.timeslots)))
+                valid_slots = self._get_valid_slots(mp)
+                candidate_slots = random.sample(valid_slots, min(15, len(valid_slots)))
                 candidate_rooms = [r for r in self.dm.rooms if r.capacity >= mp.group_size]
                 if not candidate_rooms: candidate_rooms = self.dm.rooms
 
@@ -180,6 +185,11 @@ class HybridEngine:
                         if (room.id, slot.id) in room_slot_used: cost += 1000
                         for gid in mp.td_group_ids:
                             if (gid, slot.id) in group_slot_used: cost += 1000
+                        
+                        # --- H9: Indisponibilite enseignant (BUG 5 FIX) ---
+                        if t_id and t_id != 231:
+                            prof_obj = self.dm.teacher_map.get(t_id)
+                            if prof_obj and slot.id in prof_obj.unavailable_slots: cost += 1000
                         
                         # --- H10: Type de Salle ---
                         if mp.required_room_type and room.type != mp.required_room_type: cost += 1000
@@ -208,11 +218,11 @@ class HybridEngine:
                 room, slot = best_room, best_slot
             
             # 4. ENREGISTREMENT: Le meilleur choix est acté, on verrouille le calendrier
-            if mp.teacher_id and mp.teacher_id != 231: teacher_slot_used[(mp.teacher_id, slot.id)] = True
+            if mp.teacher_id and mp.teacher_id != 231: teacher_slot_used[(mp.teacher_id, slot.id) ] = True
             room_slot_used[(room.id, slot.id)] = True
             for gid in mp.td_group_ids: group_slot_used[(gid, slot.id)] = True
             
-            # Enregistrement chirurgical S2/S4
+            # Enregistrement chirurgical S2/S4 (H13/H14)
             if sec_id:
                 key_sec = (sec_id, slot.id)
                 if key_sec not in sec_occupancy: 
@@ -228,6 +238,26 @@ class HybridEngine:
    
     # SECTION D : EVOLUTION (UNE GENERATION GA COMPLETE)
     # ==========================================================================
+
+    def inject_diversity(self, n_replace=None):
+        """
+        Anti-stagnation : Remplace une partie de la population par de nouveaux
+        individus greedy pour sortir des plateaux profonds (P11).
+        Appelé depuis main_solver.py quand le meilleur score ne bouge plus.
+        """
+        if n_replace is None:
+            n_replace = max(2, self.pop_size // 3)  # Remplace 33% de la population
+        
+        # Toujours garder les élites
+        kept = self.population[:self.elitism]
+        new_blood = [self._build_greedy_individual() for _ in range(n_replace)]
+        
+        # Remplacer les pires individus (fin de liste, après tri)
+        self.population = kept + new_blood + self.population[self.elitism:self.pop_size - n_replace]
+        
+        # Re-scorer pour que la prochaine génération parte proprement
+        for ind in new_blood:
+            self.get_score(ind)
 
     def evolve(self):
         """
@@ -396,9 +426,8 @@ class HybridEngine:
             # Application du mouvement
             if active_phase == 'hard':
                 # Mouvements génériques pour casser les conflits hard
-                idx, old_room, old_slot = self._apply_hard_move(schedule, unlocked)
-                saved_indices = [idx]
-                saved_states = [(old_room, old_slot)]
+                # NOUVEAU : retour sous forme de listes pour gérer le SWAP (2 indices)
+                saved_indices, saved_states = self._apply_hard_move(schedule, unlocked)
             else:
                 # Mouvements spécialisés (GUIDÉ P6) pour réduire les pénalités soft
                 saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
@@ -435,25 +464,68 @@ class HybridEngine:
         
         return schedule
 
+    def _get_valid_slots(self, mp):
+        """Retourne les créneaux autorisés (Interdit le Samedi pour les CM)."""
+        if mp.type == "CM":
+            return [s for s in self.dm.timeslots if s.day != "SAMEDI"]
+        return self.dm.timeslots
+
     def _apply_hard_move(self, schedule, unlocked):
         """
         Mouvements génériques (P6) pour casser les conflits physiques (H1-H4).
-        C'est la phase de 'Survie' : on déplace brutalement pour trouver une place libre.
+        Inclut le mouvement SWAP intra-section.
         """
         idx = random.choice(unlocked)
         a = schedule.assignments[idx]
         old_room, old_slot = a.room, a.timeslot
         
+        valid_slots = self._get_valid_slots(a.module_part)
+        valid_rooms = [r for r in self.dm.rooms if r.capacity >= a.module_part.group_size]
+        if a.module_part.required_room_type:
+            valid_rooms = [r for r in valid_rooms if r.type == a.module_part.required_room_type]
+        if not valid_rooms: valid_rooms = self.dm.rooms # Fallback sécurité
+        
         r = random.random()
-        if r < 0.5:
-            # Shift Both : On change tout (Salle + Créneau) pour un nouveau départ
-            a.room = random.choice(self.dm.rooms)
-            a.timeslot = random.choice(self.dm.timeslots)
-        else:
+        if r < 0.4:
+            # Shift Both : On change tout (Salle + Créneau)
+            a.room = random.choice(valid_rooms)
+            a.timeslot = random.choice(valid_slots)
+            return [idx], [(old_room, old_slot)]
+        elif r < 0.7:
             # Shift Room Only : Le créneau est bon, mais la salle est en conflit
-            a.room = random.choice(self.dm.rooms)
+            a.room = random.choice(valid_rooms)
+            return [idx], [(old_room, old_slot)]
+        else:
+            # NOUVEAU : SWAP intra-groupe ou intra-section
+            sec_id = a.module_part.section_id
+            a_groups = set(a.module_part.td_group_ids)
             
-        return idx, old_room, old_slot
+            candidates = [
+                i for i in unlocked 
+                if i != idx and (
+                    (sec_id and schedule.assignments[i].module_part.section_id == sec_id) or
+                    a_groups.intersection(schedule.assignments[i].module_part.td_group_ids)
+                )
+            ]
+            
+            if candidates:
+                other_idx = random.choice(candidates)
+                other = schedule.assignments[other_idx]
+                
+                # Vérifier si l'échange est légal pour le Samedi (si "other" est un CM sur Samedi on ne peut pas intervertir)
+                if a.module_part.type == "CM" and other.timeslot.day == "SAMEDI":
+                    a.timeslot = random.choice(valid_slots)
+                    return [idx], [(old_room, old_slot)]
+                if other.module_part.type == "CM" and a.timeslot.day == "SAMEDI":
+                    a.timeslot = random.choice(valid_slots)
+                    return [idx], [(old_room, old_slot)]
+
+                old_room_other, old_slot_other = other.room, other.timeslot
+                a.timeslot, other.timeslot = other.timeslot, a.timeslot
+                return [idx, other_idx], [(old_room, old_slot), (old_room_other, old_slot_other)]
+            else:
+                a.timeslot = random.choice(valid_slots)
+                return [idx], [(old_room, old_slot)]
 
     def _apply_soft_move(self, schedule, unlocked):
         """
@@ -467,19 +539,29 @@ class HybridEngine:
         # LOGIQUE 1 : STABILISATION DES SALLES (Réduit S6)
         if r < 0.25:
             # On choisit un module au hasard parmi ceux qui peuvent bouger
-            mid_options = [a.module_part.module_id for i, a in enumerate(schedule.assignments) if i in unlocked]
+            mid_options = [(a.module_part.module_id, a.module_part.type) for i, a in enumerate(schedule.assignments) if i in unlocked]
             if not mid_options: return self._apply_hard_move(schedule, unlocked)
-            mid = random.choice(mid_options)
+            mid, m_type = random.choice(mid_options)
             
-            # On choisit UNE SEULE salle cible pour tout le module
-            target_room = random.choice(self.dm.rooms)
+            # Identifier les séances correspondantes
+            target_assigns = [i for i in unlocked if schedule.assignments[i].module_part.module_id == mid and schedule.assignments[i].module_part.type == m_type]
             
-            # On aligne TOUTES les séances de ce module dans la même salle
-            for i in unlocked:
-                if schedule.assignments[i].module_part.module_id == mid:
-                    changed_indices.append(i)
-                    old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
-                    schedule.assignments[i].room = target_room
+            # Déterminer les types et capacités requis
+            max_cap = max(schedule.assignments[i].module_part.group_size for i in target_assigns)
+            req_type = schedule.assignments[target_assigns[0]].module_part.required_room_type
+            
+            valid_rooms = [r for r in self.dm.rooms if r.capacity >= max_cap]
+            if req_type:
+                valid_rooms = [r for r in valid_rooms if r.type == req_type]
+            if not valid_rooms: valid_rooms = self.dm.rooms
+            
+            target_room = random.choice(valid_rooms)
+            
+            # On aligne TOUTES les séances
+            for i in target_assigns:
+                changed_indices.append(i)
+                old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
+                schedule.assignments[i].room = target_room
         
         # LOGIQUE 2 : COMPACTAGE DE LA JOURNÉE PROF (Réduit S3 pour les profs)
         elif r < 0.55:
@@ -497,6 +579,8 @@ class HybridEngine:
                 changed_indices.append(idx)
                 old_states.append((a.room, a.timeslot))
                 a.timeslot = target_slot
+            else:
+                changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
 
         # LOGIQUE 3 : COMPACTAGE DE LA JOURNÉE ÉTUDIANT (Réduit S3 - Gaps & S7 - Journée courte)
         elif r < 0.85:
@@ -504,25 +588,22 @@ class HybridEngine:
             a = schedule.assignments[idx]
             sec_id = a.module_part.section_id
             
-            if sec_id:
-                # Chercher un autre cours de la MÊME section
-                sec_assigns = [schedule.assignments[i] for i in unlocked 
-                               if schedule.assignments[i].module_part.section_id == sec_id and i != idx]
+            sec_assigns = [schedule.assignments[i] for i in unlocked 
+                           if schedule.assignments[i].module_part.section_id == sec_id and i != idx] if sec_id else []
+            
+            if sec_assigns:
+                ref_day = random.choice(sec_assigns).timeslot.day
+                target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
                 
-                if sec_assigns:
-                    # Prendre le jour de cet autre cours et forcer le déplacement vers ce jour-là
-                    ref_day = random.choice(sec_assigns).timeslot.day
-                    target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
-                    
-                    changed_indices.append(idx)
-                    old_states.append((a.room, a.timeslot))
-                    a.timeslot = target_slot
+                changed_indices.append(idx)
+                old_states.append((a.room, a.timeslot))
+                a.timeslot = target_slot
+            else:
+                changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
         
         # LOGIQUE 4 : EXPLORATION RÉSIDUELLE
         else:
-            # Si on ne fait pas de mouvement spécialisé, on fait un mouvement classique
-            idx, r_old, s_old = self._apply_hard_move(schedule, unlocked)
-            changed_indices, old_states = [idx], [(r_old, s_old)]
+            changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
             
         return changed_indices, old_states
 

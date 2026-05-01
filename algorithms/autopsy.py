@@ -34,69 +34,84 @@ def autopsy():
         if mp and r and s:
             schedule.assignments.append(Assignment(mp, r, s))
 
-    print(f"Solution chargée: {len(schedule.assignments)} séances.")
-    print("-" * 60)
-    print("AUTOPSIE DES CONFLITS (Best Intermediate Solution)")
-    print("-" * 60)
-    
-    prof_slots = {}
-    room_slots = {}
-    group_slots = {}
-    sec_slots = {}
-    
-    for a in schedule.assignments:
-        ts = a.timeslot.id
-        tid = a.module_part.teacher_id
-        rid = a.room.id
-        gids = a.module_part.td_group_ids
-        sid = a.module_part.section_id
+    with open("result_autopsy.txt", "w", encoding="utf-8") as out:
+        out.write(f"Solution chargée: {len(schedule.assignments)} séances.\n")
+        out.write("-" * 60 + "\n")
+        out.write("AUTOPSIE DES CONFLITS (Full Diagnostics)\n")
+        out.write("-" * 60 + "\n")
         
-        # H1: Prof
-        if tid and tid != 231:
-            if (tid, ts) in prof_slots:
-                prev = prof_slots[(tid, ts)]
-                print(f"[H1 PROF] {dm.teacher_map[tid].name} @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}")
-            prof_slots[(tid, ts)] = a.module_part
-            
-        # H2: Room
-        if (rid, ts) in room_slots:
-            prev = room_slots[(rid, ts)]
-            print(f"[H2 ROOM] Salle {rid} @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}")
-        room_slots[(rid, ts)] = a.module_part
+        prof_slots = {}
+        room_slots = {}
+        group_slots = {}
+        sec_slots = {}
         
-        # H3: Groups
-        for gid in gids:
-            if (gid, ts) in group_slots:
-                prev = group_slots[(gid, ts)]
-                print(f"[H3 GROUP] Gr {gid} ({dm.group_map[gid]}) @ Slot {ts} : MP {prev.id} ({prev.type}) vs MP {a.module_part.id} ({a.module_part.type})")
-            group_slots[(gid, ts)] = a.module_part
-
-        # Sections & Parenté
-        if sid:
-            sid_name = dm.sec_id_to_name.get(sid, "")
-            related = []
-            if " S2" in sid_name:
-                for p in sid_name.replace(" S2", "").split("-"):
-                    child_name = f"{p} S4"
-                    for r_id, r_name in dm.sec_id_to_name.items():
-                        if r_name == child_name: related.append(r_id)
-            elif " S4" in sid_name:
-                prefix = sid_name.replace(" S4", "")
-                for r_id, r_name in dm.sec_id_to_name.items():
-                    if " S2" in r_name and prefix in r_name: related.append(r_id)
+        for a in schedule.assignments:
+            ts = a.timeslot.id
+            tid = a.module_part.teacher_id
+            rid = a.room.id
+            gids = a.module_part.td_group_ids
+            sid = a.module_part.section_id
             
-            if (sid, ts) in sec_slots:
-                 prev = sec_slots[(sid, ts)]
-                 print(f"[H3 SECTION] Section {sid_name} @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}")
-            for r_id in related:
-                if (r_id, ts) in sec_slots:
-                    prev = sec_slots[(r_id, ts)]
-                    print(f"[H13/14 PARENT] {sid_name} vs {dm.sec_id_to_name[r_id]} @ Slot {ts} : MP {a.module_part.id} vs MP {prev.id}")
-            sec_slots[(sid, ts)] = a.module_part
+            # H1: Prof
+            if tid and tid != 231:
+                if (tid, ts) in prof_slots:
+                    prev = prof_slots[(tid, ts)]
+                    out.write(f"[H1 PROF] {dm.teacher_map[tid].name} @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}\n")
+                prof_slots[(tid, ts)] = a.module_part
+                
+            # H2: Room
+            if (rid, ts) in room_slots:
+                prev = room_slots[(rid, ts)]
+                out.write(f"[H2 ROOM] Salle {a.room.name} @ Slot {ts} ({a.timeslot.day} {a.timeslot.start_time}) : MP {prev.id} vs MP {a.module_part.id}\n")
+            room_slots[(rid, ts)] = a.module_part
+            
+            # H3: Groups
+            for gid in gids:
+                if (gid, ts) in group_slots:
+                    prev = group_slots[(gid, ts)]
+                    out.write(f"[H3 GROUP] Gr {gid} ({dm.group_map[gid]}) @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}\n")
+                group_slots[(gid, ts)] = a.module_part
 
-    print("-" * 60)
-    print("FIN DE L'AUTOPSIE")
-    print("-" * 60)
+            # H9: Unavailability
+            if tid and tid != 231:
+                prof_obj = dm.teacher_map.get(tid)
+                if prof_obj and ts in prof_obj.unavailable_slots:
+                    out.write(f"[H9 UNAVAIL] {prof_obj.name} est indisponible @ Slot {ts} ! (MP {a.module_part.id})\n")
+
+            # H10: Room Type
+            if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
+                out.write(f"[H10 ROOMTYPE] MP {a.module_part.id} requiert {a.module_part.required_room_type} mais est en {a.room.type} (Salle {a.room.name})\n")
+
+            # H12: Saturday CM
+            if a.timeslot.day == "SAMEDI" and a.module_part.type == "CM":
+                out.write(f"[H12 SATURDAY] CM (MP {a.module_part.id}) placé un SAMEDI !\n")
+
+            # Sections & Parenté (filière)
+            if sid:
+                sid_name = dm.sec_id_to_name.get(sid, "")
+                sec_to_filieres = {}
+                for s_item in dm.sections:
+                    sec_to_filieres[s_item['id']] = set(g.get('filiere_id') for g in s_item.get('groupes', []) if g.get('filiere_id'))
+                
+                fils_current = sec_to_filieres.get(sid, set())
+                related = []
+                for s_other in dm.sections:
+                    if s_other['id'] == sid: continue
+                    if fils_current.intersection(sec_to_filieres.get(s_other['id'], set())):
+                        related.append(s_other['id'])
+                
+                if (sid, ts) in sec_slots:
+                     prev = sec_slots[(sid, ts)]
+                     out.write(f"[H3 SECTION] Section {sid_name} @ Slot {ts} : MP {prev.id} vs MP {a.module_part.id}\n")
+                for r_id in related:
+                    if (r_id, ts) in sec_slots:
+                        prev = sec_slots[(r_id, ts)]
+                        out.write(f"[H13/14 FILIERE] {sid_name} vs {dm.sec_id_to_name[r_id]} @ Slot {ts} : MP {a.module_part.id} vs MP {prev.id}\n")
+                sec_slots[(sid, ts)] = a.module_part
+
+        out.write("-" * 60 + "\n")
+        out.write("FIN DE L'AUTOPSIE\n")
+        out.write("-" * 60 + "\n")
 
 if __name__ == "__main__":
     autopsy()

@@ -28,16 +28,16 @@ from engine import HybridEngine
 # ==============================================================================
 
 # 1. Parametres de l'Algorithme Genetique (GA)
-POP_SIZE = 60
-MAX_GEN = 150
-MUTATION_RATE = 0.2
+POP_SIZE = 30          # Réduit : moins de calcul par génération (était 60)
+MAX_GEN = 300          # Augmenté : plus de générations possibles (était 150)
+MUTATION_RATE = 0.45   # Augmenté : casser les plateaux (était 0.35)
 ELITISM = 2
-MAX_GEN_AFTER_H0 = 50 # On pousse le polissage encore un peu plus loin
+MAX_GEN_AFTER_H0 = 50
 
 # 2. Parametres du Recuit Simule (SA) - Recherche Locale
-SA_ITERATIONS = 1200
-SA_TEMP = 50.0
-SA_COOLING = 0.90
+SA_ITERATIONS = 600    # Doublé : donner plus de force au SWAP intra-section (était 300)
+SA_TEMP = 50.0         # La temp réelle est adaptative (score * 0.05 dans engine.py)
+SA_COOLING = 0.97      # Refroidissement LENT : reste chaud plus longtemps (était 0.90)
 
 # 3. Masque des Contraintes (Activer/Desactiver des regles)
 CONSTRAINTS_MASK = {
@@ -47,6 +47,8 @@ CONSTRAINTS_MASK = {
     "H3": True,   # Pas deux cours au meme creneau pour le meme groupe
     "H4": True,   # La capacite de la salle >= effectif du groupe
     "H9": True,   # Respecter les indisponibilites des enseignants
+    "H10": True,  # Type de salle requis (Amphi / Salle TD)
+    "H12": True,  # Interdire les CM le Samedi (FIX: maintenant correctement comptabilise)
 
     # Contraintes Souples (Soft) — a optimiser
     "S_MIXING":        True,   # Eviter le melange de modules dans une demi-journee
@@ -121,13 +123,18 @@ def run_optimization():
     engine.create_initial_population()
     
     # Statistiques initiales
-    init_score, _, init_soft, _ = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
+    # BUG 7 FIX: déballer h_violations et le stocker sur la schedule pour éviter AttributeError
+    init_score, init_h, init_soft, _ = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
+    engine.population[0].h_violations = init_h
+    engine.population[0].fitness = init_score
     
     if VERBOSE:
         print(f"\n[START] Lancement GA-SA Hybrid Solver")
         print(f"        Seances a placer: {db_stats['nb_module_parts']} | Score Initial: {init_score}")
 
     h_zero_since = 0
+    stagnation_count = 0          # P11 : Compteur de stagnation
+    last_best_score = init_score  # P11 : Référence pour détecter le plateau
 
     # ── ETAPE 3 : Boucle Evolutive GA ──
     for gen in range(1, MAX_GEN + 1):
@@ -138,12 +145,30 @@ def run_optimization():
         
         gen_dur = time.time() - gen_start
         
+        current_best_score = engine.population[0].fitness
+
+        # P11 : Détection de stagnation et injection de diversité
+        if current_best_score >= last_best_score:
+            stagnation_count += 1
+        else:
+            stagnation_count = 0
+            last_best_score = current_best_score
+
+        if stagnation_count >= 5 and engine.population[0].h_violations > 0:
+            if VERBOSE: print(f"\n[DIVERSITY] Stagnation détectée à Gen {gen} (score={current_best_score:.0f}). Injection de diversité...")
+            engine.inject_diversity()
+            stagnation_count = 0
+
         # Affichage du statut (Encapsule dans reporting.py)
         print_generation_status(gen, engine.population[0], gen_dur, init_score, 
                                 CONSTRAINTS_MASK, verbose=VERBOSE)
 
         # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
         if engine.population[0].h_violations == 0:
+            if h_zero_since == 0:
+                # PREMIÈRE fois qu'on atteint H=0 : on sauvegarde immédiatement !
+                if VERBOSE: print(f"\n[SAVE] H=0 atteint à la Gen {gen} ! Sauvegarde intermédiaire...")
+                export_schedule_to_json(engine.population[0])
             h_zero_since += 1
             if h_zero_since >= MAX_GEN_AFTER_H0:
                 if VERBOSE: print(f"\n[STOP] Convergence de stabilite atteinte.")

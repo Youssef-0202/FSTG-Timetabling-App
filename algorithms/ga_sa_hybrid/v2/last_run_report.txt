@@ -1,13 +1,13 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-04-30 14:29:52
+ Date : 2026-05-01 12:57:08
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Population Size      : 60
- - Max Generations      : 150
- - Mutation Rate        : 0.2
- - SA Iterations        : 1200
+ - Population Size      : 30
+ - Max Generations      : 300
+ - Mutation Rate        : 0.45
+ - SA Iterations        : 600
  - SA Temp Initial      : 50.0
 
 2. STATISTIQUES DE LA BASE DE DONNEES :

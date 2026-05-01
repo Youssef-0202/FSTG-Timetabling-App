@@ -93,7 +93,8 @@ class DataManager:
                         section_to_groups[g['section_id']] = []
                         
                     section_to_groups[g['section_id']].append(g['id'])
-            self.group_to_section = group_to_section 
+            self.group_to_section = group_to_section
+            self.section_to_groups = section_to_groups  # FIX CRITIQUE : persister le mapping pour les CMs
 
             # 6. Module Parts
             mp_data = requests.get(f"{API_BASE_URL}/module-parts").json()
@@ -121,9 +122,11 @@ class DataManager:
                     if m_type != "CM" and not sid and td_group_ids:
                         sid = group_to_section.get(td_group_ids[0])
                     
-                    # FIX: Un CM bloque toute la section (tous ses groupes)
-                    if m_type == "CM" and sid and not td_group_ids:
-                        td_group_ids = section_to_groups.get(sid, [])
+                    # BUG 6 FIX: Un CM doit TOUJOURS bloquer TOUS les groupes de sa section
+                    # même si l'API en retourne déjà quelques-uns (union systématique)
+                    if m_type == "CM" and sid:
+                        all_section_groups = section_to_groups.get(sid, [])
+                        td_group_ids = list(set(td_group_ids) | set(all_section_groups))
                     
                     # Pour toutes les séances (CM fusionnés ou TD regroupés), 
                     # l'effectif réel est la somme des tailles des groupes rattachés.
