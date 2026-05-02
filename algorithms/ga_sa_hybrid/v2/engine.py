@@ -280,6 +280,10 @@ class HybridEngine:
 
         # 2. Elitisme : conserver les E meilleurs directement
         new_gen = self.population[:self.elitism]
+        
+        # 2.5 SA sur l'Elite : Indispensable pour franchir les derniers paliers locaux (H=1 à H=0)
+        for i in range(len(new_gen)):
+            new_gen[i] = self.simulated_annealing_search(new_gen[i])
 
         # 3. Produire les (Pop_size - E) autres individus
         while len(new_gen) < self.pop_size:
@@ -392,11 +396,28 @@ class HybridEngine:
     # SECTION F : RECHERCHE LOCALE (RECUIT SIMULE LOCAL - SA)
     # ==========================================================================
 
+    def _find_conflicting_indices(self, schedule):
+        """Identifie les indices des assignments qui causent un conflit de groupe (H3).
+        Retourne une liste d'indices ciblés pour le mouvement hard."""
+        group_slots = {}
+        conflicting = set()
+        for i, a in enumerate(schedule.assignments):
+            ts = a.timeslot.id
+            for gid in a.module_part.td_group_ids:
+                key = (gid, ts)
+                if key in group_slots:
+                    conflicting.add(i)
+                    conflicting.add(group_slots[key])
+                else:
+                    group_slots[key] = i
+        return list(conflicting)
+
     def simulated_annealing_search(self, schedule):
         """
         Recherche Locale par Recuit Simulé (SA) optimisée (P3 + P10).
         - P3 : Exécution "In-place" avec Undo (gain de temps considérable).
         - P10 : Bi-phasé (Hard vs Soft) avec mouvements spécialisés.
+        - P11 : Ciblage des conflits (évite la recherche à l'aveugle).
         """
         current_sch = schedule
         current_fit = self.get_score(current_sch)
@@ -410,24 +431,37 @@ class HybridEngine:
         # P10 : Déterminer la phase (Hard si violations hard > 0, sinon Soft)
         active_phase = 'hard' if schedule.h_violations > 0 else 'soft'
 
+        # P11 CIBLAGE : Calculer les conflits UNE SEULE FOIS avant la boucle
+        # (très coûteux d'appeler _find_conflicting_indices() à chaque itération)
+        unlocked_set_full = set(i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked)
+        conflict_cache = []
+        if active_phase == 'hard':
+            raw_conflicts = self._find_conflicting_indices(schedule)
+            conflict_cache = [i for i in raw_conflicts if i in unlocked_set_full]
+        refresh_conflict_counter = 0  # Actualiser le cache tous les 50 mouvements acceptés
+
         for it in range(self.sa_iterations):
             # Transition dynamique vers le soft si le hard est résolu à mi-parcours
             if it == self.sa_iterations // 2 and active_phase == 'hard':
-                if schedule.h_violations == 0: active_phase = 'soft'
+                if schedule.h_violations == 0:
+                    active_phase = 'soft'
+                    conflict_cache = []  # Plus besoin du cache
 
             unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
             if not unlocked: break
 
-            # P3 : Sauvegarde locale pour Undo O(1)
-            idx = random.choice(unlocked) if active_phase == 'hard' else None 
             saved_indices = []
             saved_states = []
 
             # Application du mouvement
             if active_phase == 'hard':
-                # Mouvements génériques pour casser les conflits hard
-                # NOUVEAU : retour sous forme de listes pour gérer le SWAP (2 indices)
-                saved_indices, saved_states = self._apply_hard_move(schedule, unlocked)
+                # P11 CIBLAGE : 70% du temps, cibler un assignment en conflit direct (H3 groupe)
+                # 30% du temps, mouvement aléatoire pour diversité
+                if random.random() < 0.7 and conflict_cache:
+                    targeted_unlocked = conflict_cache
+                else:
+                    targeted_unlocked = unlocked
+                saved_indices, saved_states = self._apply_hard_move(schedule, targeted_unlocked)
             else:
                 # Mouvements spécialisés (GUIDÉ P6) pour réduire les pénalités soft
                 saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
@@ -444,6 +478,14 @@ class HybridEngine:
                 if current_fit < best_fit:
                     best_fit = current_fit
                     best_state = [(a.room, a.timeslot) for a in schedule.assignments]
+                # Actualiser le cache des conflits périodiquement (tous les 20 acceptés)
+                if active_phase == 'hard':
+                    refresh_conflict_counter += 1
+                    if refresh_conflict_counter >= 20:
+                        refresh_conflict_counter = 0
+                        unlocked_set_full = set(i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked)
+                        raw_conflicts = self._find_conflicting_indices(schedule)
+                        conflict_cache = [i for i in raw_conflicts if i in unlocked_set_full]
             else:
                 # REJET (P3 : Undo O(1))
                 for i, (r, s) in zip(saved_indices, saved_states):
@@ -452,6 +494,7 @@ class HybridEngine:
                 schedule.fitness = current_fit # Restaurer le score précédent
 
             temp *= self.sa_cooling
+
 
         # Restaurer le meilleur état trouvé
         for i, (r, s) in enumerate(best_state):

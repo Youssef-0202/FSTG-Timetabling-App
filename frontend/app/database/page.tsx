@@ -388,8 +388,22 @@ function DatabaseContent() {
                                         // Filtre par statut (Locked/Unlocked)
                                         if (filterVal === "locked" && !a.is_locked) return false;
                                         if (filterVal === "unlocked" && a.is_locked) return false;
-                                        // Filtre par Section spécifique
-                                        if (filterVal.startsWith("sec-") && String(a.section_id) !== filterVal.replace("sec-", "")) return false;
+                                        // Filtre par Section spécifique (inclut les TD de la section)
+                                        if (filterVal.startsWith("sec-")) {
+                                            const targetSecId = Number(filterVal.replace("sec-", ""));
+                                            let belongsToSection = false;
+
+                                            if (a.section_id === targetSecId) belongsToSection = true;
+                                            if (a.td_groups && !belongsToSection) {
+                                                const hasGroupInSection = a.td_groups.some(g => {
+                                                    const fullG = tdGroups.find(tg => tg.id === g.id);
+                                                    return fullG && Number(fullG.section_id) === targetSecId;
+                                                });
+                                                if (hasGroupInSection) belongsToSection = true;
+                                            }
+
+                                            if (!belongsToSection) return false;
+                                        }
 
                                         // Recherche textuelle
                                         if (!search) return true;

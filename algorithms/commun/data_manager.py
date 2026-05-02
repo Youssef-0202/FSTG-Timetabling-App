@@ -127,6 +127,7 @@ class DataManager:
                     if m_type == "CM" and sid:
                         all_section_groups = section_to_groups.get(sid, [])
                         td_group_ids = list(set(td_group_ids) | set(all_section_groups))
+
                     
                     # Pour toutes les séances (CM fusionnés ou TD regroupés), 
                     # l'effectif réel est la somme des tailles des groupes rattachés.

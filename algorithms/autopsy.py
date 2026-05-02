@@ -82,6 +82,10 @@ def autopsy():
             if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
                 out.write(f"[H10 ROOMTYPE] MP {a.module_part.id} requiert {a.module_part.required_room_type} mais est en {a.room.type} (Salle {a.room.name})\n")
 
+            # H4: Capacity
+            if a.room.capacity < a.module_part.group_size:
+                out.write(f"[H4_CAP] MP {a.module_part.id} a un effectif de {a.module_part.group_size} mais la salle {a.room.name} a une capacité de {a.room.capacity}\n")
+
             # H12: Saturday CM
             if a.timeslot.day == "SAMEDI" and a.module_part.type == "CM":
                 out.write(f"[H12 SATURDAY] CM (MP {a.module_part.id}) placé un SAMEDI !\n")

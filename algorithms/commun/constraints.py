@@ -122,11 +122,10 @@ def calculate_fitness_full(schedule, mask=None):
             for r_sid in related_sids.get(sec_id, []):
                 r_status = sec_occupancy.get((r_sid, a.timeslot.id))
                 if r_status:
-                    # Je suis un CM ou Gr 6 S2, et l'autre section a déjà un cours placé
-                    if (is_cm or is_gr6) and r_status['any']:
-                        h3_count += 3
-                    # L'autre section est déjà un CM ou Gr 6 S2, et moi je viens m'ajouter par dessus
-                    elif r_status['cm'] or r_status['gr6']:
+                    # NOUVELLE LOGIQUE ASSOUPLIE :
+                    # Un conflit n'est détecté que si les deux côtés sont des "bloqueurs" (CM ou Gr 6).
+                    # Cela permet au Gr 6 de S2 de chevaucher les TD/TP de S4 si nécessaire.
+                    if (is_cm or is_gr6) and (r_status['cm'] or r_status['gr6']):
                         h3_count += 3
 
             # Mise à jour du statut pour les prochaines séances de la boucle
