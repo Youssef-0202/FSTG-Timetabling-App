@@ -1,286 +1,200 @@
+# ==============================================================================
+# CONSTRAINTS.PY — FORMULATION MATHÉMATIQUE ET PÉDAGOGIQUE
+# 
+# Approche : Lexicographique avec Facteur de Pénalité Big-M (M = 1,000,000)
+# Formule  : Score Total = (M * Somme(Violations_Hard)) + Somme(Pénalités_Soft)
+# ==============================================================================
 
 def calculate_fitness_full(schedule, mask=None):
     """
-    Calcule la fitness totale en utilisant l'approche lexicographique rapport
-    F(x) = M * f1 + f2 + alpha * f3
+    Calcule la fitness globale d'un emploi du temps.
     
-    mask: dict of bool to enabled/disable constraints (e.g. {'H1': False})
+    L'objectif est d'atteindre H_violations = 0 (Solution réalisable),
+    puis de minimiser le score Soft (Qualité pédagogique).
     """
     if mask is None:
         mask = {
-            "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H11": True,
-            "S_MIXING": True, "S_CM_DISPERSION": True, "S_GAPS": True,
-            "S_BALANCE": True, "S_STABILITY": True, "S_EMPTY_DAYS": True,
-            "S_PREFERENCES": True, "S_FREE_AFTERNOONS": True
+            "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H12": True,
+            "S_GAPS": True, "S_BALANCE": True, "S_STABILITY": True, "S_LUNCH": True,
+            "S_SHORT_DAY": True, "S_FREE_APM": True, "S_FATIGUE": True, "S_SATURDAY": True
         }
 
-    M = 1000000 # Big M massif pour interdire les erreurs Hard (Lexicographique)
-    
+    M = 1000000 # Poids dissuasif pour les contraintes critiques
     dm = schedule.data_manager
+    
+    # Initialisation des compteurs
     h_violations = 0
-    total_gaps = 0
-    consec_penalty = 0
-    mixing_penalty = 0
-    dispersion_penalty = 0
-    stability_penalty = 0
-    s7_empty_day_penalty = 0
-    s5_balance_penalty = 0
-    s4_lunch_penalty = 0
-    s9_fatigue_penalty = 0
-    s8_free_afternoon_penalty = 0
-    
-    s10_saturday_penalty = 0
-    
+    soft_score = 0
     details = {}
 
-    # ── PRÉ-CALCUL GÉNÉRATIF (H13-H14) ──
-    # On construit l'arbre de parenté dynamiquement à partir des noms
-    name_to_sid = {s['name']: s['id'] for s in dm.sections}
-    # --- Mapping de Parenté Structurale V3.17 (par Filière) ---
-    related_sids = {}
+    # 1. ── PRÉ-CALCULS DE STRUCTURE (FILIÈRES) ──
+    # Identifie quelles sections partagent les mêmes étudiants (ex: S4 hérite du S2)
     sec_to_filieres = {}
-    for s in schedule.data_manager.sections:
+    # { 1: [3, 5, 10], # La section 1 est liée aux sections 3, 5 et 10
+    #  2: [4, 6],     # La section 2 est liée aux sections 4 et ... }
+
+
+    for s in dm.sections:
         sec_to_filieres[s['id']] = set(g.get('filiere_id') for g in s.get('groupes', []) if g.get('filiere_id'))
         
-    for s1 in schedule.data_manager.sections:
+    related_sids = {}
+    #1: [9, ...] ➡ "La section 1 est liée à la 9"
+    #9: [1, ...] ➡ "La section 9 est liée à la 1" 
+    for s1 in dm.sections:
         sid1 = s1['id']
-        related_sids[sid1] = []
-        fils1 = sec_to_filieres.get(sid1, set())
-        if not fils1: continue
-        for s2 in schedule.data_manager.sections:
+        related_sids[sid1] = [] 
+        f1 = sec_to_filieres.get(sid1, set())
+        for s2 in dm.sections:
             sid2 = s2['id']
-            if sid1 == sid2: continue
-            if fils1.intersection(sec_to_filieres.get(sid2, set())):
+            if sid1 != sid2 and f1.intersection(sec_to_filieres.get(sid2, set())):
                 related_sids[sid1].append(sid2)
 
-    # ── CONTRAINTES DURES (HARD) ──
+    # 2. ── ANALYSE DES CONTRAINTES DURES (HARD) ──
+    # Ces contraintes DOIVENT être à 0 pour que l'emploi du temps soit valide.
     
-    prof_slots = {}
-    room_slots = {}
-    group_slots = {}
-    sec_occupancy = {} # Tracking chirurgical pour H13-H14: (sec_id, time_id) -> {'cm': bool, 'gr6': bool, 'any': bool}
+    prof_slots = {} # (ID_Prof, ID_Creneau)
+    room_slots = {}  
+    group_slots = {} 
+    sec_occupancy = {} #  H13/H14 (sec_id, slot_id) -> {'cm': bool, 'gr6': bool}
     
-    h1_count = 0
-    h2_count = 0
-    h3_count = 0
-    h4_count = 0
-    h9_count = 0
-    h10_count = 0
-    h12_count = 0  # CMs placés le Samedi (Hard)
+    h1, h2, h3, h4, h9, h10, h12 = 0, 0, 0, 0, 0, 0, 0
 
     for a in schedule.assignments:
-        # H1: Enseignant (Ignorer si c'est le prof générique ID 231)
-        t_id = a.module_part.teacher_id
-        if t_id and t_id != 231:
-            key = (t_id, a.timeslot.id)
-            if key in prof_slots:
-                h1_count += 1
-            prof_slots[key] = True
-            
-            # H9: Indisponibilites
+        ts_id = a.timeslot.id
+        mp = a.module_part
+        is_cm = (mp.type == "CM")
+
+        # H1 & H9 : Contraintes Enseignants
+        t_id = mp.teacher_id
+        if t_id and t_id != 231: # 231 est le prof générique
+            # H1: Un prof = Un créneau
+            if (t_id, ts_id) in prof_slots: h1 += 1
+            prof_slots[(t_id, ts_id)] = True
+            # H9: Indisponibilité déclarée
             prof_obj = dm.teacher_map.get(t_id)
-            if prof_obj and a.timeslot.id in prof_obj.unavailable_slots:
-                h9_count += 1
+            if prof_obj and ts_id in prof_obj.unavailable_slots: h9 += 1
                 
-        # H2: Salle
-        key_r = (a.room.id, a.timeslot.id)
-        if key_r in room_slots:
-            h2_count += 1
-        room_slots[key_r] = True
+        # H2 & H10 : Contraintes Salles
+        r_id = a.room.id
+        if (r_id, ts_id) in room_slots: h2 += 1
+        room_slots[(r_id, ts_id)] = True
+        # H10: Type de salle (Amphi vs Salle TD)
+        if mp.required_room_type and a.room.type != mp.required_room_type: h10 += 1
+
+        # H4 : Capacité Physique
+        if a.room.capacity < mp.group_size: h4 += 1
+
+        # H12 : CM le Samedi interdit
+        if a.timeslot.day == "SAMEDI" and is_cm: h12 += 1
+
+        # H3 : Chevauchement de Groupes (Direct et Filière)
+        is_gr6 = any("Gr 6" in dm.group_map.get(gid, "") or "Gr6" in dm.group_map.get(gid, "") for gid in mp.td_group_ids)
         
-        # H10: Type de Salle Requis
-        if a.module_part.required_room_type and a.room.type != a.module_part.required_room_type:
-            h10_count += 1
+        # Conflit direct (Même groupe au même moment)
+        for g_id in mp.td_group_ids:
+            if (g_id, ts_id) in group_slots: h3 += 1
+            group_slots[(g_id, ts_id)] = True
 
-        # H12 & S10: Gestion du Samedi
-        if a.timeslot.day == "SAMEDI":
-            if a.module_part.type == "CM":
-                h12_count += 1  # FIX: compteur propre, ne sera pas écrasé ligne 247
-            else:
-                s10_saturday_penalty += 5000  # Soft : Très forte pénalité pour vider le samedi
-
-        # H3: Chevauchements des Groupes TD (Standard)
-        is_gr6 = False
-        for g_id in a.module_part.td_group_ids:
-            key_g = (g_id, a.timeslot.id)
-            if key_g in group_slots:
-                h3_count += 1
-            group_slots[key_g] = True
-            if "Gr 6" in dm.group_map.get(g_id, ""):
-                is_gr6 = True
-
-        # H13 & H14: Chevauchements Parents-Enfants (S2 vs S4)
-        sec_id = a.module_part.section_id
-        if sec_id:
-            key_sec = (sec_id, a.timeslot.id)
-            if key_sec not in sec_occupancy:
-                sec_occupancy[key_sec] = {'cm': False, 'gr6': False, 'any': False}
-                
-            is_cm = (a.module_part.type == "CM")
+        # Conflit Filière (H13/H14) : S2 vs S4
+        if mp.section_id:
+            sec_key = (mp.section_id, ts_id)
+            if sec_key not in sec_occupancy: sec_occupancy[sec_key] = {'cm': False, 'gr6': False}
             
-            # Vérifier les sections liées (Ex: si je suis GB-GEG S2, je regarde GB S4 et GEG S4)
-            for r_sid in related_sids.get(sec_id, []):
-                r_status = sec_occupancy.get((r_sid, a.timeslot.id))
+            # Un CM ou un Gr 6 ne peut pas chevaucher un autre CM/Gr6 d'une année liée
+            for r_sid in related_sids.get(mp.section_id, []):
+                r_status = sec_occupancy.get((r_sid, ts_id))
                 if r_status:
-                    # NOUVELLE LOGIQUE ASSOUPLIE :
-                    # Un conflit n'est détecté que si les deux côtés sont des "bloqueurs" (CM ou Gr 6).
-                    # Cela permet au Gr 6 de S2 de chevaucher les TD/TP de S4 si nécessaire.
                     if (is_cm or is_gr6) and (r_status['cm'] or r_status['gr6']):
-                        h3_count += 3
+                        h3 += 3 # Sanction forte pour conflit filière
 
-            # Mise à jour du statut pour les prochaines séances de la boucle
-            sec_occupancy[key_sec]['any'] = True
-            if is_cm:  sec_occupancy[key_sec]['cm'] = True
-            if is_gr6: sec_occupancy[key_sec]['gr6'] = True
+            # Maj du statut pour les prochaines itérations
+            if is_cm: sec_occupancy[sec_key]['cm'] = True
+            if is_gr6: sec_occupancy[sec_key]['gr6'] = True
 
-        # H4: Capacite
-        if a.room.capacity < a.module_part.group_size:
-            h4_count += 1
+    # Agrégation des Hard Violations selon le masque
+    h_violations = (h1 if mask["H1"] else 0) + (h2 if mask["H2"] else 0) + \
+                   (h3 if mask["H3"] else 0) + (h4 if mask["H4"] else 0) + \
+                   (h9 if mask["H9"] else 0) + (h10 if mask["H10"] else 0) + \
+                   (h12 if mask["H12"] else 0)
 
-    if mask.get("H1", True): h_violations += h1_count
-    if mask.get("H2", True): h_violations += h2_count
-    if mask.get("H3", True): h_violations += h3_count
-    if mask.get("H4", True): h_violations += h4_count
-    if mask.get("H9", True): h_violations += h9_count
-    if mask.get("H10", True): h_violations += h10_count
-    if mask.get("H12", True): h_violations += h12_count
+    # 3. ── ANALYSE DES CONTRAINTES SOUPLES (SOFT) ──
+    # Objectif : Confort et Pédagogie.
     
-    details['H1'] = h1_count
-    details['H2'] = h2_count
-    details['H3'] = h3_count
-    details['H4'] = h4_count
-    details['H9'] = h9_count
-    details['H10'] = h10_count
-    details['H12_SAT_CM'] = h12_count  # FIX: utiliser le compteur propre
-
-    # ── CONTRAINTES SOUPLES (SOFT) ──
-    
-    # Organisation par Section pour S1, S2, S3, S5, S7, S8
-    section_assignments = {}
+    # Organisation par section pour analyser la journée des étudiants
+    section_assigns = {}
     for a in schedule.assignments:
         sid = a.module_part.section_id
-        if sid not in section_assignments:
-            section_assignments[sid] = []
-        section_assignments[sid].append(a)
+        if sid: section_assigns.setdefault(sid, []).append(a)
 
-    for sid, assigns in section_assignments.items():
+    s_gaps, s_lunch, s_fatigue, s_balance, s_short, s_free_apm, s_saturday = 0, 0, 0, 0, 0, 0, 0
+
+    for sid, assigns in section_assigns.items():
         day_map = {}
-        for a in assigns:
-            day = a.timeslot.day
-            if day not in day_map: day_map[day] = []
-            day_map[day].append(a)
-            
-        # S8: Apres-midis libres (Favoriser >= 2 apm vides par semaine)
-        # On considere un apm occupe s'il y a un cours a 14h30 ou 16h35
-        busy_days = set()
-        daily_hours = [] # pour S7 et S5
+        for a in assigns: day_map.setdefault(a.timeslot.day, []).append(a)
+        
+        busy_afternoons = set()
+        daily_hours = []
 
-        for day, day_assigns in day_map.items():
-            # Analyse du temps reel pour S4 et S9
-            for a in day_assigns:
-                # Recuperer les infos du Timeslot via le DataManager
-                ts = dm.slot_map.get(a.timeslot.id)
-                if not ts: continue
-                
-                start_time = ts.start_time # format "HH:MM:SS"
-                
-                # S4: Pause Dejeuner (12:30)
-                if "12:30" in start_time:
-                    if mask.get("S_PREFERENCES", True): s4_lunch_penalty += 40
-                
-                # S9: Fatigue et Preferences
-                if "14:30" in start_time:
-                    if mask.get("S_PREFERENCES", True): s9_fatigue_penalty += 10
-                if "16:35" in start_time:
-                    if mask.get("S_PREFERENCES", True): s9_fatigue_penalty += 20
-                
-                # Detecter si l'apres-midi est occupe (Slots apres 14h)
-                if "14:30" in start_time or "16:35" in start_time:
-                    busy_days.add(day)
-
-            # S3: Gaps (Trous)
-            # Trier par ID de creneau (hypothese: les IDs suivent l'ordre chronologique)
-            slots = sorted([a.timeslot.id for a in day_assigns])
+        for day, day_acts in day_map.items():
+            slots = sorted([a.timeslot.id for a in day_acts])
             daily_hours.append(len(slots) * 1.5)
             
+            # S3: Trous (Gaps) - Pénalise les attentes inutiles entre deux cours
             if len(slots) > 1:
-                # Un trou est un saut dans les IDs de creneaux sur un meme jour
-                day_gap = (max(slots) - min(slots) + 1) - len(slots)
-                if day_gap > 0:
-                    total_gaps += day_gap * 5
+                gap_count = (max(slots) - min(slots) + 1) - len(slots)
+                s_gaps += gap_count * 10
             
-            # S1: Mixing (Melange de matieres dans la meme demi-journee)
-            # Matin: slots 1, 2, 3 | Apres-midi: 4, 5 (ou selon ta structure)
-            # Ici simplifie: on verifie juste combien de modules differents par jour
-            modules_today = set(a.module_part.module_id for a in day_assigns)
-            if len(modules_today) > 1:
-                mixing_penalty += 30
+            # Analyse des horaires pour Lunch et Fatigue
+            for a in day_acts:
+                ts = dm.slot_map.get(a.timeslot.id)
+                if not ts: continue
+                # S4: Pause Déj (12:30)
+                if "12:30" in ts.start_time: s_lunch += 40
+                # S9: Fatigue (14:30 = +10, 16h35 = +20)
+                if "14:30" in ts.start_time: s_fatigue += 10
+                if "16:35" in ts.start_time: s_fatigue += 20
+                # S10: Samedi (Malus TD le samedi)
+                if ts.day == "SAMEDI": s_saturday += 5000
+                # Tracking des après-midis occupés (pour S8)
+                if any(h in ts.start_time for h in ["14:30", "16:35"]): busy_afternoons.add(day)
 
-        # S8 final calculation
-        free_afternoons = 5 - len(busy_days) # On suppose 5 jours travaillés (Lundi-Vendredi)
-        if free_afternoons < 2:
-            if mask.get("S_FREE_AFTERNOONS", True):
-                s8_free_afternoon_penalty += (2 - free_afternoons) * 80
+        # S7: Évitement des journées à une seule séance (déplacement inutile)
+        s_short += sum(80 for h in daily_hours if h == 1.5)
 
-        # S7: Évitement des journées "1 séance seulement" 
-        for h in daily_hours:
-            if h == 1.5:
-                if mask.get("S_EMPTY_DAYS", True): s7_empty_day_penalty += 80
+        # S8: Après-midis libres (Cible : >= 2 après-midis vides par semaine)
+        free_apm_count = 5 - len(busy_afternoons)
+        if free_apm_count < 2: s_free_apm += (2 - free_apm_count) * 100
 
-        # S5: Équilibre (Balance) - Éviter les jours à 6h+ si d'autres jours ont 1.5h
+        # S5: Équilibre de charge (évite un jour à 6h et un autre à 1.5h)
         if len(daily_hours) > 1:
             avg = sum(daily_hours) / len(daily_hours)
-            for h in daily_hours:
-                s5_balance_penalty += abs(h - avg) * 2
+            s_balance += sum(abs(h - avg) * 5 for h in daily_hours)
 
-    # S6: Stabilite des Salles (Un module doit rester dans la meme salle)
-    module_rooms = {}
+    # S6: Stabilité des Salles (Un module doit rester dans la même salle au fil de la semaine)
+    mod_rooms = {}
     for a in schedule.assignments:
         mid = a.module_part.module_id
-        if mid not in module_rooms: module_rooms[mid] = set()
-        module_rooms[mid].add(a.room.id)
+        mod_rooms.setdefault(mid, set()).add(a.room.id)
+    s_stability = sum((len(rooms)-1) * 100 for rooms in mod_rooms.values() if len(rooms) > 1)
+
+    # Calcul du score Soft total
+    soft_score = (s_gaps if mask["S_GAPS"] else 0) + \
+                 (s_lunch if mask["S_LUNCH"] else 0) + \
+                 (s_fatigue if mask["S_FATIGUE"] else 0) + \
+                 (s_balance if mask["S_BALANCE"] else 0) + \
+                 (s_stability if mask["S_STABILITY"] else 0) + \
+                 (s_short if mask["S_SHORT_DAY"] else 0) + \
+                 (s_free_apm if mask["S_FREE_APM"] else 0) + \
+                 s_saturday
+
+    # 4. ── RÉSULTAT FINAL ──
+    total_score = (M * h_violations) + soft_score
     
-    for mid, rooms in module_rooms.items():
-        if len(rooms) > 1:
-            stability_penalty += (len(rooms) - 1) * 50
-
-    # Aggregation des Hard
-    # FIX CRITIQUE: ne pas réassigner h_violations ici, déjà calculé correctement ci-dessus
-
-    # FINAL CALCULATION
-    total_soft = (
-        (total_gaps if mask.get("S_GAPS", True) else 0) +
-        (mixing_penalty if mask.get("S_MIXING", True) else 0) +
-        (dispersion_penalty if mask.get("S_CM_DISPERSION", True) else 0) +
-        (stability_penalty if mask.get("S_STABILITY", True) else 0) +
-        (s7_empty_day_penalty if mask.get("S_EMPTY_DAYS", True) else 0) +
-        (s5_balance_penalty if mask.get("S_BALANCE", True) else 0) +
-        (s4_lunch_penalty if mask.get("S_PREFERENCES", True) else 0) +
-        (s8_free_afternoon_penalty if mask.get("S_FREE_AFTERNOONS", True) else 0) +
-        (s9_fatigue_penalty if mask.get("S_PREFERENCES", True) else 0) +
-        s10_saturday_penalty
-    )
-
-    total_score = (M * h_violations) + total_soft
-    
-    # Detail complet pour le reporting
     details.update({
-        'H1_Teacher': h1_count,
-        'H2_Room': h2_count,
-        'H3_Group': h3_count,
-        'H4_Cap': h4_count,
-        'H9_Unavail': h9_count,
-        'H10_RoomType': h10_count,
-        'S1_Mixing': mixing_penalty,
-        'S2_Disp': dispersion_penalty,
-        'S3_Gaps': total_gaps,
-        'S4_Lunch': s4_lunch_penalty,
-        'S5_Balance': s5_balance_penalty,
-        'S6_Stability': stability_penalty,
-        'S7_ShortDay': s7_empty_day_penalty,
-        'S8_FreeApm': s8_free_afternoon_penalty,
-        'S9_Fatigue': s9_fatigue_penalty,
-        'S10_Sat_TD': s10_saturday_penalty
+        'H_Total': h_violations, 'S_Total': soft_score,
+        'H1_Prof': h1, 'H2_Salle': h2, 'H3_Grp': h3, 'H4_Cap': h4, 'H9_Indisp': h9,
+        'S3_Gaps': s_gaps, 'S4_Lunch': s_lunch, 'S6_Stab': s_stability, 
+        'S8_FreeApm': s_free_apm, 'S10_Sat': s_saturday
     })
 
-    return total_score, h_violations, total_soft, details
+    return total_score, h_violations, soft_score, details
