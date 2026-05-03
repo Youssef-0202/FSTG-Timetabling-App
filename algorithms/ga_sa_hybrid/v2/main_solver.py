@@ -128,8 +128,8 @@ def run_optimization():
         print(f"        Seances a placer: {db_stats['nb_module_parts']} | Score Initial: {init_score}")
 
     h_zero_since = 0
-    stagnation_count = 0          # P11 : Compteur de stagnation
-    last_best_score = init_score  # P11 : Référence pour détecter le plateau
+    stagnation_count = 0          #  Compteur de stagnation
+    last_best_score = init_score  #  Référence pour détecter le plateau
 
     # ── ETAPE 3 : Boucle Evolutive GA ──
     for gen in range(1, MAX_GEN + 1):
@@ -142,7 +142,7 @@ def run_optimization():
         
         current_best_score = engine.population[0].fitness
 
-        # P11 : Détection de stagnation et injection de diversité
+        # Détection de stagnation et injection de diversité
         if current_best_score >= last_best_score:
             stagnation_count += 1
         else:
@@ -150,7 +150,7 @@ def run_optimization():
             last_best_score = current_best_score
 
         if stagnation_count >= 5 and engine.population[0].h_violations > 0:
-            if VERBOSE: print(f"\n[DIVERSITY] Stagnation détectée à Gen {gen} (score={current_best_score:.0f}). Injection de diversité...")
+            if VERBOSE: print(f"\n DIVERSITY : Stagnation détectée à Gen {gen} (score={current_best_score:.0f}) => Injection de diversité...")
             engine.inject_diversity()
             stagnation_count = 0
 

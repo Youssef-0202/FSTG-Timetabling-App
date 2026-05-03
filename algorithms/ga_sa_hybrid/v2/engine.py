@@ -254,7 +254,7 @@ class HybridEngine:
     def inject_diversity(self, n_replace=None):
         """
         Anti-stagnation : Remplace une partie de la population par de nouveaux
-        individus greedy pour sortir des plateaux profonds (P11).
+        individus greedy pour sortir des plateaux profonds .
         Appelé depuis main_solver.py quand le meilleur score ne bouge plus.
         """
         if n_replace is None:
@@ -273,40 +273,38 @@ class HybridEngine:
 
     def evolve(self):
         """
-        Execute UNE generation complete de l algorithme Genetique.
-
-        Etapes :
-            1. Trier la population par score 
-            2. Copier les E meilleurs sans modification (Elitisme)
-            3. Boucler jusqu a Pop_size individus :
-               a. TournamentSelect x2  → choisir Parent_1 et Parent_2
-               b. UniformCrossover     → creer un Enfant
-               c. Mutate               → modifier aleatoirement un gene de l Enfant
-               d. SA Local Search      → polir intensivement l Enfant (400 iterations SA)
-               e. Ajouter l Enfant a la nouvelle generation
-            4. Remplacer l ancienne population par la nouvelle
-            5. Trier la nouvelle population -> population[0] = meilleur de la gen)
+        Exécute un cycle complet d'évolution mémétique (Génération GA + Raffinement SA).
+        
+        Processus :
+        1. ÉLITISME : Préservation des meilleurs individus pour garantir la non-régression.
+        2. POLISSAGE ÉLITE : Application du SA sur les élites pour franchir les paliers locaux.
+        3. REPRODUCTION : 
+           - Sélection par tournoi (Tournament Selection) riche en diversité.
+           - Croisement uniforme par module pour préserver les blocs cohérents.
+        4. MUTATION : Modification aléatoire ciblée sur les zones de conflit.
+        5. MÉMÉTIQUE : Chaque enfant subit une recherche locale intensive (SA) avant insertion.
+        6. SURVIE : Remplacement de l'ancienne population par les nouveaux individus polis.
         """
-        # 1. Trier par fitness (P4/P2 : get_score mettra en cache)
+        # 1. Tri de la population par fitness (utilisation du cache)
         self.population.sort(key=lambda x: self.get_score(x))
 
         # 2. Elitisme : conserver les E meilleurs directement
         new_gen = self.population[:self.elitism]
         
-        # 2.5 SA sur l'Elite : Indispensable pour franchir les derniers paliers locaux (H=1 à H=0)
+        # 2.5 SA sur l'Elite : Indispensable pour franchir les derniers paliers locaux (H=1/3 à H=0)
         for i in range(len(new_gen)):
             new_gen[i] = self.simulated_annealing_search(new_gen[i])
 
         # 3. Produire les (Pop_size - E) autres individus
         while len(new_gen) < self.pop_size:
 
-            # a. Selection par Tournoi : lire directement le cache fitness (P4)
+            # a. Selection par Tournoi : lire directement le cache fitness (
             p1 = min(random.sample(self.population, min(5, len(self.population))), key=lambda x: x.fitness)
             p2 = min(random.sample(self.population, min(5, len(self.population))), key=lambda x: x.fitness)
 
             # b. Croisement Uniforme : creer un Enfant
             child = self.crossover(p1, p2)
-            child.fitness = None  # Invalider : le crossover casse le cache (P2)
+            child.fitness = None  # Invalider : le crossover casse le cache (
 
             # c. Mutation (Exploration) : 15% de chance
             if random.random() < self.mutation_rate:
@@ -328,11 +326,13 @@ class HybridEngine:
 
     def crossover(self, p1, p2):
         """
-        Module-preserving Uniform Crossover (P7).
-        On choisit le parent AU NIVEAU DU MODULE, pas de la séance.
-        Toutes les séances d'un même module viennent du même parent.
+        Croisement Uniforme par Module (Module-preserving Crossover).
+        
+        Contrairement au croisement classique point par point, nous opérons ici au niveau 
+        de l'entité 'Module'. L'objectif est de préserver la cohérence interne des matières 
+        (CM/TD/TP) en ne les séparant pas entre deux parents différents.
         """
-        # Grouper les indices de séances par module_id
+        # 1. Analyse de la structure sémantique (On groupe les indices par module_id)
         module_groups = {}
         for i, a in enumerate(p1.assignments):
             mid = a.module_part.module_id
@@ -340,10 +340,14 @@ class HybridEngine:
 
         new_assignments = [None] * len(p1.assignments)
 
+        # 2. Transmission génétique par bloc
         for module_id, indices in module_groups.items():
-            # Choisir UN seul parent pour TOUT le module
+            # Pour chaque module, on tire au sort quel parent transmet ses gènes
+            # pile (Parent 1) ou face (Parent 2)
             parent = p1 if random.random() < 0.5 else p2
+            
             for i in indices:
+                # On recopie l'affectation complète (salle + créneau) de ce parent
                 orig = parent.assignments[i]
                 new_assignments[i] = Assignment(orig.module_part, orig.room, orig.timeslot)
 
@@ -351,35 +355,51 @@ class HybridEngine:
 
     def mutate(self, schedule):
         """
-        Mutation pondérée (P8) : Modifier un gène, en priorité ceux en conflit.
+        Mutation Pondérée  : Focalise l'exploration sur les zones de conflit.
+        
+        Plutôt que de muter une séance au hasard, on calcule un poids pour chaque gène.
+        L'algorithme a ainsi beaucoup plus de chances de modifier une séance qui viole
+        une contrainte Hard qu'une séance déjà parfaitement placée.
         """
         if not schedule.assignments:
             return
+            
+        # On ne mute que les séances qui ne sont pas verrouillées par l'utilisateur
         unlocked = [(i, a) for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
         if not unlocked:
             return
             
-        # P8 : Calculer des poids basés sur les conflits Hard (H1, H2, H3)
+        # 1. Analyse des conflits actuels pour définir les priorités de mutation
+        # On appelle une version ultra-rapide du calcul de pénalités (Hard seulement)
         penalties = self._compute_rough_penalties(schedule)
+        
+        # 2. Création de la liste des poids : (Poids élevé = Haute probabilité de mutation)
         weights = [penalties.get(i, 0.1) for i, _ in unlocked]
         
-        # Tirage pondéré
-        idx = random.choices([i for i, _ in unlocked], weights=weights, k=1)[0]
+        # 3. Sélection de la séance à muter (Tirage au sort pondéré)
+        indices_list = [i for i, _ in unlocked]
+        idx = random.choices(indices_list, weights=weights, k=1)[0]
         
+        # 4. Mutation effective : Changement aléatoire de la salle ET du créneau
         schedule.assignments[idx].room     = random.choice(self.dm.rooms)
         schedule.assignments[idx].timeslot = random.choice(self.dm.timeslots)
 
     def _compute_rough_penalties(self, schedule):
-        """Calcule sommairement les conflits Hard pour pondérer la mutation (P8)."""
+        """
+        Calculateur de 'Chaleur' (Rough Penalties).
+        Scan rapide de la population pour identifier les indices 'coupeables' de conflits.
+        """
         penalties = {}
+        # Dictionnaires pour détecter les doublons au vol
         prof_slots = {}
         room_slots = {}
         group_slots = {}
         
         for i, a in enumerate(schedule.assignments):
-            penalties[i] = 0.1 # Poids de base pour permettre la mutation de gènes sains
+            # Poids de base (0.1) pour permettre une exploration résiduelle même sans conflit
+            penalties[i] = 0.1 
             
-            # H1 : Enseignant
+            # Détection Conflit Enseignant (H1)
             if a.module_part.teacher_id:
                 key = (a.module_part.teacher_id, a.timeslot.id)
                 if key in prof_slots:
@@ -387,14 +407,14 @@ class HybridEngine:
                     penalties[prof_slots[key]] += 1000
                 prof_slots[key] = i
             
-            # H2 : Salle
+            # Détection Conflit Salle (H2)
             key_r = (a.room.id, a.timeslot.id)
             if key_r in room_slots:
                 penalties[i] += 1000
                 penalties[room_slots[key_r]] += 1000
             room_slots[key_r] = i
             
-            # H3 : Groupes
+            # Détection Conflit Groupes d'étudiants (H3)
             for g_id in a.module_part.td_group_ids:
                 key_g = (g_id, a.timeslot.id)
                 if key_g in group_slots:

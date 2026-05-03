@@ -26,16 +26,35 @@ Procedure MAIN_SOLVER()
 2 :  Calculer_Graphe_Filières() // Pré-calcul statique (Related Sections)
 3 :  Population = Initialiser_Greedy(30, 0.8) // 80% Glouton, 20% Aléatoire
 4 :  
-5 :  Tant que Gen < MAX_GEN ET Stagnation < LIMITE :
-6 :      Population = EVOLVE(Population)
-7 :      Meilleur = Population[0]
-8 :      
-9 :      Si Meilleur.H_Violations == 0 :
-10:         Phase = "POLISHING_SOFT"
-11:         Incrémenter Compteur_Early_Stopping
-12:      Fin Si
-13:  Fin Tant que
-14:  Exporter_Json(Meilleur)
+5 :  Initialiser_Compteur_Stagnation(C = 0)
+6 :  Tant que Gen < MAX_GEN et H > 0 (ou Stabilité non atteinte) :
+7 :      EVOLVE(Population)
+8 :      Nouveau_Best = Population[0]
+9 :      
+10:      // Détection de stagnation (Anti-Plateau)
+11:      Si Nouveau_Best.Score >= Ancien_Best.Score :
+12:          C = C + 1
+13:      Sinon :
+14:          C = 0
+15:      
+16:      Si C >= 5 et H > 0 :
+17:          INJECTER_DIVERSITE(Population) // Relancer la recherche
+18:          C = 0
+19:      
+20:      Afficher_Progrès(Gen, Nouveau_Best)
+21:      Gen = Gen + 1
+22:  Fin Tant que
+23:  Archiver_Résultats_Base_Données(Meilleur)
+24:  Exporter_Json(Meilleur)
+
+Procedure INJECTER_DIVERSITE(Population)
+----------------------------------------
+1 :  Conserver_Elites(Population) // On garde les meilleurs (Élitisme)
+2 :  Pour i = (ELITISM + 1) à (POP_SIZE / 3) :
+3 :      Nouveau = CONSTRUIRE_INDIVIDU_GREEDY()
+4 :      Remplacer_Pire_Individu(Population, Nouveau)
+5 :  Fin Pour
+6 :  Mélanger_Population_Restante()
 
 Procedure INITIALISER_POPULATION()
 ----------------------------------
@@ -103,6 +122,53 @@ Procedure EVOLVE(Population)
 20:     Nouvelle_Pop.Ajouter(Enfant)
 21: Fin Tant que
 22: Retourner Nouvelle_Pop
+    
+Procedure CROISEMENT_MODULAIRE(P1, P2)
+--------------------------------------
+1 :  Initialiser Enfant_Vide()
+2 :  Modules = Lister_Modules_Uniques(P1) 
+3 :
+4 :  Pour chaque Module M dans Modules :
+5 :      // Tirage au sort du parent donneur pour LE BLOC COMPLET
+6 :      Si Aléatoire(0, 1) < 0.5 :
+7 :          Parent_Source = P1
+8 :      Sinon :
+9 :          Parent_Source = P2
+10:
+11:      // On transmet toutes les séances (CM, TD, TP) de ce module d'un seul bloc
+12:      Pour chaque Séance s appartenant à M :
+13:          Enfant[s] = Parent_Source[s] (Salle, Créneau)
+14:      Fin Pour
+15:  Fin Pour
+16:  Retourner Enfant
+    
+Procedure MUTATION_PONDÉRÉE(Individu)
+-------------------------------------
+1 :  // 1. Identification des zones à problèmes
+2 :  Poids_Conflits = ESTIMER_CHALEUR_CONFLITS(Individu)
+3 :
+4 :  // 2. Sélection biaisée (plus un gène a de conflits, plus il risque de muter)
+5 :  Séance_Cible = Tirage_Au_Sort_Pondéré(Individu.Séances, Poids_Conflits)
+6 :
+7 :  // 3. Modification aléatoire (Exploration)
+8 :  Séance_Cible.Salle = Nouvelle_Salle_Aléatoire()
+9 :  Séance_Cible.Créneau = Nouveau_Créneau_Aléatoire()
+
+Procedure ESTIMER_CHALEUR_CONFLITS(Individu)
+--------------------------------------------
+1 :  Initialiser Poids[] avec une valeur de base (0.1) pour tous
+2 :  
+3 :  // Scan rapide O(N) des ressources physiques
+4 :  Pour chaque s dans Individu.Séances :
+5 :      Si Professeur(s) est occupé ailleurs au même moment :
+6 :          Poids[s] += 1000
+7 :      Si Salle(s) est occupée ailleurs au même moment :
+8 :          Poids[s] += 1000
+9 :      Si Groupe(s) a un autre cours au même moment :
+10:          Poids[s] += 1000
+11:  Fin Pour
+12:  
+13:  Retourner Poids
 
 Procedure RECUIT_SIMULÉ_LOCAL(Individu, Iters, Alpha)
 -----------------------------------------------------
