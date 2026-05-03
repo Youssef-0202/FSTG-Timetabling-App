@@ -119,7 +119,6 @@ def run_optimization():
     engine.create_initial_population()
     
     # Statistiques initiales
-    # BUG 7 FIX: déballer h_violations et le stocker sur la schedule pour éviter AttributeError
     init_score, init_h, init_soft, _ = calculate_fitness_full(engine.population[0], CONSTRAINTS_MASK)
     engine.population[0].h_violations = init_h
     engine.population[0].fitness = init_score

@@ -120,25 +120,28 @@ class HybridEngine:
 
     def _build_greedy_individual(self):
         """
-        simule un mini-calcul de contraintes pendant la création de l'individu : placement séance par séance de manière intelligente.
-        Objectif : Éviter les conflits durs (H1->H14) dès la naissance de l'horaire, 
-        pour donner une avance écrasante au Recuit Simulé.
-        """
+        Heuristique Constructive Greedy  : Construit un individu séance par séance.
+        
+        L'objectif est d'aboutir à un emploi du temps presque valide dès le départ en vérifiant
+        les conflits au moment du placement. Cela évite au GA/SA de perdre du temps sur des 
+        configurations absurdes.
+        """ 
         assignments = []
         
-        # 1. Calendriers de suivi : on note ce qui est déjà occupé pour l'individu en cours de création
+        # 1. Registres de suivi local (propres à cet individu pendant sa création)
+        # Permettent une vérification de conflit en temps constant O(1)
         teacher_slot_used = {}
         room_slot_used    = {}
         group_slot_used   = {}
-        sec_occupancy     = {}  # Tracking S2/S4 comme dans constraints.py
+        sec_occupancy     = {} # Suivi partagé pour les CM et Groupes 6 (H13/H14)
         
-        # 2. Préparation des relations pour éviter S2/S4 (H13)
-        # Correction : Mappage inversé correct (Nom -> ID)
-        name_to_sid = {s['name']: s['id'] for s in self.dm.sections}
-        # BUG 3 FIX: Utiliser filiere_id intersection (comme constraints.py) au lieu du parsing de noms
+        # 2. Analyse des dépendances entre sections
+        # Deux sections sont "liées" si elles partagent au moins une filière.
+        # Cela permet de garantir que les redoublants de la filière X ne ratent pas un cours.
         sec_to_filieres = {}
         for s in self.dm.sections:
             sec_to_filieres[s['id']] = set(g.get('filiere_id') for g in s.get('groupes', []) if g.get('filiere_id'))
+            
         related_sids = {}
         for s1 in self.dm.sections:
             sid1 = s1['id']
@@ -148,28 +151,29 @@ class HybridEngine:
             for s2 in self.dm.sections:
                 sid2 = s2['id']
                 if sid1 == sid2: continue
+                # Si intersection non vide, les deux sections ont des étudiants communs
                 if fils1.intersection(sec_to_filieres.get(sid2, set())):
                     related_sids[sid1].append(sid2)
         
-        # Mélanger pour garantir la diversité génétique des individus
+        # Mélange des séances pour garantir la diversité génétique des individus
         module_parts_shuffled = list(self.dm.module_parts)
         random.shuffle(module_parts_shuffled)
         
-        # 3. Placement glouton (Greedy)
+        # 3. Processus de placement itératif (Glouton)
         for mp in module_parts_shuffled:
-            # Attributs fixes de la séance à placer (Accessibles partout)
             is_cm = (mp.type == "CM")
             is_gr6 = any("Gr 6" in self.dm.group_map.get(gid, "") for gid in mp.td_group_ids)
             sec_id = mp.section_id
             
             if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
-                # Les séances verrouillées n'ont pas le choix
+                # Priorité aux séances verrouillées par l'administration
                 room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
                 slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id), random.choice(self.dm.timeslots))
             else:
                 best_room, best_slot, best_cost = None, None, float('inf')
                 
-                # Échantillonnage : On teste 15 créneaux au hasard pour aller vite
+                # Échantillonnage stochastique : on teste 15 combinaisons au hasard
+                # Le hasard garantit que tous les individus Greedy ne se ressemblent pas trop
                 valid_slots = self._get_valid_slots(mp)
                 candidate_slots = random.sample(valid_slots, min(15, len(valid_slots)))
                 candidate_rooms = [r for r in self.dm.rooms if r.capacity >= mp.group_size]
@@ -179,50 +183,58 @@ class HybridEngine:
                     for room in candidate_rooms:
                         cost = 0
                         
-                        # --- H1, H2, H3: Base de l'emploi du temps ---
+                        # --- Vérification H1, H2, H3 (Ressources physiques) ---
                         t_id = mp.teacher_id
-                        if t_id and t_id != 231 and (t_id, slot.id) in teacher_slot_used: cost += 1000
-                        if (room.id, slot.id) in room_slot_used: cost += 1000
+                        if t_id and t_id != 231 and (t_id, slot.id) in teacher_slot_used:
+                            cost += 1000
+                        if (room.id, slot.id) in room_slot_used:
+                            cost += 1000
                         for gid in mp.td_group_ids:
-                            if (gid, slot.id) in group_slot_used: cost += 1000
+                            if (gid, slot.id) in group_slot_used:
+                                cost += 1000
                         
-                        # --- H9: Indisponibilite enseignant (BUG 5 FIX) ---
+                        # --- Vérification H9 (Indisponibilité enseignant) ---
                         if t_id and t_id != 231:
                             prof_obj = self.dm.teacher_map.get(t_id)
-                            if prof_obj and slot.id in prof_obj.unavailable_slots: cost += 1000
+                            if prof_obj and slot.id in prof_obj.unavailable_slots:
+                                cost += 1000
                         
-                        # --- H10: Type de Salle ---
-                        if mp.required_room_type and room.type != mp.required_room_type: cost += 1000
+                        # --- Vérification H10 (Compatibilité Type Salle) ---
+                        if mp.required_room_type and room.type != mp.required_room_type:
+                            cost += 1000
                         
-                        # --- H12: SAMEDI INTERDIT (Nouvelle contrainte !) ---
-                        # --- H12: SAMEDI (CM=Hard, TD=Soft cost) ---
+                        # --- Vérification H12 (Interdiction Samedi) ---
                         if slot.day == "SAMEDI":
-                            if is_cm: cost += 100000 # Interdit
-                            else:     cost += 15000  # Très coûteux (eviter si possible)
+                            if is_cm: cost += 100000 
+                            else:     cost += 15000  # Forte dissuasion pour les TD
                             
-                        # --- H13/H14: NE PAS PLACER S2 et S4 EN MÊME TEMPS ---
+                        # --- Vérification H13/H14 (Chevauchement de filières) ---
                         if sec_id:
                             for r_sid in related_sids.get(sec_id, []):
                                 r_status = sec_occupancy.get((r_sid, slot.id))
                                 if r_status:
-                                    if (is_cm or is_gr6) and r_status['any']: cost += 3000
-                                    elif r_status['cm'] or r_status['gr6']: cost += 3000
+                                    # Si un CM ou un Gr 6 est déjà présent dans une section liée
+                                    if (is_cm or is_gr6) and r_status['any']:
+                                        cost += 3000
+                                    elif r_status['cm'] or r_status['gr6']:
+                                        cost += 3000
 
-                        # Si on trouve une solution parfaite (coût 0), on s'arrête immédiatement
+                        # Critère d'acceptation du glouton
                         if cost < best_cost:
                             best_cost = cost
                             best_room, best_slot = room, slot
-                            if cost == 0: break
+                            if cost == 0: break # On prend la première place parfaite trouvée
                     if best_cost == 0: break
                 
                 room, slot = best_room, best_slot
             
-            # 4. ENREGISTREMENT: Le meilleur choix est acté, on verrouille le calendrier
-            if mp.teacher_id and mp.teacher_id != 231: teacher_slot_used[(mp.teacher_id, slot.id) ] = True
+            # 4. Finalisation et mise à jour des registres de l'individu
+            if mp.teacher_id and mp.teacher_id != 231:
+                teacher_slot_used[(mp.teacher_id, slot.id) ] = True
             room_slot_used[(room.id, slot.id)] = True
-            for gid in mp.td_group_ids: group_slot_used[(gid, slot.id)] = True
+            for gid in mp.td_group_ids:
+                group_slot_used[(gid, slot.id)] = True
             
-            # Enregistrement chirurgical S2/S4 (H13/H14)
             if sec_id:
                 key_sec = (sec_id, slot.id)
                 if key_sec not in sec_occupancy: 
@@ -414,38 +426,39 @@ class HybridEngine:
 
     def simulated_annealing_search(self, schedule):
         """
-        Recherche Locale par Recuit Simulé (SA) optimisée (P3 + P10).
-        - P3 : Exécution "In-place" avec Undo (gain de temps considérable).
-        - P10 : Bi-phasé (Hard vs Soft) avec mouvements spécialisés.
-        - P11 : Ciblage des conflits (évite la recherche à l'aveugle).
+        Recherche Locale par Recuit Simulé (SA) optimisée.
+        
+        Cette méthode affine l'individu en explorant son voisinage. Elle utilise
+        une logique bi-phasée (Hard d'abord, puis Soft) et une modification
+        directe (In-place) avec capacité d'annulation (Undo) pour maximiser les performances.
         """
         current_sch = schedule
         current_fit = self.get_score(current_sch)
         
-        # P5 : Température adaptive (5% du score courant)
+        # Température initiale adaptative basée sur la qualité actuelle
         temp = max(self.sa_temp, current_fit * 0.05)
         
         best_fit = current_fit
         best_state = [(a.room, a.timeslot) for a in schedule.assignments]
         
-        # P10 : Déterminer la phase (Hard si violations hard > 0, sinon Soft)
+        # Détermination de la phase active
         active_phase = 'hard' if schedule.h_violations > 0 else 'soft'
 
-        # P11 CIBLAGE : Calculer les conflits UNE SEULE FOIS avant la boucle
-        # (très coûteux d'appeler _find_conflicting_indices() à chaque itération)
+        # CIBLAGE : On identifie les gènes à problèmes une seule fois pour économiser du CPU
         unlocked_set_full = set(i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked)
         conflict_cache = []
         if active_phase == 'hard':
             raw_conflicts = self._find_conflicting_indices(schedule)
             conflict_cache = [i for i in raw_conflicts if i in unlocked_set_full]
-        refresh_conflict_counter = 0  # Actualiser le cache tous les 50 mouvements acceptés
+        
+        refresh_counter = 0
 
         for it in range(self.sa_iterations):
-            # Transition dynamique vers le soft si le hard est résolu à mi-parcours
+            # Passage dynamique à la phase soft si le problème hard est résolu à mi-parcours
             if it == self.sa_iterations // 2 and active_phase == 'hard':
                 if schedule.h_violations == 0:
                     active_phase = 'soft'
-                    conflict_cache = []  # Plus besoin du cache
+                    conflict_cache = []
 
             unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
             if not unlocked: break
@@ -453,55 +466,55 @@ class HybridEngine:
             saved_indices = []
             saved_states = []
 
-            # Application du mouvement
+            # Choix et application du mouvement selon la phase
             if active_phase == 'hard':
-                # P11 CIBLAGE : 70% du temps, cibler un assignment en conflit direct (H3 groupe)
-                # 30% du temps, mouvement aléatoire pour diversité
+                # Stratégie 70/30 : On cible les conflits 70% du temps, le reste en exploration libre
                 if random.random() < 0.7 and conflict_cache:
                     targeted_unlocked = conflict_cache
                 else:
                     targeted_unlocked = unlocked
                 saved_indices, saved_states = self._apply_hard_move(schedule, targeted_unlocked)
             else:
-                # Mouvements spécialisés (GUIDÉ P6) pour réduire les pénalités soft
+                # Mouvements "Métier" (Salles, Profs, Gaps)
                 saved_indices, saved_states = self._apply_soft_move(schedule, unlocked)
 
-            # Invalider le cache et recalculer
+            # Recalcul du score (get_score gère l'invalidation du cache)
             schedule.fitness = None
             neighbor_fit = self.get_score(schedule)
             delta = neighbor_fit - current_fit
 
-            # Critère de Metropolis
+            # Critère d'acceptation de Metropolis
             if delta < 0 or (temp > 0 and random.random() < math.exp(-delta / temp)):
-                # Acceptation
+                # Mouvement accepté
                 current_fit = neighbor_fit
                 if current_fit < best_fit:
                     best_fit = current_fit
                     best_state = [(a.room, a.timeslot) for a in schedule.assignments]
-                # Actualiser le cache des conflits périodiquement (tous les 20 acceptés)
+                
+                # Mise à jour périodique du cache des conflits si nécessaire
                 if active_phase == 'hard':
-                    refresh_conflict_counter += 1
-                    if refresh_conflict_counter >= 20:
-                        refresh_conflict_counter = 0
-                        unlocked_set_full = set(i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked)
+                    refresh_counter += 1
+                    if refresh_counter >= 20: 
+                        refresh_counter = 0
                         raw_conflicts = self._find_conflicting_indices(schedule)
+                        unlocked_set_full = set(i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked)
                         conflict_cache = [i for i in raw_conflicts if i in unlocked_set_full]
             else:
-                # REJET (P3 : Undo O(1))
+                # REJET : On annule le mouvement en O(1) grâce aux états sauvegardés
                 for i, (r, s) in zip(saved_indices, saved_states):
                     schedule.assignments[i].room = r
                     schedule.assignments[i].timeslot = s
-                schedule.fitness = current_fit # Restaurer le score précédent
+                schedule.fitness = current_fit 
 
+            # Refroidissement géométrique
             temp *= self.sa_cooling
 
-
-        # Restaurer le meilleur état trouvé
+        # On applique le meilleur état rencontré durant toute la recherche locale
         for i, (r, s) in enumerate(best_state):
             schedule.assignments[i].room = r
             schedule.assignments[i].timeslot = s
     
-        # Recalcul complet après restauration (important pour h_violations)
+        # Recalcul final indispensable
         schedule.fitness = None
         self.get_score(schedule)
         
