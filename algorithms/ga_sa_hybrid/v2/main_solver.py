@@ -41,24 +41,20 @@ SA_COOLING = 0.965     # Refroidissement ideal pour sortir des minima locaux
 
 # 3. Masque des Contraintes (Activer/Desactiver des regles)
 CONSTRAINTS_MASK = {
-    # Contraintes Dures (Hard) — a respecter absolument
-    "H1": True,   # Pas deux cours au meme creneau pour le meme prof
-    "H2": True,   # Pas deux cours au meme creneau dans la meme salle
-    "H3": True,   # Pas deux cours au meme creneau pour le meme groupe
-    "H4": True,   # La capacite de la salle >= effectif du groupe
-    "H9": True,   # Respecter les indisponibilites des enseignants
-    "H10": True,  # Type de salle requis (Amphi / Salle TD)
-    "H12": True,  # Interdire les CM le Samedi (FIX: maintenant correctement comptabilise)
+    # Contraintes Dures (Hard)
+    "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H12": True,
 
-    # Contraintes Souples (Soft) — a optimiser
-    "S_MIXING":        True,   # Eviter le melange de modules dans une demi-journee
-    "S_CM_DISPERSION": True,   # Eviter les CM disperses matin + apres-midi
-    "S_GAPS":          True,   # Reduire les trous entre les cours
-    "S_BALANCE":       True,   # Equilibrer la charge horaire quotidienne
-    "S_STABILITY":     True,   # Un module reste dans la meme salle d une semaine a l autre
-    "S_EMPTY_DAYS":    True,   # Eviter les journees a une seule seance (trop courtes)
-    "S_PREFERENCES":   True,   # Eviter les creneaux sensibles (Samedi, fin de journee)
-    "S_FREE_AFTERNOONS": True, # Favoriser au moins 2 apres-midis vides par semaine
+    # Contraintes Souples (Soft)
+    "S_GAPS":          True,  # Réduire les trous (S3)
+    "S_LUNCH":         True,  # Pause déjeuner (S4)
+    "S_BALANCE":       True,  # Équilibre journalier (S5)
+    "S_STABILITY":     True,  # Stabilité des salles (S6)
+    "S_SHORT_DAY":     True,  # Éviter les journées trop courtes (S7)
+    "S_FREE_APM":      True,  # Après-midis libres (S8)
+    "S_FATIGUE":       True,  # Éviter la fatigue de fin de journée (S9)
+    "S_SATURDAY":      True,  # Pénalité samedi (S10)
+    "S_MIXING":        True,  # Éviter le mélange de modules
+    "S_CM_DISPERSION": True,  # Dispersion des CM
 }
 
 # 4. Parametres d'affichage
