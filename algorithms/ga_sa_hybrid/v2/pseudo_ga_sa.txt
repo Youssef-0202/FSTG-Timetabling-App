@@ -202,6 +202,29 @@ Procedure RECUIT_SIMULÉ_LOCAL(Individu, Iters, Alpha)
 28: 
 29: Retourner Snapshot
 
+Procedure SHIFT_COLLISION(Individu, Cache_Conflits)
+--------------------------------------------------
+1 :  Séance = Choisir_Au_Hasard(Cache_Conflits)
+2 :  Option = Choisir_Probabilité()
+3 :
+4 :  Si Option < 0.4 : Déplacer(Séance, Nouvelle_Salle, Nouveau_Créneau)
+5 :  Si Option < 0.7 : Changer_Salle_Uniquement(Séance)
+6 :  Sinon : Echanger_Créneaux(Séance, Autre_Séance_Du_Groupe) // SWAP
+7 :  
+8 :  Retourner Changements
+
+Procedure COMPACT_DAY(Individu)
+-------------------------------
+1 :  Séance = Choisir_Au_Hasard(Population_Mobile)
+2 :  Option = Choisir_Probabilité()
+3 :
+4 :  // Objectif : Réduire les "Trous" (Gaps) s'il n'y a plus de conflits Hard
+5 :  Si Option < 0.3 : Aligner_Salles_Du_Module(Séance.Module)
+6 :  Si Option < 0.6 : Rapprocher_Séance_Du_Prof(Séance) // Réduire S3 Prof
+7 :  Sinon : Rapprocher_Séance_Des_Etudiants(Séance)  // Réduire S3 Etudiant
+8 :
+9 :  Retourner Changements
+
 3. FORMULATION MATHÉMATIQUE DE LA FITNESS
 -----------------------------------------
 Le score d'un individu x est calculé par la fonction multi-objectifs hiérarchisée :

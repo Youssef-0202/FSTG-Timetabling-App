@@ -548,31 +548,37 @@ class HybridEngine:
 
     def _apply_hard_move(self, schedule, unlocked):
         """
-        Mouvements génériques (P6) pour casser les conflits physiques (H1-H4).
-        Inclut le mouvement SWAP intra-section.
+        Mouvements Génériques (P6) : Vise la résolution des conflits physiques (H1-H4).
+        
+        L'algorithme choisit entre trois types d'actions :
+        1. Shift Complet (40%) : Change la salle et le créneau.
+        2. Shift Salle (30%)   : Change uniquement la salle (utile si le créneau est bon).
+        3. Swap Intra (30%)    : Échange sa place avec un autre cours du même groupe ou section.
         """
         idx = random.choice(unlocked)
         a = schedule.assignments[idx]
         old_room, old_slot = a.room, a.timeslot
         
+        # Identification des ressources valides pour cette séance
         valid_slots = self._get_valid_slots(a.module_part)
         valid_rooms = [r for r in self.dm.rooms if r.capacity >= a.module_part.group_size]
         if a.module_part.required_room_type:
             valid_rooms = [r for r in valid_rooms if r.type == a.module_part.required_room_type]
-        if not valid_rooms: valid_rooms = self.dm.rooms # Fallback sécurité
+        if not valid_rooms: valid_rooms = self.dm.rooms # Fallback
         
         r = random.random()
         if r < 0.4:
-            # Shift Both : On change tout (Salle + Créneau)
+            # Action 1 : Déplacement total
             a.room = random.choice(valid_rooms)
             a.timeslot = random.choice(valid_slots)
             return [idx], [(old_room, old_slot)]
         elif r < 0.7:
-            # Shift Room Only : Le créneau est bon, mais la salle est en conflit
+            # Action 2 : Réallocation de salle
             a.room = random.choice(valid_rooms)
             return [idx], [(old_room, old_slot)]
         else:
-            # NOUVEAU : SWAP intra-groupe ou intra-section
+            # Action 3 : SWAP Intra-Groupe / Intra-Section
+            # On cherche une autre séance avec laquelle on pourrait intervertir nos créneaux
             sec_id = a.module_part.section_id
             a_groups = set(a.module_part.td_group_ids)
             
@@ -588,14 +594,13 @@ class HybridEngine:
                 other_idx = random.choice(candidates)
                 other = schedule.assignments[other_idx]
                 
-                # Vérifier si l'échange est légal pour le Samedi (si "other" est un CM sur Samedi on ne peut pas intervertir)
-                if a.module_part.type == "CM" and other.timeslot.day == "SAMEDI":
-                    a.timeslot = random.choice(valid_slots)
-                    return [idx], [(old_room, old_slot)]
-                if other.module_part.type == "CM" and a.timeslot.day == "SAMEDI":
+                # Vérification de sécurité pour le Samedi (H12)
+                if (a.module_part.type == "CM" and other.timeslot.day == "SAMEDI") or \
+                   (other.module_part.type == "CM" and a.timeslot.day == "SAMEDI"):
                     a.timeslot = random.choice(valid_slots)
                     return [idx], [(old_room, old_slot)]
 
+                # Échange de références (Double modification In-place)
                 old_room_other, old_slot_other = other.room, other.timeslot
                 a.timeslot, other.timeslot = other.timeslot, a.timeslot
                 return [idx, other_idx], [(old_room, old_slot), (old_room_other, old_slot_other)]
@@ -605,41 +610,38 @@ class HybridEngine:
 
     def _apply_soft_move(self, schedule, unlocked):
         """
-        RECHERCHE LOCALE GUIDÉE (P6 & P10) : Mouvements spécialisés pour le confort.
-        Cette méthode n'est appelée qu'en 'Phase Soft'. Elle utilise une intelligence
+        Mouvements Métier (P6 & P10) : Vise le confort pédagogique (S1-S8).
+        
+        Cette méthode n'est activée que lorsque H=0. Elle utilise une intelligence
         métier pour regrouper les cours au lieu de simplement les déplacer au hasard.
         """
         r = random.random()
         changed_indices, old_states = [], []
 
-        # LOGIQUE 1 : STABILISATION DES SALLES (Réduit S6)
+        # LOGIQUE 1 : STABILISATION DES SALLES (Optimise S6)
+        # On essaie de mettre toutes les séances d'un module dans la même salle.
         if r < 0.25:
-            # On choisit un module au hasard parmi ceux qui peuvent bouger
             mid_options = [(a.module_part.module_id, a.module_part.type) for i, a in enumerate(schedule.assignments) if i in unlocked]
             if not mid_options: return self._apply_hard_move(schedule, unlocked)
             mid, m_type = random.choice(mid_options)
             
-            # Identifier les séances correspondantes
             target_assigns = [i for i in unlocked if schedule.assignments[i].module_part.module_id == mid and schedule.assignments[i].module_part.type == m_type]
-            
-            # Déterminer les types et capacités requis
             max_cap = max(schedule.assignments[i].module_part.group_size for i in target_assigns)
             req_type = schedule.assignments[target_assigns[0]].module_part.required_room_type
             
             valid_rooms = [r for r in self.dm.rooms if r.capacity >= max_cap]
-            if req_type:
-                valid_rooms = [r for r in valid_rooms if r.type == req_type]
+            if req_type: valid_rooms = [r for r in valid_rooms if r.type == req_type]
             if not valid_rooms: valid_rooms = self.dm.rooms
             
             target_room = random.choice(valid_rooms)
             
-            # On aligne TOUTES les séances
             for i in target_assigns:
                 changed_indices.append(i)
                 old_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
                 schedule.assignments[i].room = target_room
         
-        # LOGIQUE 2 : COMPACTAGE DE LA JOURNÉE PROF (Réduit S3 pour les profs)
+        # LOGIQUE 2 : COMPACTAGE PROFESSEUR (Optimise S3 Profs)
+        # On déplace un cours vers un jour où le prof a déjà d'autres cours.
         elif r < 0.55:
             idx = random.choice(unlocked)
             a = schedule.assignments[idx]
@@ -651,14 +653,14 @@ class HybridEngine:
             if prof_assigns:
                 ref_day = random.choice(prof_assigns).timeslot.day
                 target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
-                
                 changed_indices.append(idx)
                 old_states.append((a.room, a.timeslot))
                 a.timeslot = target_slot
             else:
                 changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
 
-        # LOGIQUE 3 : COMPACTAGE DE LA JOURNÉE ÉTUDIANT (Réduit S3 - Gaps & S7 - Journée courte)
+        # LOGIQUE 3 : COMPACTAGE ÉTUDIANT (Optimise S3/S7 Sections)
+        # On déplace un cours vers un jour déjà occupé pour la section.
         elif r < 0.85:
             idx = random.choice(unlocked)
             a = schedule.assignments[idx]
@@ -670,36 +672,14 @@ class HybridEngine:
             if sec_assigns:
                 ref_day = random.choice(sec_assigns).timeslot.day
                 target_slot = random.choice([s for s in self.dm.timeslots if s.day == ref_day])
-                
                 changed_indices.append(idx)
                 old_states.append((a.room, a.timeslot))
                 a.timeslot = target_slot
             else:
                 changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
         
-        # LOGIQUE 4 : EXPLORATION RÉSIDUELLE
+        # LOGIQUE 4 : EXPLORATION ALÉATOIRE (Diversité)
         else:
             changed_indices, old_states = self._apply_hard_move(schedule, unlocked)
             
         return changed_indices, old_states
-
-    # ==========================================================================
-    # SECTION G : PERSPECTIVES & OPTIMISATIONS (P1 - DELTA SCORING)
-    # ==========================================================================
-
-    def _calculate_hard_delta_score(self, assignment, old_room, old_slot, new_room, new_slot, occupancy_maps):
-        """
-        [PROTOTYPE P1] : Algorithme de calcul incrémental en O(1).
-        
-        Rationnel : Au lieu de scanner les 245 séances (O(N)), cette méthode regarde
-        uniquement l'impact local du déplacement d'un cours.
-        
-        Fonctionnement :
-        1. On soustrait les conflits potentiels générés par l'ancienne position.
-        2. On ajoute les nouveaux conflits potentiels générés par la nouvelle position.
-        3. Le score total est mis à jour par simple addition (Delta).
-        """
-        delta = 0
-        # Cette logique sera branchée lors de la phase de montée en charge (Large Scale)
-        # pour garantir des performances fluides sur des milliers de séances.
-        pass
