@@ -37,6 +37,48 @@ Procedure MAIN_SOLVER()
 13:  Fin Tant que
 14:  Exporter_Json(Meilleur)
 
+Procedure INITIALISER_POPULATION()
+----------------------------------
+1 :  Pour k = 1 à (POP_SIZE * 0.8) :
+2 :      Individu = CONSTRUIRE_INDIVIDU_GREEDY() // 80% de solutions intelligentes
+3 :      Ajouter Individu à Population
+4 :  Fin Pour
+5 :  Pour k = 1 à (POP_SIZE * 0.2) :
+6 :      Ajouter Individu_Aléatoire() à Population // 20% pour la diversité
+7 :  Fin Pour
+
+Procedure CONSTRUIRE_INDIVIDU_GREEDY()
+--------------------------------------
+1 :  Initialiser_Registres_Vides(Prof_Used, Salle_Used, Groupe_Used)
+2 :  Seances = Mélanger_Aléatoirement(Liste_Toutes_Les_Séances)
+3 :
+4 :  Pour chaque S dans Seances :
+5 :      Si S est verrouillée :
+6 :          Placer S à sa position fixe
+7 :      Sinon :
+8 :          Options = Échantillonner_15_Créneaux_Aléatoires()
+9 :          Meilleur_Score = INFINI
+10:
+11:          Pour chaque (Créneau, Salle) dans Options :
+12:              Coût_Local = 0
+13:              // Vérification instantanée via les registres du passé
+14:              Si Prof_Used[S.Prof, Créneau] : Coût_Local += 1000
+15:              Si Salle_Used[Salle, Créneau] : Coût_Local += 1000
+16:              Si Groupe_Used[S.Groupe, Créneau] : Coût_Local += 1000
+17:              // Vérification contraintes spéciales (H10, H12, H13)
+18:              ... 
+19:              Si Coût_Local < Meilleur_Score :
+20:                  Meilleur_Score = Coût_Local
+21:                  Choix_Final = (Créneau, Salle)
+22:              Si Coût_Local == 0 : Break // Solution parfaite trouvée
+23:          Fin Pour
+24:      
+25:      // Mise à jour des registres pour les prochaines séances de CE MEME individu
+26:      Mise_à_jour_Registres(Choix_Final, Prof_Used, Salle_Used, Groupe_Used)
+27:      Enregistrer_Affectation(S, Choix_Final)
+28:  Fin Pour
+29:  Retourner Individu_Complet
+
 Procedure EVOLVE(Population)
 ---------------------------------
 1 :  Trier(Population, par fitness lexicographique) 

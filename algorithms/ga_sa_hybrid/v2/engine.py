@@ -120,7 +120,7 @@ class HybridEngine:
 
     def _build_greedy_individual(self):
         """
-        Heuristique constructive Greedy (P9) : placement séance par séance de manière intelligente.
+        simule un mini-calcul de contraintes pendant la création de l'individu : placement séance par séance de manière intelligente.
         Objectif : Éviter les conflits durs (H1->H14) dès la naissance de l'horaire, 
         pour donner une avance écrasante au Recuit Simulé.
         """
