@@ -136,7 +136,7 @@ def run_optimization():
         gen_start = time.time()
         
         # Executer une generation complete (tri + elitisme + crossover + mutation + SA)
-        engine.evolve()
+        sa_impact, diversity = engine.evolve()
         
         gen_dur = time.time() - gen_start
         
@@ -158,8 +158,8 @@ def run_optimization():
         print_generation_status(gen, engine.population[0], gen_dur, init_score, 
                                 CONSTRAINTS_MASK, verbose=VERBOSE)
 
-        # Enregistrement CSV (PFE Analytics)
-        csv_logger.log(gen, engine.population[0], gen_dur)
+        # Enregistrement CSV (PFE Analytics - Master Level)
+        csv_logger.log(gen, engine.population[0], gen_dur, diversity, sa_impact)
 
         # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
         if engine.population[0].h_violations == 0:

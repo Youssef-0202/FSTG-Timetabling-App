@@ -1,0 +1,36 @@
+# JOURNAL DE BORD DU PFE - MST TIMETABLING
+# Session du 03 Mai 2026 : Refactorisation et Audit Algorithmique V2.1
+
+## 1. TRAVAUX EFFECTUES SUR LE MOTEUR (engine.py)
+------------------------------------------------
+- Nettoyage des commentaires : Suppression des tags de debug (BUG FIX) et des prototypes.
+- Professionnalisation des docstrings : Explication des mecanismes de Memetique (GA+SA).
+- Clarification du "Polissage d'Elite" : Pourquoi on applique le SA meme sur les meilleurs (evitement des minima locaux).
+- Invalidation du Cache : Mise en place rigoureuse de `child.fitness = None` apres chaque croisement/mutation pour garantir la justesse des scores.
+
+## 2. MISE A JOUR DU PSEUDO-CODE (pseudo_ga_sa.txt)
+---------------------------------------------------
+- Synchronisation totale avec le code Python V2.1.
+- Ajout de la Procedure CONSTRUIRE_INDIVIDU_GREEDY (Initialisation intelligente).
+- Ajout de la Procedure INJECTER_DIVERSITE (Strategie Anti-stagnation de 5 generations).
+- Ajout de la Procedure CROISEMENT_MODULAIRE (Preservation des blocs de matieres).
+- Ajout de la Procedure MUTATION_PONDEREE (Mutation biaisee vers les conflits Hard).
+- Ajout des Procedures SHIFT_COLLISION et COMPACT_DAY (Mouvements specialises du SA).
+
+## 3. DECISIONS TECHNIQUES ET ARCHITECTURE
+-------------------------------------------
+- Selection : Utilisation du Tournoi (k=5) pour balancer Diversite et Vitesse.
+- Mutation : Cible prioritairement les conflits H1 (Prof), H2 (Salle) et H3 (Groupe).
+- Croisement : S'opere au niveau du "Module" pour garder la coherence pedagogique.
+- Performance : Passage par reference et modification "In-place" avec Undo pour minimiser l'usage de la RAM.
+- Delta-Scoring : Identifie comme la prochaine étape d'optimisation (Future Perspective).
+
+## 4. PROCHAINES ETAPES
+-----------------------
+- Validation pedagogique via les graphiques generes dans `logs/plots/`.
+- Developpement de l'interface Frontend pour la visualisation et validation administrative des resultats archives.
+- Finalisation du manuscrit en s'appuyant sur les nouveaux pseudo-codes scientifiquement solides.
+
+================================================================================
+FIN DU CONTEXTE V2.1
+================================================================================

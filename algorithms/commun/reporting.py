@@ -5,19 +5,24 @@ import os
 import sys
 
 def get_log_path():
-    """Détermine le chemin du fichier de log dans un dossier 'logs' dédié."""
-    try:
-        main_dir = os.path.dirname(os.path.abspath(sys.modules['__main__'].__file__))
-        log_dir = os.path.join(main_dir, "logs")
-        if not os.path.exists(log_dir):
+    """Détermine le chemin absolu du fichier de log (Force V2 Logs)."""
+    # Chemin absolu vers .../algorithms/ga_sa_hybrid/v2/logs
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
+    
+    if not os.path.exists(log_dir):
+        try:
             os.makedirs(log_dir)
-        return os.path.join(log_dir, "last_run_report.txt")
-    except:
-        return os.path.join(os.getcwd(), "last_run_report.txt")
+        except:
+            # Fallback ultime à la racine si même ça échoue
+            return os.path.join(os.getcwd(), "last_run_report.txt")
+            
+    return os.path.join(log_dir, "last_run_report.txt")
 
 def initialize_log_file(params, db_stats):
     """Cree l'en-tete du fichier de log avec les parametres et stats DB."""
     log_path = get_log_path()
+    print(f"[LOG] Initialisation du rapport dans : {log_path}")
 
     header = [
         "=" * 60,
@@ -51,9 +56,7 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
     from .constraints import calculate_fitness_full
     score, h, s, details = calculate_fitness_full(individual, mask)
     
-    # Amelioration par rapport au debut
     improvement = ((init_score - score) / max(1, init_score)) * 100
-    
     line = f" Gen {gen:03d} | Score: {score:8.0f} | H: {h} | S: {s:5.0f} | Imp: {improvement:>5.1f}% | Time: {gen_duration:4.2f}s"
     
     if h > 0:
@@ -70,7 +73,6 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
     best_overall = engine.population[0]
     final_fitnesses = [p.fitness for p in engine.population]
     avg_pop = statistics.mean(final_fitnesses)
-    std_pop = statistics.stdev(final_fitnesses) if len(final_fitnesses) > 1 else 0
     worst_pop = max(final_fitnesses)
     
     final_score, final_h, final_s, final_details = calculate_fitness_full(best_overall, mask)
@@ -90,13 +92,12 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
         f"  - Meilleure Solution    : {final_score}",
         f"  - Pire Solution         : {worst_pop}",
         f"  - Moyenne Population    : {avg_pop:.1f}",
-        f"  - Ecart-type (Std Dev)  : {std_pop:.1f}",
         "-" * 60,
         " DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :",
     ]
     
     for k, v in final_details.items():
-        if v > 0 or k.startswith('S'): # On affiche tout le detail final
+        if v > 0 or k.startswith('S'): 
             report_lines.append(f"  - {k:20} : {v}")
     
     report_lines.append("=" * 60)
@@ -105,36 +106,31 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
     if verbose:
         print(summary_text)
 
-    # Sauvegarde automatique (Ajout a la fin du fichier existant)
     log_path = get_log_path()
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(summary_text)
-    except:
-        pass
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(summary_text)
     
+    print(f"[REPORT] Rapport final mis à jour dans : {log_path}")
     return summary_text
 
 
 class HistoryLogger:
     """Enregistre l'historique complet (H1, H2, S1, S2...) dans un fichier CSV."""
     def __init__(self, filename="evolution_history.csv"):
-        try:
-            main_dir = os.path.dirname(os.path.abspath(sys.modules['__main__'].__file__))
-            log_dir = os.path.join(main_dir, "logs")
-            if not os.path.exists(log_dir):
-                os.makedirs(log_dir)
-            self.filepath = os.path.join(log_dir, filename)
-        except:
-            self.filepath = os.path.join(os.getcwd(), filename)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
         
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+            
+        self.filepath = os.path.join(log_dir, filename)
         self.headers_written = False
+        print(f"[CSV] Historique sera enregistré dans : {self.filepath}")
 
-    def log(self, gen, individual, gen_duration, diversity=0):
+    def log(self, gen, individual, gen_duration, diversity=0, sa_impact=0):
         import csv
         from .constraints import calculate_fitness_full
         
-        # On recalcule les détails complets (pas de masque pour avoir tout)
         score, h, s, details = calculate_fitness_full(individual, None)
         
         row = {
@@ -143,18 +139,15 @@ class HistoryLogger:
             "h_total": h,
             "s_total": s,
             "time": gen_duration,
-            "diversity": diversity
+            "diversity": diversity,
+            "sa_impact": sa_impact
         }
-        # Ajout de tous les détails (H1, H2, S1, S2...)
         row.update(details)
 
         mode = 'a' if self.headers_written else 'w'
-        try:
-            with open(self.filepath, mode, newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=row.keys())
-                if not self.headers_written:
-                    writer.writeheader()
-                    self.headers_written = True
-                writer.writerow(row)
-        except:
-            pass
+        with open(self.filepath, mode, newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=row.keys())
+            if not self.headers_written:
+                writer.writeheader()
+                self.headers_written = True
+            writer.writerow(row)

@@ -222,6 +222,10 @@ class Assignment(BaseModel):
         from_attributes = True
 
 # ─── STATS (Dashboard) ──────────────────────────────────────
+class DashboardStats(BaseModel):
+    total_teachers: int
+    total_rooms: int
+    total_sections: int
     total_modules: int
     total_assignments: int
     hard_violations: int

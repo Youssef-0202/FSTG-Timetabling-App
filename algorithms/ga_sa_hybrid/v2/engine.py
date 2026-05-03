@@ -272,53 +272,69 @@ class HybridEngine:
             self.get_score(ind)
 
     def evolve(self):
-        """
-        Exécute un cycle complet d'évolution mémétique (Génération GA + Raffinement SA).
-        
-        Processus :
-        1. ÉLITISME : Préservation des meilleurs individus pour garantir la non-régression.
-        2. POLISSAGE ÉLITE : Application du SA sur les élites pour franchir les paliers locaux.
-        3. REPRODUCTION : 
-           - Sélection par tournoi (Tournament Selection) riche en diversité.
-           - Croisement uniforme par module pour préserver les blocs cohérents.
-        4. MUTATION : Modification aléatoire ciblée sur les zones de conflit.
-        5. MÉMÉTIQUE : Chaque enfant subit une recherche locale intensive (SA) avant insertion.
-        6. SURVIE : Remplacement de l'ancienne population par les nouveaux individus polis.
-        """
+        """Execute une generation complete et retourne les métriques pour analyse Master."""
         # 1. Tri de la population par fitness (utilisation du cache)
         self.population.sort(key=lambda x: self.get_score(x))
 
         # 2. Elitisme : conserver les E meilleurs directement
         new_gen = self.population[:self.elitism]
         
-        # 2.5 SA sur l'Elite : Indispensable pour franchir les derniers paliers locaux (H=1/3 à H=0)
+        sa_impact_list = [] # Pour stocker les gains du SA
+
+        # 2.5 SA sur l'Elite : Indispensable pour franchir les derniers paliers locaux
         for i in range(len(new_gen)):
+            old_fit = new_gen[i].fitness if new_gen[i].fitness is not None else self.get_score(new_gen[i])
             new_gen[i] = self.simulated_annealing_search(new_gen[i])
+            sa_impact_list.append(max(0, old_fit - new_gen[i].fitness))
 
         # 3. Produire les (Pop_size - E) autres individus
         while len(new_gen) < self.pop_size:
-
-            # a. Selection par Tournoi : lire directement le cache fitness (
+            # a. Selection par Tournoi
             p1 = min(random.sample(self.population, min(5, len(self.population))), key=lambda x: x.fitness)
             p2 = min(random.sample(self.population, min(5, len(self.population))), key=lambda x: x.fitness)
 
-            # b. Croisement Uniforme : creer un Enfant
+            # b. Croisement Uniforme
             child = self.crossover(p1, p2)
-            child.fitness = None  # Invalider : le crossover casse le cache (
+            child.fitness = None
 
             # c. Mutation (Exploration) : 15% de chance
             if random.random() < self.mutation_rate:
                 self.mutate(child)
-                child.fitness = None  # Invalider : la mutation casse le cache (P2)
+                child.fitness = None
 
-            # d. Recherche Locale SA : Calcule et attache child.fitness une seule fois
+            # d. Recherche Locale SA : Mesure de l'impact memetique
+            old_fit_child = self.get_score(child)
             child = self.simulated_annealing_search(child)
+            sa_impact_list.append(max(0, old_fit_child - child.fitness))
 
             new_gen.append(child)
 
-        # 4 & 5. Remplacer et retrier la population (lecture du cache garantie)
+        # -- ANALYSE MASTER : Diversite & Stagnation --
+        avg_sa_impact = sum(sa_impact_list) / len(sa_impact_list)
+        diversity = self._calculate_population_diversity(new_gen)
+
+        # 4 & 5. Remplacer et retrier la population
         self.population = new_gen
         self.population.sort(key=lambda x: x.fitness)
+
+        return avg_sa_impact, diversity
+
+    def _calculate_population_diversity(self, pop):
+        """Calcule la diversité (Distance moyenne génotypique entre les individus)."""
+        if not pop: return 0
+        import random
+        # Echantillonnage de paires pour estimer l'espace de recherche explore
+        samples = min(10, len(pop))
+        total_dist = 0
+        for _ in range(samples):
+            idx1, idx2 = random.sample(range(len(pop)), 2)
+            dist = 0
+            ind1, ind2 = pop[idx1], pop[idx2]
+            for a1, a2 in zip(ind1.assignments, ind2.assignments):
+                if a1.room.id != a2.room.id or a1.timeslot.id != a2.timeslot.id:
+                    dist += 1
+            total_dist += (dist / len(ind1.assignments))
+        return (total_dist / samples) * 100 # En pourcentage de difference
 
 
     # SECTION E : OPERATEURS GENETIQUES
@@ -354,13 +370,7 @@ class HybridEngine:
         return Schedule(self.dm, new_assignments)
 
     def mutate(self, schedule):
-        """
-        Mutation Pondérée  : Focalise l'exploration sur les zones de conflit.
-        
-        Plutôt que de muter une séance au hasard, on calcule un poids pour chaque gène.
-        L'algorithme a ainsi beaucoup plus de chances de modifier une séance qui viole
-        une contrainte Hard qu'une séance déjà parfaitement placée.
-        """
+        """Mutation Ponderee : Focalise l exploration sur les zones de conflit."""
         if not schedule.assignments:
             return
             
@@ -429,8 +439,7 @@ class HybridEngine:
     # ==========================================================================
 
     def _find_conflicting_indices(self, schedule):
-        """Identifie les indices des assignments qui causent un conflit de groupe (H3).
-        Retourne une liste d'indices ciblés pour le mouvement hard."""
+        """Identifie les indices des assignments qui causent un conflit de groupe (H3)."""
         group_slots = {}
         conflicting = set()
         for i, a in enumerate(schedule.assignments):
@@ -445,13 +454,7 @@ class HybridEngine:
         return list(conflicting)
 
     def simulated_annealing_search(self, schedule):
-        """
-        Recherche Locale par Recuit Simulé (SA) optimisée.
-        
-        Cette méthode affine l'individu en explorant son voisinage. Elle utilise
-        une logique bi-phasée (Hard d'abord, puis Soft) et une modification
-        directe (In-place) avec capacité d'annulation (Undo) pour maximiser les performances.
-        """
+        """Recherche Locale par Recuit Simule (SA) bi-phasee et optimisee."""
         current_sch = schedule
         current_fit = self.get_score(current_sch)
         
@@ -609,12 +612,7 @@ class HybridEngine:
                 return [idx], [(old_room, old_slot)]
 
     def _apply_soft_move(self, schedule, unlocked):
-        """
-        Mouvements Métier (P6 & P10) : Vise le confort pédagogique (S1-S8).
-        
-        Cette méthode n'est activée que lorsque H=0. Elle utilise une intelligence
-        métier pour regrouper les cours au lieu de simplement les déplacer au hasard.
-        """
+        """Mouvements Metier : Vise le confort pedagogique (S1-S10) quand H=0."""
         r = random.random()
         changed_indices, old_states = [], []
 
