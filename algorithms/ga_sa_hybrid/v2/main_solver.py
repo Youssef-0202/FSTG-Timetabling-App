@@ -28,16 +28,16 @@ from engine import HybridEngine
 # ==============================================================================
 
 # 1. Parametres de l'Algorithme Genetique (GA)
-POP_SIZE = 30          # Réduit : moins de calcul par génération (était 60)
-MAX_GEN = 300          # Augmenté : plus de générations possibles (était 150)
-MUTATION_RATE = 0.45   # Augmenté : casser les plateaux (était 0.35)
+POP_SIZE = 30          # Optimal selon Grid Search
+MAX_GEN = 300          # Large budget pour convergence totale
+MUTATION_RATE = 0.40   # Record de performance au Round 3
 ELITISM = 2
 MAX_GEN_AFTER_H0 = 50
 
 # 2. Parametres du Recuit Simule (SA) - Recherche Locale
-SA_ITERATIONS = 600    # Doublé : donner plus de force au SWAP intra-section (était 300)
-SA_TEMP = 50.0         # La temp réelle est adaptative (score * 0.05 dans engine.py)
-SA_COOLING = 0.97      # Refroidissement LENT : reste chaud plus longtemps (était 0.90)
+SA_ITERATIONS = 1200   # Force maximale pour polissage Soft (Score < 8000)
+SA_TEMP = 50.0
+SA_COOLING = 0.965     # Refroidissement ideal pour sortir des minima locaux
 
 # 3. Masque des Contraintes (Activer/Desactiver des regles)
 CONSTRAINTS_MASK = {
