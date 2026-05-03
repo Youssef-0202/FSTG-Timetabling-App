@@ -98,7 +98,7 @@ class HybridEngine:
         
         for k in range(self.pop_size):
             if k < n_greedy:
-                # 80% de solutions intelligentes (H1/H2/H3 minimisés)
+                # 80% de solutions intelligentes (hard constraints minimisés)
                 schedule = self._build_greedy_individual()
             else:
                 # 20% de solutions purement aléatoires

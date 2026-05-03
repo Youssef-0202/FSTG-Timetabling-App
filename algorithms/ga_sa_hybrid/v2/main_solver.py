@@ -1,4 +1,3 @@
-
 # ==============================================================================
 # main_solver.py — Chef d Orchestre de l algorithme GA+SA
 # 
@@ -14,10 +13,8 @@ import sys
 import json
 import time
 from datetime import datetime
-
-# Ajouter le chemin racine pour permettre les imports de 'commun'
+# Ajouter le chemin racine 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 from commun.data_manager import DataManager
 from commun.models import Schedule
 from commun.constraints import calculate_fitness_full
@@ -27,15 +24,15 @@ from engine import HybridEngine
 # CONFIGURATION ET PARAMÈTRES 
 # ==============================================================================
 
-# 1. Parametres de l'Algorithme Genetique (GA)
-POP_SIZE = 30          # Optimal selon Grid Search
+# 1. Parametres de l'Algorithme Genetique (GA) selon Grid Search
+POP_SIZE = 30          
 MAX_GEN = 300          # Large budget pour convergence totale
-MUTATION_RATE = 0.40   # Record de performance au Round 3
+MUTATION_RATE = 0.40   # Record de performance en GS
 ELITISM = 2
 MAX_GEN_AFTER_H0 = 50
 
 # 2. Parametres du Recuit Simule (SA) - Recherche Locale
-SA_ITERATIONS = 1200   # Force maximale pour polissage Soft (Score < 8000)
+SA_ITERATIONS = 1200   # Force maximale pour polissage Soft 
 SA_TEMP = 50.0
 SA_COOLING = 0.965     # Refroidissement ideal pour sortir des minima locaux
 
@@ -61,19 +58,21 @@ CONSTRAINTS_MASK = {
 VERBOSE = True
 
 
-
 # SECTION B : FLUX PRINCIPAL DE L ALGORITHME
 # ==============================================================================
 
 def run_optimization():
     """
-    Flux complet de l algorithme hybride GA+SA :
-
-    ETAPE 1 : Charger les donnees depuis l API 
-    ETAPE 2 : Creer la population initiale aleatoire 
-    ETAPE 3 : Boucle evolutive GA Generation par Generation
-    ETAPE 4 : Critere d arret anticipe (Early Stopping quand Hard=0)
-    ETAPE 5 : Exporter le meilleur emploi du temps en JSON
+    Flux d'optimisation mémétique V2.1 :
+    
+    1. INIT : Synchronisation des données (API REST) et initialisation des logs (CSV Analytics).
+    2. SEEDING : Création d'une population initiale par recherche gloutonne (Greedy) pour limiter H au départ.
+    3. MÉMÉTIQUE : Boucle d'évolution combinant :
+       - Sélection par tournoi et Croisement modulaire.
+       - Mutation guidée par les conflits.
+       - Raffinement par Recuit Simulé (SA) local pour chaque individu.
+    4. STABILITÉ : Surveillance de la convergence pour un arrêt anticipé (Early Stopping).
+    5. ARCHIVAGE : Exportation JSON, génération du rapport et synchronisation SQL (Archive DB).
     """
 
     # ── ETAPE 1 : Chargement des donnees ──
