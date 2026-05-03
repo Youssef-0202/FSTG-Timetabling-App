@@ -1,10 +1,5 @@
-================================================================================
-            DOCUMENTATION SCIENTIFIQUE : ALGORITHME HYBRIDE GA+SA (V2.1)
-================================================================================
-Auteur : Youssef (Master IAII)
-Sujet  : Ordonnancement Universitaire FST Marrakech
-Méthode : Algorithme Mémétique (Génétique + Recuit Simulé Local)
-================================================================================
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME HYBRIDE GA+SA (V2.1)
+
 
 1. ARCHITECTURE GLOBALE (Évolution V1 -> V2.1)
 ---------------------------------------------
@@ -13,46 +8,46 @@ génétique), mais remplace la recherche locale "aveugle" par une recherche
 **"Guidée par la Connaissance du Domaine"** et une évaluation haute performance.
 
 Les 3 piliers du saut qualitatif :
-- **Mouvements Guidés** : Ciblent chirurgicalement les séances en conflit (Phase Hard)
+- Mouvements Guidés : Ciblent chirurgicalement les séances en conflit (Phase Hard)
   ou les opportunités de regroupement pédagogique (Phase Soft).
-- **Delta-Scoring** : Ne recalcule que la variation de score (Gain de vitesse x10).
-- **In-place Mutation with Undo** : Zéro allocation mémoire durant le Recuit 
+- Delta-Scoring : Ne recalcule que la variation de score (Gain de vitesse x10).
+- In-place Mutation with Undo : Zéro allocation mémoire durant le Recuit 
   Simulé (évite les copies d'objets coûteuses).
 
 
 
 
-2. PSEUDO-CODE DÉTAILLÉ
+2. PSEUDO-CODE :
 -----------------------
 
 Procedure MAIN_SOLVER()
 -----------------------
-1:  DM = Charger_Données_API()
-2:  Calculer_Graphe_Filières() // Pré-calcul statique (Related Sections)
-3:  Population = Initialiser_Greedy(30, 0.8) // 80% Glouton, 20% Aléatoire
-4:  
-5:  Tant que Gen < MAX_GEN ET Stagnation < LIMITE :
-6:      Population = EVOLVE_V2_1(Population)
-7:      Meilleur = Population[0]
-8:      
-9:      Si Meilleur.H_Violations == 0 :
+1 :  DM = Charger_Données_API()
+2 :  Calculer_Graphe_Filières() // Pré-calcul statique (Related Sections)
+3 :  Population = Initialiser_Greedy(30, 0.8) // 80% Glouton, 20% Aléatoire
+4 :  
+5 :  Tant que Gen < MAX_GEN ET Stagnation < LIMITE :
+6 :      Population = EVOLVE(Population)
+7 :      Meilleur = Population[0]
+8 :      
+9 :      Si Meilleur.H_Violations == 0 :
 10:         Phase = "POLISHING_SOFT"
 11:         Incrémenter Compteur_Early_Stopping
 12:      Fin Si
 13:  Fin Tant que
 14:  Exporter_Json(Meilleur)
 
-Procedure EVOLVE_V2_1(Population)
+Procedure EVOLVE(Population)
 ---------------------------------
-1:  Trier(Population, par fitness lexicographique) 
-2:  Nouvelle_Pop = Population[0..ELITISM] // Conservation des génies
-3:  
-4:  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
-5:      // 1. Sélection
-6:      P1, P2 = Sélection_Tournoi(Population, k=3)
-7:      
-8:      // 2. Croisement Modulaire (Crossover)
-9:      Enfant = Crossover_Par_Module(P1, P2)
+1 :  Trier(Population, par fitness lexicographique) 
+2 :  Nouvelle_Pop = Population[0..ELITISM] // Conservation des génies
+3 :  
+4 :  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+5 :      // 1. Sélection
+6 :      P1, P2 = Sélection_Tournoi(Population, k=3)
+7 :      
+8 :      // 2. Croisement Modulaire (Crossover)
+9 :      Enfant = Crossover_Par_Module(P1, P2)
 10:     
 11:     // 3. Mutation Guidée (Inversion des Conflits)
 12:     Si Random() < MUTATION_RATE :
@@ -69,15 +64,15 @@ Procedure EVOLVE_V2_1(Population)
 
 Procedure RECUIT_SIMULÉ_LOCAL(Individu, Iters, Alpha)
 -----------------------------------------------------
-1:  T0 = Individu.Total_Score * 0.05 // Température adaptative
-2:  Courant_S = Individu.Total_Score
-3:  Snapshot = Copy_Light(Individu)
-4:  
-5:  Pour i = 1 à Iters :
-6:      // Choix du mouvement stratégique
-7:      Si Individu.H_Violations > 0 :
-8:          Move = SHIFT_COLLISION(Individu) // Cible un prof/salle occupé
-9:      Sinon :
+1 :  T0 = Individu.Total_Score * 0.05 // Température adaptative
+2 :  Courant_S = Individu.Total_Score
+3 :  Snapshot = Copy_Light(Individu)
+4 :  
+5 :  Pour i = 1 à Iters :
+6 :      // Choix du mouvement stratégique
+7 :      Si Individu.H_Violations > 0 :
+8 :          Move = SHIFT_COLLISION(Individu) // Cible un prof/salle occupé
+9 :      Sinon :
 10:         Move = COMPACT_DAY(Individu)     // Cible un trou S3 ou stabilité S6
 11:     Fin Si
 12:     
@@ -123,12 +118,12 @@ FIN DU DOCUMENT V2.1
 
 
 Ce qui change réellement entre V1 et V2.1 :
-Du "Hasard" vers le "Ciblage" :
+----> Du "Hasard" vers le "Ciblage" :
 V1 : Le SA faisait des mouvements aléatoires (Random Shift/Swap) sur n'importe quelle séance.
 V2.1 : Le SA est "Conscient des Conflits". S'il y a un problème de prof (H1), il n'essaie de bouger que les séances en conflit. S'y il n'y a plus de conflits, il n'essaie de faire que des mouvements bénéfiques pour les "Trous" (S3) ou la "Stabilité" (S6).
-La Vitesse (Delta-Scoring) :
+----> La Vitesse (Delta-Scoring) :
 V1 : Chaque mouvement du SA recalculait toute l'infirmerie des contraintes ($O(N^2)$). Très lent.
 V2.1 : On ne calcule que la différence provoquée par le mouvement (Delta-Scoring). C'est ce qui a permis de passer de 400 à 1200 itérations sans ramer.
-La Mémoire (Undo Logic) :
+----> La Mémoire (Undo Logic) :
 V1 : On faisait une copie complète de l'individu (Child.copy()) à chaque étape.
 V2.1 : On modifie l'individu directement "en place", et si le score est mauvais, on fait "Undo" (on revient en arrière). Zéro copie mémoire.
