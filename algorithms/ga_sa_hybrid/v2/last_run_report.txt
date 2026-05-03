@@ -20,3 +20,28 @@
 ============================================================
  SUIVI DES GENERATIONS :
 ============================================================
+
+============================================================
+ ANALYSE FINALE DES PERFORMANCES 
+============================================================
+ Temps total d'execution  : 2301.32 secondes
+ Generations effectuees   : 52
+------------------------------------------------------------
+ Score Initial (Best)     : 50018954.0
+ Score Final   (Best)     : 8477.5
+ Amelioration Totale      : 100.0 %
+------------------------------------------------------------
+ STATISTIQUES DE LA DERNIERE POPULATION :
+  - Meilleure Solution    : 8477.5
+  - Pire Solution         : 5056391.25
+  - Moyenne Population    : 1565504.5
+  - Ecart-type (Std Dev)  : 1392134.9
+------------------------------------------------------------
+ DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
+  - S_Total              : 8477.5
+  - S3_Gaps              : 720
+  - S4_Lunch             : 960
+  - S6_Stab              : 4000
+  - S8_FreeApm           : 800
+  - S10_Sat              : 0
+============================================================

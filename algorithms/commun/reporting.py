@@ -5,12 +5,14 @@ import os
 import sys
 
 def get_log_path():
-    """Détermine le chemin du fichier de log (à côté du script principal)."""
+    """Détermine le chemin du fichier de log dans un dossier 'logs' dédié."""
     try:
         main_dir = os.path.dirname(os.path.abspath(sys.modules['__main__'].__file__))
-        return os.path.join(main_dir, "last_run_report.txt")
+        log_dir = os.path.join(main_dir, "logs")
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        return os.path.join(log_dir, "last_run_report.txt")
     except:
-        # Repli sur le dossier courant si __main__ n'est pas accessible
         return os.path.join(os.getcwd(), "last_run_report.txt")
 
 def initialize_log_file(params, db_stats):
@@ -112,3 +114,47 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
         pass
     
     return summary_text
+
+
+class HistoryLogger:
+    """Enregistre l'historique complet (H1, H2, S1, S2...) dans un fichier CSV."""
+    def __init__(self, filename="evolution_history.csv"):
+        try:
+            main_dir = os.path.dirname(os.path.abspath(sys.modules['__main__'].__file__))
+            log_dir = os.path.join(main_dir, "logs")
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+            self.filepath = os.path.join(log_dir, filename)
+        except:
+            self.filepath = os.path.join(os.getcwd(), filename)
+        
+        self.headers_written = False
+
+    def log(self, gen, individual, gen_duration, diversity=0):
+        import csv
+        from .constraints import calculate_fitness_full
+        
+        # On recalcule les détails complets (pas de masque pour avoir tout)
+        score, h, s, details = calculate_fitness_full(individual, None)
+        
+        row = {
+            "gen": gen,
+            "score": score,
+            "h_total": h,
+            "s_total": s,
+            "time": gen_duration,
+            "diversity": diversity
+        }
+        # Ajout de tous les détails (H1, H2, S1, S2...)
+        row.update(details)
+
+        mode = 'a' if self.headers_written else 'w'
+        try:
+            with open(self.filepath, mode, newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=row.keys())
+                if not self.headers_written:
+                    writer.writeheader()
+                    self.headers_written = True
+                writer.writerow(row)
+        except:
+            pass

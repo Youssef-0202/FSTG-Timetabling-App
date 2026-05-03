@@ -88,7 +88,7 @@ def run_optimization():
         return
 
     # ── ETAPE 2 : Statistiques et Initialisation Log ──
-    from commun.reporting import print_generation_status, generate_final_report, initialize_log_file
+    from commun.reporting import print_generation_status, generate_final_report, initialize_log_file, HistoryLogger
     
     db_stats = {
         "nb_teachers": len(dm.teachers),
@@ -103,6 +103,7 @@ def run_optimization():
     }
     
     initialize_log_file(params, db_stats)
+    csv_logger = HistoryLogger()
     
     start_time_exec = time.time()
     engine = HybridEngine(
@@ -158,6 +159,9 @@ def run_optimization():
         # Affichage du statut (Encapsule dans reporting.py)
         print_generation_status(gen, engine.population[0], gen_dur, init_score, 
                                 CONSTRAINTS_MASK, verbose=VERBOSE)
+
+        # Enregistrement CSV (PFE Analytics)
+        csv_logger.log(gen, engine.population[0], gen_dur)
 
         # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
         if engine.population[0].h_violations == 0:
