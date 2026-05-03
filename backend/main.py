@@ -480,3 +480,40 @@ def get_preview_schedule():
     with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
+# --- GESTION DES RÉSULTATS D'OPTIMISATION ---
+
+@app.get("/timetable-results", response_model=List[schemas.TimetableResult])
+def list_timetable_results(db: Session = Depends(get_db)):
+    """Liste tous les emplois du temps générés par ordre chronologique inverse."""
+    return db.query(models.TimetableResult).order_by(models.TimetableResult.id.desc()).all()
+
+@app.post("/timetable-results", response_model=schemas.TimetableResult, status_code=201)
+def create_timetable_result(result: schemas.TimetableResultCreate, db: Session = Depends(get_db)):
+    """Sauvegarde un nouveau résultat de génération (appelé par le solveur)."""
+    db_res = models.TimetableResult(**result.model_dump())
+    db.add(db_res); db.commit(); db.refresh(db_res)
+    return db_res
+
+@app.put("/timetable-results/{res_id}/validate", response_model=schemas.TimetableResult)
+def validate_timetable_result(res_id: int, db: Session = Depends(get_db)):
+    """Valide officiellement un emploi du temps et dé-valide les précédents."""
+    # Optionnel : On peut décider de n'avoir qu'un seul EDT validé à la fois
+    db.query(models.TimetableResult).update({models.TimetableResult.is_validated: False})
+    
+    res = db.query(models.TimetableResult).filter(models.TimetableResult.id == res_id).first()
+    if not res:
+        raise HTTPException(status_code=404, detail="Résultat introuvable")
+    
+    res.is_validated = True
+    db.commit(); db.refresh(res)
+    return res
+
+@app.delete("/timetable-results/{res_id}", status_code=204)
+def delete_timetable_result(res_id: int, db: Session = Depends(get_db)):
+    """Supprime un ancien résultat de l'historique."""
+    res = db.query(models.TimetableResult).filter(models.TimetableResult.id == res_id).first()
+    if not res:
+        raise HTTPException(status_code=404, detail="Résultat introuvable")
+    db.delete(res); db.commit()
+

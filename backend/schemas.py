@@ -222,10 +222,22 @@ class Assignment(BaseModel):
         from_attributes = True
 
 # ─── STATS (Dashboard) ──────────────────────────────────────
-class DashboardStats(BaseModel):
-    total_teachers: int
-    total_rooms: int
-    total_sections: int    # Modifié par rapport à total_groups
     total_modules: int
     total_assignments: int
     hard_violations: int
+
+# ─── TIMETABLE RESULT ───────────────────────────────────────
+class TimetableResultBase(BaseModel):
+    created_at: str
+    score_hard: int
+    score_soft: float
+    data: List[Any]
+    is_validated: bool = False
+
+class TimetableResultCreate(TimetableResultBase):
+    pass
+
+class TimetableResult(TimetableResultBase):
+    id: int
+    class Config:
+        from_attributes = True

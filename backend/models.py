@@ -231,3 +231,21 @@ class Assignment(Base):
     timeslot = relationship("Timeslot", back_populates="assignments")
     section = relationship("Section", back_populates="assignments")
     td_groups = relationship("TDGroup", secondary=assignment_tdgroups, back_populates="assignments")
+
+
+# =============================================================================
+# PARTIE 6 : ARCHIVAGE ET RÉSULTATS
+# =============================================================================
+
+class TimetableResult(Base):
+    """
+    Stocke le résultat d'un run du solveur (une solution complète).
+    Permet de garder une trace de chaque tentative et de valider la meilleure.
+    """
+    __tablename__ = "timetable_results"
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(String)     # Date et heure de génération (ISO)
+    score_hard = Column(Integer)    # Nombre de violations Hard (Cible 0)
+    score_soft = Column(Float)      # Score de qualité Soft
+    data = Column(JSON)             # La liste complète des affectations (JSON)
+    is_validated = Column(Boolean, default=False) # True si l'admin a validé cet EDT

@@ -202,6 +202,39 @@ def export_schedule_to_json(schedule):
     
     if VERBOSE:
         print(f"\n[EXPORT] Solution sauvegardee dans : {os.path.basename(file_path)}")
+    
+    # ── ÉTAPE 6 : Archivage permanent en Base de Données ──
+    # On délègue à une fonction séparée pour ne pas bloquer si l'API est éteinte
+    save_result_to_db(schedule, output)
+
+def save_result_to_db(schedule, formatted_data):
+    """Envoie le résultat à l'API pour stockage permanent dans la table TimetableResult."""
+    import requests
+    try:
+        url = "http://localhost:8000/timetable-results"
+        
+        # On recalcule h et soft pour être sûr d'avoir les dernières valeurs
+        _, h, soft, _ = calculate_fitness_full(schedule, CONSTRAINTS_MASK)
+        
+        payload = {
+            "created_at": datetime.now().isoformat(),
+            "score_hard": int(h),
+            "score_soft": float(soft),
+            "data": formatted_data,
+            "is_validated": False
+        }
+        
+        response = requests.post(url, json=payload, timeout=5)
+        if response.status_code == 201:
+            res_id = response.json().get('id')
+            if VERBOSE:
+                print(f"[DB] Succès : Résultat archivé dans l'historique (ID : {res_id})")
+        else:
+            if VERBOSE:
+                print(f"[DB] Erreur lors de l'archivage : {response.status_code}")
+    except Exception as e:
+        if VERBOSE:
+            print(f"[DB] Note : API indisponible pour l'archivage automatique ({e})")
 
 if __name__ == "__main__":
     run_optimization()
