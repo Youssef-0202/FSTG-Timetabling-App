@@ -126,12 +126,12 @@ def run_optimization():
     if VERBOSE:
         print(f"\n[START] Lancement GA-SA Hybrid Solver")
         print(f"        Seances a placer: {db_stats['nb_module_parts']} | Score Initial: {init_score}")
-
-    h_zero_since = 0
-    stagnation_count = 0          #  Compteur de stagnation
-    last_best_score = init_score  #  Référence pour détecter le plateau
-
-    # ── ETAPE 3 : Boucle Evolutive GA ──
+        print(f"        Initial H-Violations: {init_h} | Soft Score: {init_soft}")
+    
+    # ── ETAPE 3 : Evolution Memetique ──
+    CONVERGENCE_TARGET_REACHED = False
+    convergence_counter = 0
+    
     for gen in range(1, MAX_GEN + 1):
         gen_start = time.time()
         
@@ -140,103 +140,45 @@ def run_optimization():
         
         gen_dur = time.time() - gen_start
         
-        current_best_score = engine.population[0].fitness
-
-        # Détection de stagnation et injection de diversité
-        if current_best_score >= last_best_score:
-            stagnation_count += 1
-        else:
-            stagnation_count = 0
-            last_best_score = current_best_score
-
-        if stagnation_count >= 5 and engine.population[0].h_violations > 0:
-            if VERBOSE: print(f"\n DIVERSITY : Stagnation détectée à Gen {gen} (score={current_best_score:.0f}) => Injection de diversité...")
-            engine.inject_diversity()
-            stagnation_count = 0
-
-        # Affichage du statut (Encapsule dans reporting.py)
-        print_generation_status(gen, engine.population[0], gen_dur, init_score, 
-                                CONSTRAINTS_MASK, verbose=VERBOSE)
-
+        best = engine.population[0]
+        
+        # Affichage status console
+        if VERBOSE:
+            print_generation_status(gen, best, gen_dur, diversity, sa_impact)
+            
         # Enregistrement CSV (PFE Analytics - Master Level)
-        csv_logger.log(gen, engine.population[0], gen_dur, diversity, sa_impact)
-
+        csv_logger.log(gen, best, gen_dur, diversity, sa_impact)
+        
         # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
         if engine.population[0].h_violations == 0:
-            if h_zero_since == 0:
-                # PREMIÈRE fois qu'on atteint H=0 : on sauvegarde immédiatement !
-                if VERBOSE: print(f"\n[SAVE] H=0 atteint à la Gen {gen} ! Sauvegarde intermédiaire...")
-                export_schedule_to_json(engine.population[0])
-            h_zero_since += 1
-            if h_zero_since >= MAX_GEN_AFTER_H0:
-                if VERBOSE: print(f"\n[STOP] Convergence de stabilite atteinte.")
-                break
-        else:
-            h_zero_since = 0
-
-    # ── ETAPE 4 : Rapport Final et Statistiques ──
-    duration = time.time() - start_time_exec
-    generate_final_report(engine, duration, init_score, CONSTRAINTS_MASK, actual_generations=gen, verbose=VERBOSE)
-
-    # ── ETAPE 5 : Export JSON final pour l'interface ──
-    export_schedule_to_json(engine.population[0])
-
-def export_schedule_to_json(schedule):
-    """Convertit l'emploi du temps en format JSON compatible avec le frontend."""
-    output = []
-    for a in schedule.assignments:
-        output.append({
-            "id": a.module_part.id, # ID de l'affectation
-            "module_part_id": a.module_part.module_id, # ID réel de la partie de module (DB)
-            "teacher_id": a.module_part.teacher_id,
-            "room_id": a.room.id,
-            "slot_id": a.timeslot.id,
-            "section_id": a.module_part.section_id,
-            "td_groups": [{"id": g_id} for g_id in a.module_part.td_group_ids]
-        })
+            if CONVERGENCE_TARGET_REACHED: 
+                convergence_counter += 1
+            else:
+                CONVERGENCE_TARGET_REACHED = True
+                convergence_counter = 1
+        
+        if convergence_counter >= MAX_GEN_AFTER_H0:
+            print("\n[FIN] Stagnation de la qualité ou perfection atteinte. Arrêt anticipé.")
+            break
+            
+    # ── ETAPE 4 : Finalisation et Archivage ──
+    total_duration = time.time() - start_time_exec
+    best_final = engine.population[0]
     
-    # On remonte de 4 niveaux : main_solver.py -> v2 -> ga_sa_hybrid -> algorithms -> Racine/_Project_PFE
-    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    file_path = os.path.join(root_dir, "backend", "generated_timetable.json")
+    # 1. Mise a jour SQL (Archive)
+    best_final.sync_to_db()
     
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=4)
+    # 2. Rapport Final
+    generate_final_report(total_duration, gen, engine.population)
     
-    if VERBOSE:
-        print(f"\n[EXPORT] Solution sauvegardee dans : {os.path.basename(file_path)}")
-    
-    # ── ÉTAPE 6 : Archivage permanent en Base de Données ──
-    # On délègue à une fonction séparée pour ne pas bloquer si l'API est éteinte
-    save_result_to_db(schedule, output)
-
-def save_result_to_db(schedule, formatted_data):
-    """Envoie le résultat à l'API pour stockage permanent dans la table TimetableResult."""
-    import requests
+    # 3. Export JSON pour le Frontend
     try:
-        url = "http://localhost:8000/timetable-results"
-        
-        # On recalcule h et soft pour être sûr d'avoir les dernières valeurs
-        _, h, soft, _ = calculate_fitness_full(schedule, CONSTRAINTS_MASK)
-        
-        payload = {
-            "created_at": datetime.now().isoformat(),
-            "score_hard": int(h),
-            "score_soft": float(soft),
-            "data": formatted_data,
-            "is_validated": False
-        }
-        
-        response = requests.post(url, json=payload, timeout=5)
-        if response.status_code == 201:
-            res_id = response.json().get('id')
-            if VERBOSE:
-                print(f"[DB] Succès : Résultat archivé dans l'historique (ID : {res_id})")
-        else:
-            if VERBOSE:
-                print(f"[DB] Erreur lors de l'archivage : {response.status_code}")
+        export_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "generated_timetable.json")
+        with open(export_path, 'w', encoding='utf-8') as f:
+            json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
+        print(f"[EXPORT] Solution sauvegardee dans : {os.path.basename(export_path)}")
     except Exception as e:
-        if VERBOSE:
-            print(f"[DB] Note : API indisponible pour l'archivage automatique ({e})")
+        print(f"[ERREUR] Export echoue : {e}")
 
 if __name__ == "__main__":
     run_optimization()

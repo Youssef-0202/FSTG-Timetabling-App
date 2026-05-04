@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import glob
 
 # --- MAPPING POUR LA SOUTENANCE (Friendly Names) ---
 NAMES = {
@@ -24,88 +25,138 @@ NAMES = {
     "S10_Sat": "Samedi (S10)"
 }
 
-CSV_FILE = "evolution_history.csv"
-OUTPUT_DIR = "plots"
+# Détection automatique des chemins
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_FILE = os.path.join(BASE_DIR, "evolution_history.csv")
+OUTPUT_DIR = os.path.join(BASE_DIR, "plots")
 
-def generate_master_dashboard():
+def cleanup_old_plots():
+    """Supprime les anciens fichiers 1.png, 2.png, 3.png etc."""
+    for f in glob.glob(os.path.join(OUTPUT_DIR, "[1-9].png")):
+        try: os.remove(f)
+        except: pass
+
+def save_individual_plot(name, fig_func, df):
+    """Génère et sauvegarde un plot seul."""
+    plt.figure(figsize=(10, 6))
+    fig_func(plt.gca(), df)
+    plt.savefig(os.path.join(OUTPUT_DIR, f"{name}.png"), dpi=150, bbox_inches='tight')
+    plt.close()
+
+# --- FONCTIONS DE DESSIN ---
+def draw_convergence(ax, df):
+    ax.set_title("Analyse de la Convergence (Faisabilité vs Qualité)", fontsize=12, fontweight='bold')
+    
+    # Courbe Hard (Rouge - Axe Gauche)
+    lns1 = ax.plot(df['gen'], df['h_total'], label='Violations Hard', 
+                   color='red', linewidth=2, marker='x', markevery=5)
+    ax.set_ylabel("Violations Hard", color='red')
+    ax.tick_params(axis='y', labelcolor='red')
+    
+    # Force les entiers pour éviter les 0.5
+    import matplotlib.ticker as ticker
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    
+    # Création du deuxième axe pour le Soft
+    ax2 = ax.twinx()
+    lns2 = ax2.plot(df['gen'], df['s_total'], label='Score Soft', 
+                    color='blue', linestyle='--', linewidth=1.5, marker='o', markevery=5, alpha=0.7)
+    ax2.set_ylabel("Pénalités Soft", color='blue')
+    ax2.tick_params(axis='y', labelcolor='blue')
+    
+    ax.set_xlabel("Générations")
+    
+    # Fusion des légendes en bas
+    lns = lns1 + lns2
+    labs = [l.get_label() for l in lns]
+    ax.legend(lns, labs, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, fontsize=10)
+
+def draw_diversity(ax, df):
+    ax.set_title("Exploration de l'Espace (Diversité Génétique)", fontsize=12, fontweight='bold')
+    if 'diversity' in df.columns:
+        sns.lineplot(data=df, x='gen', y='diversity', ax=ax, color='purple', linewidth=2)
+        ax.fill_between(df['gen'], 0, df['diversity'], color='purple', alpha=0.1)
+    ax.set_ylabel("Hamming Distance (%)")
+
+def draw_sa_impact(ax, df):
+    ax.set_title("Impact de la Recherche Locale (Gain Mémétique)", fontsize=12, fontweight='bold')
+    if 'sa_impact' in df.columns:
+        sns.barplot(data=df, x='gen', y='sa_impact', ax=ax, color='orange', alpha=0.6)
+        for i, t in enumerate(ax.get_xticklabels()):
+            if i % 10 != 0: t.set_visible(False)
+    ax.set_ylabel("Gain Fitness")
+
+def draw_soft_profile(ax, df):
+    ax.set_title("Répartition Finale des Pénalités (Profil de Qualité)", fontsize=12, fontweight='bold')
+    last_gen = df.iloc[-1]
+    soft_cols = [c for c in df.columns if c.startswith('S') and c != 's_total' and last_gen[c] > 0]
+    labels = [NAMES.get(k, k) for k in soft_cols]
+    values = [last_gen[k] for k in soft_cols]
+    if values:
+        sns.barplot(x=values, y=labels, ax=ax, palette='viridis')
+
+def draw_soft_evolution(ax, df):
+    ax.set_title("Dynamique d'Optimisation des Règles Pédagogiques", fontsize=12, fontweight='bold')
+    soft_cols = [c for c in df.columns if c.startswith('S') and c != 's_total' and df[c].max() > 0]
+    for col in soft_cols:
+        ax.plot(df['gen'], df[col], label=NAMES.get(col, col), alpha=0.8)
+    ax.legend(fontsize=8, loc='upper right')
+
+def draw_cpu_time(ax, df):
+    ax.set_title("Performance Temporelle et Efficacité CPU", fontsize=12, fontweight='bold')
+    sns.lineplot(data=df, x='gen', y='time', ax=ax, color='green')
+    ax.set_ylabel("Secondes / Gen")
+
+def draw_hard_details(ax, df):
+    ax.set_title("Détail de la Résolution des Conflits Critiques", fontsize=12, fontweight='bold')
+    hard_cols = [c for c in df.columns if c.startswith('H') and c != 'h_total']
+    for col in hard_cols:
+        ax.plot(df['gen'], df[col], label=NAMES.get(col, col))
+    ax.legend(fontsize=8)
+    ax.set_ylabel("Violations")
+
+# --- MAIN ---
+def run_analysis():
     if not os.path.exists(CSV_FILE):
         print(f"❌ Erreur : {CSV_FILE} introuvable.")
         return
 
+    if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
+    cleanup_old_plots()
     df = pd.read_csv(CSV_FILE)
     sns.set_theme(style="whitegrid")
-    
-    # Creation de la figure globale (Dashboard 3x2)
+
+    # 1. Générer le Dashboard Combiné
     fig, axes = plt.subplots(2, 3, figsize=(22, 12))
     plt.subplots_adjust(hspace=0.3, wspace=0.25)
-    fig.suptitle("ANALYSE GÉNÉTIQUE & MÉMÉTIQUE - DASHBOARD MASTER AI", fontsize=22, fontweight='bold', y=0.98)
-
-    # 1. CONVERGENCE GLOBALE (Log scale pour les conflits)
-    ax1 = axes[0, 0]
-    ax1.set_title("1. Convergence Globale (Log Scale)", fontsize=14, fontweight='bold')
-    ax1.plot(df['gen'], df['h_total'], label='Violations Hard', color='red', linewidth=2.5)
-    ax1.set_yscale('symlog')
-    ax1.set_ylabel("Hard (Log)", color='red', fontsize=12)
-    ax1_twin = ax1.twinx()
-    ax1_twin.plot(df['gen'], df['s_total'], label='Pénalités Soft', color='blue', linestyle='--', alpha=0.7)
-    ax1_twin.set_ylabel("Soft (Linear)", color='blue', fontsize=12)
-    ax1.set_xlabel("Générations")
-
-    # 2. DIVERSITÉ GÉNÉTIQUE (Hamming Distance)
-    ax2 = axes[0, 1]
-    ax2.set_title("2. Diversité de la Population (%)", fontsize=14, fontweight='bold')
-    if 'diversity' in df.columns:
-        sns.lineplot(data=df, x='gen', y='diversity', ax=ax2, color='purple', linewidth=2)
-        ax2.fill_between(df['gen'], 0, df['diversity'], color='purple', alpha=0.1)
-        ax2.set_ylabel("Différence Inter-Individus (%)")
-    else:
-        ax2.text(0.5, 0.5, "Données non dispos", ha='center')
-
-    # 3. IMPACT DU RECUIT SIMULÉ (Mémétique)
-    ax3 = axes[0, 2]
-    ax3.set_title("3. Gain du Recuit Simulé (SA Impact)", fontsize=14, fontweight='bold')
-    if 'sa_impact' in df.columns:
-        sns.barplot(data=df, x='gen', y='sa_impact', ax=ax3, color='orange', alpha=0.6)
-        # On ne montre qu'une tick sur 5 pour la lisibilité
-        for i, t in enumerate(ax3.get_xticklabels()):
-            if i % 5 != 0: t.set_visible(False)
-        ax3.set_ylabel("Amélioration Fitness par SA")
-    else:
-        ax3.text(0.5, 0.5, "Données non dispos", ha='center')
-
-    # 4. RÉSOLUTION DÉTAILLÉE DES CONFLITS HARD
-    ax4 = axes[1, 0]
-    ax4.set_title("4. Résolution par Type de Conflit (Hard)", fontsize=14, fontweight='bold')
-    hard_cols = [c for c in df.columns if c.startswith('H') and c != 'h_total']
-    for col in hard_cols:
-        ax4.plot(df['gen'], df[col], label=NAMES.get(col, col), alpha=0.8)
-    ax4.legend(fontsize=9, loc='upper right')
-    ax4.set_ylabel("Violations")
-
-    # 5. PROFIL QUALITÉ (Dernière Génération)
-    ax5 = axes[1, 1]
-    ax5.set_title("5. Profil Qualité (Dernière Gen)", fontsize=14, fontweight='bold')
-    last_gen = df.iloc[-1]
-    soft_keys = [k for k in df.columns if k.startswith('S') and k != 's_total']
-    labels = [NAMES.get(k, k) for k in soft_keys if last_gen[k] > 0]
-    values = [last_gen[k] for k in soft_keys if last_gen[k] > 0]
-    if values:
-        sns.barplot(x=values, y=labels, ax=ax5, palette='viridis')
-        ax5.set_xlabel("Pénalité cumulée")
-    else:
-        ax5.text(0.5, 0.5, "Qualité Parfaite !", ha='center')
-
-    # 6. STABILITÉ / TEMPS CPU
-    ax6 = axes[1, 2]
-    ax6.set_title("6. Stabilité du Temps de Calcul (CPU)", fontsize=14, fontweight='bold')
-    sns.lineplot(data=df, x='gen', y='time', ax=ax6, color='green', marker='o', markersize=4)
-    ax6.set_ylabel("Secondes par Génération")
+    fig.suptitle("ANALYSE GA-SA HYBRIDE - FSTG TIMETABLING", fontsize=20, fontweight='bold')
     
-    # Sauvegarde
-    if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
+    draw_convergence(axes[0,0], df)
+    draw_diversity(axes[0,1], df)
+    draw_sa_impact(axes[0,2], df)
+    draw_soft_profile(axes[1,0], df)
+    draw_soft_evolution(axes[1,1], df)
+    draw_cpu_time(axes[1,2], df)
+    
     plt.savefig(os.path.join(OUTPUT_DIR, "master_pfe_dashboard.png"), dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"✅ Dashboard Master généré : {OUTPUT_DIR}/master_pfe_dashboard.png")
+
+    # 2. Générer les 7 fichiers séparés
+    plots = {
+        "1_convergence": draw_convergence,
+        "2_diversity": draw_diversity,
+        "3_sa_impact": draw_sa_impact,
+        "4_quality_profile": draw_soft_profile,
+        "5_quality_evolution": draw_soft_evolution,
+        "6_cpu_performance": draw_cpu_time,
+        "7_hard_conflicts": draw_hard_details
+    }
+    
+    for name, func in plots.items():
+        save_individual_plot(name, func, df)
+        print(f"✅ Graphe sauvegardé : {name}.png")
+
+    print("\n🚀 ANALYSE TERMINÉE : Dashboard + 7 Graphes individuels générés.")
 
 if __name__ == "__main__":
-    generate_master_dashboard()
+    run_analysis()
