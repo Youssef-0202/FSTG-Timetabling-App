@@ -44,3 +44,7 @@ temp/
 
 # --- DOCUMENTATION ---
 *.md
+
+# Excel locks
+~$*.xlsx
+~$*.xls
