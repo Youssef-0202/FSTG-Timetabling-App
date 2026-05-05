@@ -60,10 +60,10 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
     line = f" Gen {gen:03d} | Score: {score:8.0f} | H: {h} | S: {s:5.0f} | Imp: {improvement:>5.1f}% | Time: {gen_duration:4.2f}s"
     
     if h > 0:
-        h_details = " → Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
+        h_details = " - Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
         print(line + h_details)
     else:
-        s_details = " → Soft: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('S') and v > 0])
+        s_details = " - Soft: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('S') and v > 0])
         print(line + s_details)
 
 def generate_final_report(engine, total_duration, init_score, mask, actual_generations=0, verbose=True):
@@ -127,11 +127,12 @@ class HistoryLogger:
         self.headers_written = False
         print(f"[CSV] Historique sera enregistré dans : {self.filepath}")
 
-    def log(self, gen, individual, gen_duration, diversity=0, sa_impact=0):
+    def log(self, gen, individual, gen_duration, mask=None, diversity=0, sa_impact=0):
         import csv
         from .constraints import calculate_fitness_full
         
-        score, h, s, details = calculate_fitness_full(individual, None)
+        # Utilisation du masque passé, sinon un masque vide ou None si géré par fitness
+        score, h, s, details = calculate_fitness_full(individual, mask)
         
         row = {
             "gen": gen,

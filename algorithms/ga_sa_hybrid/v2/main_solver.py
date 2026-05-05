@@ -144,10 +144,11 @@ def run_optimization():
         
         # Affichage status console
         if VERBOSE:
-            print_generation_status(gen, best, gen_dur, diversity, sa_impact)
+            # Correction : on passe init_score et le masque de contraintes
+            print_generation_status(gen, best, gen_dur, init_score, CONSTRAINTS_MASK)
             
-        # Enregistrement CSV (PFE Analytics - Master Level)
-        csv_logger.log(gen, best, gen_dur, diversity, sa_impact)
+        # Enregistrement CSV
+        csv_logger.log(gen, best, gen_dur, mask=CONSTRAINTS_MASK, diversity=diversity, sa_impact=sa_impact)
         
         # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
         if engine.population[0].h_violations == 0:
@@ -169,11 +170,14 @@ def run_optimization():
     best_final.sync_to_db()
     
     # 2. Rapport Final
-    generate_final_report(total_duration, gen, engine.population)
+    # Correction : Respect de l'ordre (engine, duration, init_score, mask, gens)
+    generate_final_report(engine, total_duration, init_score, CONSTRAINTS_MASK, actual_generations=gen)
     
     # 3. Export JSON pour le Frontend
     try:
-        export_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "generated_timetable.json")
+        # Correction : Remonter 4 niveaux pour atteindre _Project_PFE
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        export_path = os.path.join(root_dir, "backend", "generated_timetable.json")
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
         print(f"[EXPORT] Solution sauvegardee dans : {os.path.basename(export_path)}")

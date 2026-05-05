@@ -85,6 +85,35 @@ class Schedule : # un emploi du temps complet proposé par l'algo
         new_sched.soft_score = self.soft_score
         return new_sched
 
+    def sync_to_db(self):
+        """Envoie le planning complet à l'API pour mise à jour de la base de données."""
+        import requests
+        API_URL = "http://localhost:8000"
+        
+        print(f"--- Synchronisation de {len(self.assignments)} seances avec la base de donnees SQL...")
+        
+        # Préparation du payload au format AssignmentCreate (backend/schemas.py)
+        payload = []
+        for a in self.assignments:
+            payload.append({
+                "module_part_id": a.module_part.id, # a.module_part.id est l'ID de l'assignment source
+                "teacher_id": a.module_part.teacher_id,
+                "room_id": a.room.id,
+                "slot_id": a.timeslot.id,
+                "section_id": a.module_part.section_id,
+                "tdgroup_ids": a.module_part.td_group_ids,
+                "is_locked": False
+            })
+            
+        try:
+            resp = requests.post(f"{API_URL}/save-assignments", json=payload, timeout=30)
+            if resp.status_code in [200, 201]:
+                print(f"OK : La base de donnees SQL a ete mise a jour.")
+            else:
+                print(f"Error lors de la synchro : {resp.status_code} - {resp.text}")
+        except Exception as e:
+            print(f"Error de connexion a l API pour la synchronisation : {e}")
+
     def __str__(self):
         return f"Schedule: {len(self.assignments)} assignments, H: {self.h_violations}"
 

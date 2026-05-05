@@ -11,7 +11,7 @@ def generate_s4_tds():
             models.ModulePart.type == "CM"
         ).all()
 
-        print(f"🔄 Génération des TD pour {len(s4_cm_assignments)} modules S4...")
+        print(f"🔄 Génération des TD pour toutes les sections S4 (Tous Groupes)...")
         
         count = 0
         for cm_a in s4_cm_assignments:
@@ -24,32 +24,32 @@ def generate_s4_tds():
             if not td_part:
                 continue
 
-            # Vérifier si un TD existe déjà pour éviter les doublons
-            existing = db.query(models.Assignment).filter(
-                models.Assignment.module_part_id == td_part.id,
-                models.Assignment.section_id == cm_a.section_id
-            ).first()
+            # Récupérer TOUS les groupes de cette section
+            all_groups = db.query(models.TDGroup).filter(
+                models.TDGroup.section_id == cm_a.section_id
+            ).all()
 
-            if not existing:
-                # Trouver le "Gr 1" de cette section
-                gr1 = db.query(models.TDGroup).filter(
-                    models.TDGroup.section_id == cm_a.section_id,
-                    models.TDGroup.name.like('%Gr 1%')
-                ).first()
+            for grp in all_groups:
+                # Vérifier si un TD existe déjà pour ce groupe spécifique
+                # (Une assignment qui contient ce groupe dans sa relation multiple-à-multiple)
+                existing = db.query(models.Assignment).filter(
+                    models.Assignment.module_part_id == td_part.id,
+                    models.Assignment.section_id == cm_a.section_id
+                ).join(models.Assignment.td_groups).filter(models.TDGroup.id == grp.id).first()
 
-                if gr1:
+                if not existing:
                     new_td = models.Assignment(
                         module_part_id=td_part.id,
                         teacher_id=cm_a.teacher_id,
                         section_id=cm_a.section_id,
                         is_locked=False
                     )
-                    new_td.td_groups.append(gr1)
+                    new_td.td_groups.append(grp)
                     db.add(new_td)
                     count += 1
 
         db.commit()
-        print(f"✅ Succès : {count} affectations de TD créées pour le S4.")
+        print(f"✅ Succès : {count} nouvelles affectations de TD créées.")
 
     finally:
         db.close()
