@@ -480,19 +480,14 @@ def get_preview_schedule(mode: str = "ga_sa"):
         
     file_path = os.path.join(os.path.dirname(__file__), filename)
     
-    # Fallback si le fichier spécifié n'existe pas encore
+    # Pas de fallback automatique : on veut voir la différence
     if not os.path.exists(file_path):
-        if mode == "rl":
-            # Si RL demandé mais pas trouvé, on tente de voir si le GA classique existe
-            file_path = os.path.join(os.path.dirname(__file__), "generated_timetable.json")
-            if not os.path.exists(file_path):
-                return []
-        else:
-            return []
+        return []
             
     with open(file_path, "r", encoding="utf-8") as f:
         try:
-            return json.load(f)
+            data = json.load(f)
+            return data
         except:
             return []
 

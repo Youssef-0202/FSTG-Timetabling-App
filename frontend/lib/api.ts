@@ -220,7 +220,7 @@ export const deleteTimeslot = (id: number) =>
 
 // ─── Assignments 
 export const getAssignments = () => apiFetch<Assignment[]>("/assignments");
-export const getPreviewSchedule = () => apiFetch<Assignment[]>("/preview-schedule");
+export const getPreviewSchedule = (mode: string = "ga_sa") => apiFetch<Assignment[]>(`/preview-schedule?mode=${mode}`);
 export const createAssignment = (data: AssignmentCreate) =>
   apiFetch<Assignment>("/assignments", { method: "POST", body: JSON.stringify(data) });
 export const updateAssignment = (id: number, data: Partial<AssignmentCreate>) =>

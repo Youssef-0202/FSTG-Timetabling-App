@@ -30,12 +30,13 @@ export default function TimetablePage() {
     const [auditGhostType, setAuditGhostType] = useState<"CM" | "ALL">("CM"); // type de fantomes a injecter
 
     const [tdGroups, setTdGroups] = useState<any[]>([]); // Ajouté pour le support multi-section
+    const [resultMode, setResultMode] = useState<"ga_sa" | "rl">("rl");
 
     const load = useCallback(async () => {
         setLoading(true);
         try {
             const [a, t, r, m, mp, ts, sec, tdg] = await Promise.all([
-                getPreviewSchedule(), getTeachers(), getRooms(), getModules(),
+                getPreviewSchedule(resultMode), getTeachers(), getRooms(), getModules(),
                 getModuleParts(), getTimeslots(), getSections(), getTDGroups()
             ]);
             console.log("Assignments loaded:", a.length);
@@ -51,9 +52,9 @@ export default function TimetablePage() {
         } catch (e) {
             console.error(e);
         } finally { setLoading(false); }
-    }, []);
+    }, [resultMode]);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => { load(); }, [load, resultMode]);
 
     // Lignes pour les vues Section/Enseignant
     const uniqueHours = Array.from(new Set(timeslots.map(t => t.start_time.substring(0, 5)))).sort();
@@ -131,6 +132,23 @@ export default function TimetablePage() {
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
 
+                    <div className="result-mode-selector" style={{ display: 'flex', background: '#fef3c7', padding: '4px', borderRadius: '8px', border: '1px solid #fcd34d' }}>
+                        <button
+                            className={resultMode === "rl" ? "active-rl" : ""}
+                            onClick={() => setResultMode("rl")}
+                            style={{ border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 800, background: resultMode === "rl" ? '#d97706' : 'transparent', color: resultMode === "rl" ? 'white' : '#92400e' }}
+                        >
+                            RL Agent
+                        </button>
+                        <button
+                            className={resultMode === "ga_sa" ? "active-ga" : ""}
+                            onClick={() => setResultMode("ga_sa")}
+                            style={{ border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 800, background: resultMode === "ga_sa" ? '#d97706' : 'transparent', color: resultMode === "ga_sa" ? 'white' : '#92400e' }}
+                        >
+                            GA+SA
+                        </button>
+                    </div>
+
                     {viewMode !== "master" && (
                         <select className="id-selector" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
                             {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : activeTeachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -161,6 +179,15 @@ export default function TimetablePage() {
 
                 {loading ? (
                     <div className="loading-state">Chargement du planning...</div>
+                ) : assignments.length === 0 ? (
+                    <div className="empty-state" style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '12px', border: '2px dashed #e2e8f0' }}>
+                        <h3 style={{ color: '#64748b', marginBottom: '8px' }}>Aucune solution trouvée</h3>
+                        <p style={{ color: '#94a3b8' }}>
+                            {resultMode === "rl"
+                                ? "L'agent RL n'a pas encore généré de planning. Lancez main_rl.py pour commencer."
+                                : "Aucun planning généré par GA+SA n'est disponible."}
+                        </p>
+                    </div>
                 ) : (
                     <div className="timetable-area">
                         {viewMode !== "master" ? (
