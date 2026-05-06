@@ -79,6 +79,10 @@ def run_rl_optimization():
     print(f" Score Initial: {init_score} | H: {init_h}")
 
     print("\n[STEP 2] Debut de l evolution dirigee par RL...")
+    PATIENCE = 20  # Arrêt si pas d'amélioration pendant 20 générations consécutives
+    no_improve_count = 0
+    best_score_ever = float('inf')
+
     for gen in range(1, MAX_GEN + 1):
         gen_start = time.time()
         
@@ -86,9 +90,20 @@ def run_rl_optimization():
         
         gen_dur = time.time() - gen_start
         best = engine.population[0]
+        current_score = best.fitness if best.fitness is not None else float('inf')
         
         print_generation_status(gen, best, gen_dur, init_score, CONSTRAINTS_MASK)
         csv_logger.log(gen, best, gen_dur, mask=CONSTRAINTS_MASK, diversity=diversity, sa_impact=sa_impact)
+
+        # Early stopping
+        if current_score < best_score_ever - 0.5:
+            best_score_ever = current_score
+            no_improve_count = 0
+        else:
+            no_improve_count += 1
+            if no_improve_count >= PATIENCE:
+                print(f"\n[STOP ANTICIPÉ] Pas d'amélioration depuis {PATIENCE} générations. Convergence atteinte à Gen {gen}.")
+                break
 
     total_duration = time.time() - start_time_exec
     generate_final_report(engine, total_duration, init_score, CONSTRAINTS_MASK, actual_generations=gen)

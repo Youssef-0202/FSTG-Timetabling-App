@@ -95,21 +95,36 @@ def calculate_fitness_full(schedule, mask=None):
             if (g_id, ts_id) in group_slots: h3 += 1
             group_slots[(g_id, ts_id)] = True
 
-        # Conflit Filière (H13/H14) : S2 vs S4
+        # Conflit Filière (H13/H14) : liées via les mêmes filières (S2 vs S4)
+        involved_sections = set()
         if mp.section_id:
-            sec_key = (mp.section_id, ts_id)
-            if sec_key not in sec_occupancy: sec_occupancy[sec_key] = {'cm': False, 'gr6': False}
-            
-            # Un CM ou un Gr 6 ne peut pas chevaucher un autre CM/Gr6 d'une année liée
-            for r_sid in related_sids.get(mp.section_id, []):
-                r_status = sec_occupancy.get((r_sid, ts_id))
-                if r_status:
-                    if (is_cm or is_gr6) and (r_status['cm'] or r_status['gr6']):
-                        h3 += 3 # Sanction forte pour conflit filière
+            involved_sections.add(mp.section_id)
+        for gid in mp.td_group_ids:
+            # Récupérer la section de ce groupe spécifique
+            g_sec = dm.group_to_section.get(gid)
+            if g_sec:
+                involved_sections.add(g_sec)
 
-            # Maj du statut pour les prochaines itérations
-            if is_cm: sec_occupancy[sec_key]['cm'] = True
-            if is_gr6: sec_occupancy[sec_key]['gr6'] = True
+        is_cm_or_gr6 = is_cm or is_gr6
+
+        if is_cm_or_gr6 and involved_sections:
+            for sid in involved_sections:
+                sec_key = (sid, ts_id)
+                if sec_key not in sec_occupancy: 
+                    sec_occupancy[sec_key] = {'cm': False, 'gr6': False}
+                
+                # Un CM ou un Gr 6 ne peut pas chevaucher un autre CM/Gr6 d'une année liée
+                for r_sid in related_sids.get(sid, []):
+                    r_status = sec_occupancy.get((r_sid, ts_id))
+                    if r_status:
+                        if r_status['cm'] or r_status['gr6']:
+                            h3 += 3 # Sanction forte pour conflit filière
+
+            # Mise à jour des statuts (après les vérifications pour éviter les auto-conflits croisés)
+            for sid in involved_sections:
+                sec_key = (sid, ts_id)
+                if is_cm: sec_occupancy[sec_key]['cm'] = True
+                if is_gr6: sec_occupancy[sec_key]['gr6'] = True
 
     # Agrégation des Hard Violations selon le masque
     h_violations = (h1 if mask["H1"] else 0) + (h2 if mask["H2"] else 0) + \
