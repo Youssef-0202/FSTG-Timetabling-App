@@ -469,16 +469,32 @@ import os
 import json
 
 @app.get("/preview-schedule")
-def get_preview_schedule():
+def get_preview_schedule(mode: str = "ga_sa"):
     """
     Renvoie le dernier emploi du temps généré par l'IA stocké dans le fichier JSON,
     sans toucher à la base de données SQL.
     """
-    file_path = os.path.join(os.path.dirname(__file__), "generated_timetable.json")
+    filename = "generated_timetable.json"
+    if mode == "rl":
+        filename = "generated_timetable_rl.json"
+        
+    file_path = os.path.join(os.path.dirname(__file__), filename)
+    
+    # Fallback si le fichier spécifié n'existe pas encore
     if not os.path.exists(file_path):
-        return []
+        if mode == "rl":
+            # Si RL demandé mais pas trouvé, on tente de voir si le GA classique existe
+            file_path = os.path.join(os.path.dirname(__file__), "generated_timetable.json")
+            if not os.path.exists(file_path):
+                return []
+        else:
+            return []
+            
     with open(file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except:
+            return []
 
 
 # --- GESTION DES RÉSULTATS D'OPTIMISATION ---

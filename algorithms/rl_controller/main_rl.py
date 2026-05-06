@@ -14,10 +14,10 @@ from reporting import print_generation_status, generate_final_report, initialize
 
 # CONFIGURATION
 POP_SIZE = 30
-MAX_GEN = 100 # Pour test initial
+MAX_GEN = 200
 MUTATION_RATE = 0.40
 ELITISM = 2
-SA_ITERATIONS = 400 # Reduit pour vitesse du test RL
+SA_ITERATIONS = 1200
 SA_TEMP = 50.0
 SA_COOLING = 0.965
 
@@ -97,6 +97,26 @@ def run_rl_optimization():
     knowledge_path = os.path.join(os.path.dirname(__file__), "logs", "rl_knowledge.json")
     agent.save_knowledge(knowledge_path)
     print(f"\n[RL] Intelligence de l agent sauvegardee dans : {knowledge_path}")
+
+    # --- INTEGRATION UI & BACKEND ---
+    best_final = engine.population[0]
+    
+    # 1. Mise à jour SQL (Archive) via l API ou methode interne
+    if hasattr(best_final, 'sync_to_db'):
+        print("[DB] Synchronisation de la solution RL dans la base de données...")
+        best_final.sync_to_db()
+
+    # 2. Export JSON pour le Frontend (Next.js)
+    try:
+        # On remonte de algorithms/rl_controller vers la racine _Project_PFE
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        export_path = os.path.join(root_dir, "backend", "generated_timetable_rl.json")
+        
+        with open(export_path, 'w', encoding='utf-8') as f:
+            json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
+        print(f"[EXPORT] Solution RL sauvegardee : {export_path}")
+    except Exception as e:
+        print(f"[ERREUR] Export UI echoue : {e}")
 
 if __name__ == "__main__":
     run_rl_optimization()
