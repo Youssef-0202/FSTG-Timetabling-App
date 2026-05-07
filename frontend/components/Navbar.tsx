@@ -12,7 +12,7 @@ const links = [
     { href: "/", label: "Tableau de Bord", Icon: LayoutDashboard },
     { href: "/database", label: "Base de Données", Icon: Database },
     { href: "/algorithms", label: "Algorithmes", Icon: Cpu },
-    { href: "/timetable", label: "Emploi du Temps", Icon: CalendarDays },
+    { href: "/timetable/preview", label: "Emploi du Temps", Icon: CalendarDays },
     { href: "/reports", label: "Rapports", Icon: BarChart2 },
 ];
 

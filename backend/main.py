@@ -453,17 +453,39 @@ def save_assignments(assignments: List[schemas.AssignmentCreate], db: Session = 
     """
     Reçoit le résultat de l'IA (le planning) et l'enregistre dans la base.
     """
-    db.query(models.Assignment).delete() # On écrase l'ancien planning
-    for a in assignments:
-        new_a = models.Assignment(
-            module_part_id=a.module_part_id,
-            teacher_id=a.teacher_id,
-            room_id=a.room_id,
-            slot_id=a.slot_id
-        )
-        db.add(new_a)
-    db.commit()
-    return {"message": "Planning sauvegardé en base de données."}
+    try:
+        # 1. On vide proprement l'ancien planning
+        # On utilise une boucle pour être sûr que les relations M:M sont nettoyées
+        old_assignments = db.query(models.Assignment).all()
+        for old in old_assignments:
+            old.td_groups = [] # Nettoyer la table d'association
+            db.delete(old)
+        db.flush() 
+
+        # 2. On enregistre le nouveau planning
+        for a in assignments:
+            new_a = models.Assignment(
+                module_part_id=a.module_part_id,
+                teacher_id=a.teacher_id,
+                room_id=a.room_id,
+                slot_id=a.slot_id,
+                section_id=a.section_id,
+                is_locked=a.is_locked
+            )
+            # Ajout des groupes TD si présents
+            if a.tdgroup_ids:
+                for g_id in a.tdgroup_ids:
+                    g = db.query(models.TDGroup).filter(models.TDGroup.id == g_id).first()
+                    if g:
+                        new_a.td_groups.append(g)
+            
+            db.add(new_a)
+        
+        db.commit()
+        return {"message": "Planning sauvegardé en base de données avec tous les détails."}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la sauvegarde : {str(e)}")
 
 import os
 import json
@@ -530,4 +552,140 @@ def delete_timetable_result(res_id: int, db: Session = Depends(get_db)):
     if not res:
         raise HTTPException(status_code=404, detail="Résultat introuvable")
     db.delete(res); db.commit()
+
+@app.get("/audit/section/{section_id}")
+def audit_section(section_id: int, mode: str = "alns", db: Session = Depends(get_db)):
+    """
+    Analyse la qualité de l'emploi du temps pour une section.
+    """
+    filename = "generated_timetable_alns.json"
+    if mode == "rl": filename = "generated_timetable_rl.json"
+    elif mode == "ga_sa": filename = "generated_timetable.json"
+    
+    file_path = os.path.join(os.path.dirname(__file__), filename)
+    if not os.path.exists(file_path):
+        return {"section": "N/A", "score": 0, "status": "Fichier introuvable"}
+        
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            all_assignments = json.load(f)
+            
+        timeslots = {t.id: t for t in db.query(models.Timeslot).all()}
+        section = db.query(models.Section).filter(models.Section.id == section_id).first()
+        if not section: return {"section": f"ID {section_id}", "score": 0, "status": "Section non trouvée en base"}
+        
+        td_groups = db.query(models.TDGroup).filter(models.TDGroup.section_id == section_id).all()
+        td_group_ids = [g.id for g in td_groups]
+        
+        cm_assigns = []
+        group_assigns = {gid: [] for gid in td_group_ids}
+        
+        count_found = 0
+        for a in all_assignments:
+            # Comparaison robuste (force int)
+            a_sid = int(a.get('section_id', -1))
+            is_my_cm = (a_sid == section_id)
+            
+            a_groups = [int(g['id']) for g in a.get('td_groups', [])]
+            matched_groups = [gid for gid in td_group_ids if gid in a_groups]
+            
+            if is_my_cm and not a_groups: 
+                cm_assigns.append(a)
+                count_found += 1
+            elif matched_groups: 
+                for gid in matched_groups:
+                    group_assigns[gid].append(a)
+                    count_found += 1
+
+        if count_found == 0:
+            return {"section": section.name, "score": 0, "status": "Aucune séance trouvée dans le JSON"}
+
+        # Indices de satisfaction par groupe
+        group_details = {
+            "gaps": [],
+            "lunch": [],
+            "fatigue": [],
+            "stability": []
+        }
+        group_satisfaction = []
+        
+        # Ordre fixe des débuts de cours pour détecter les trous
+        time_order = ["08:30", "10:35", "12:30", "14:30", "16:35"]
+        
+        for gid in td_group_ids:
+            my_path = cm_assigns + group_assigns[gid]
+            if not my_path: continue
+            
+            path_gaps = 0
+            path_lunch_hits = 0
+            path_late_hits = 0
+            day_map = {}
+            for a in my_path:
+                ts = timeslots.get(int(a['slot_id']))
+                if ts: day_map.setdefault(ts.day.upper(), []).append(ts)
+            
+            for day, day_slots in day_map.items():
+                day_slots.sort(key=lambda x: x.start_time)
+                
+                # GAPS calculation (Excluding natural 12:30 lunch break)
+                if len(day_slots) > 1:
+                    indices = []
+                    for ts in day_slots:
+                        t_str = ts.start_time.strftime("%H:%M")
+                        if t_str in time_order:
+                            indices.append(time_order.index(t_str))
+                    if len(indices) > 1:
+                        # Gaps are missing slots between classes
+                        # But we ignore index 2 (12:30) as it's a standard lunch break
+                        should_be = set(range(min(indices), max(indices) + 1))
+                        missing = should_be - set(indices)
+                        true_gaps = len([m for m in missing if m != 2])
+                        path_gaps += true_gaps
+                
+                # LUNCH & FATIGUE calculation
+                for ts in day_slots:
+                    start_str = ts.start_time.strftime("%H:%M")
+                    if "12:30" in start_str: path_lunch_hits += 1
+                    if "16:35" in start_str: path_late_hits += 1
+            
+            # Normalize sub-scores (Smoothed)
+            # Gaps: -15% per gap
+            g_score = max(0, 100 - (path_gaps * 15))
+            # Lunch: -25% per hit (Critical but less extreme)
+            l_score = max(0, 100 - (path_lunch_hits * 25))
+            # Fatigue: -10% per late session
+            f_score = max(0, 100 - (path_late_hits * 10))
+            if "SAMEDI" in day_map: f_score = max(0, f_score - 20)
+            
+            # Stability: 100 if CMs in morning, 80 otherwise
+            cm_in_morning = all("08:30" in ts.start_time.strftime("%H:%M") or "10:35" in ts.start_time.strftime("%H:%M") 
+                               for a in cm_assigns if (ts := timeslots.get(int(a['slot_id']))))
+            s_score = 100 if cm_in_morning else 80
+
+            group_details["gaps"].append(g_score)
+            group_details["lunch"].append(l_score)
+            group_details["fatigue"].append(f_score)
+            group_details["stability"].append(s_score)
+            
+            # Global score weighted: Gaps and Lunch are primary (35% each)
+            group_satisfaction.append((g_score * 0.35 + l_score * 0.35 + f_score * 0.2 + s_score * 0.1))
+
+        if not group_satisfaction:
+            return {"section": section.name, "score": 0, "status": "Pas de données"}
+            
+        avg_score = sum(group_satisfaction) / len(group_satisfaction)
+        
+        return {
+            "section": section.name,
+            "score": round(avg_score, 1),
+            "details": {
+                "gaps": round(sum(group_details["gaps"]) / len(group_details["gaps"]), 1),
+                "lunch": round(sum(group_details["lunch"]) / len(group_details["lunch"]), 1),
+                "fatigue": round(sum(group_details["fatigue"]) / len(group_details["fatigue"]), 1),
+                "stability": round(sum(group_details["stability"]) / len(group_details["stability"]), 1)
+            },
+            "status": "Excellent" if avg_score > 85 else "Bon" if avg_score > 70 else "Moyen" if avg_score > 50 else "Médiocre"
+        }
+    except Exception as e:
+        return {"section": "Erreur", "score": 0, "status": str(e), "details": {}}
 

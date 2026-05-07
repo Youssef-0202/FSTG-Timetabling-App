@@ -227,3 +227,19 @@ export const updateAssignment = (id: number, data: Partial<AssignmentCreate>) =>
   apiFetch<Assignment>(`/assignments/${id}`, { method: "PUT", body: JSON.stringify(data) });
 export const deleteAssignment = (id: number) =>
   apiFetch<void>(`/assignments/${id}`, { method: "DELETE" });
+
+// ─── Auditing ───
+export interface AuditResult {
+  section: string;
+  score: number;
+  status: "Excellent" | "Good" | "Average" | "Poor" | string;
+  details: {
+    gaps: number;
+    lunch: number;
+    fatigue: number;
+    stability: number;
+  };
+}
+
+export const auditSection = (sectionId: number, mode: string) => 
+  apiFetch<AuditResult>(`/audit/section/${sectionId}?mode=${mode}`);
