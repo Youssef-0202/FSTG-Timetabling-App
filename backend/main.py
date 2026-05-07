@@ -474,9 +474,12 @@ def get_preview_schedule(mode: str = "ga_sa"):
     Renvoie le dernier emploi du temps généré par l'IA stocké dans le fichier JSON,
     sans toucher à la base de données SQL.
     """
-    filename = "generated_timetable.json"
     if mode == "rl":
         filename = "generated_timetable_rl.json"
+    elif mode == "alns":
+        filename = "generated_timetable_alns.json"
+    else:
+        filename = "generated_timetable.json"
         
     file_path = os.path.join(os.path.dirname(__file__), filename)
     

@@ -1,0 +1,34 @@
+{
+    "RandomShift": {
+        "count": 4790,
+        "avg_reward": 0.1068
+    },
+    "SwapSlots": {
+        "count": 722,
+        "avg_reward": 0.0
+    },
+    "StabilizeRoom": {
+        "count": 839,
+        "avg_reward": 0.0126
+    },
+    "CompactProf": {
+        "count": 1091,
+        "avg_reward": 0.0325
+    },
+    "CompactSection": {
+        "count": 1086,
+        "avg_reward": 0.0322
+    },
+    "LunchFix": {
+        "count": 967,
+        "avg_reward": 0.0237
+    },
+    "SwapRoomOnly": {
+        "count": 804,
+        "avg_reward": 0.0091
+    },
+    "KempeChain": {
+        "count": 16063,
+        "avg_reward": 0.1463
+    }
+}

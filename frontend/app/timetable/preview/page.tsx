@@ -30,7 +30,7 @@ export default function TimetablePage() {
     const [auditGhostType, setAuditGhostType] = useState<"CM" | "ALL">("CM"); // type de fantomes a injecter
 
     const [tdGroups, setTdGroups] = useState<any[]>([]); // Ajouté pour le support multi-section
-    const [resultMode, setResultMode] = useState<"ga_sa" | "rl">("rl");
+    const [resultMode, setResultMode] = useState<"ga_sa" | "rl" | "alns">("alns");
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -132,18 +132,43 @@ export default function TimetablePage() {
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
 
-                    <div className="result-mode-selector" style={{ display: 'flex', background: '#fef3c7', padding: '4px', borderRadius: '8px', border: '1px solid #fcd34d' }}>
+                    <div className="result-mode-selector" style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
+                        <button
+                            className={resultMode === "alns" ? "active-alns" : ""}
+                            onClick={() => setResultMode("alns")}
+                            style={{
+                                border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer',
+                                fontSize: '0.75rem', fontWeight: 800,
+                                background: resultMode === "alns" ? '#7c3aed' : 'transparent',
+                                color: resultMode === "alns" ? 'white' : '#64748b',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                        >
+                            ALNS Agent (New)
+                        </button>
                         <button
                             className={resultMode === "rl" ? "active-rl" : ""}
                             onClick={() => setResultMode("rl")}
-                            style={{ border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 800, background: resultMode === "rl" ? '#d97706' : 'transparent', color: resultMode === "rl" ? 'white' : '#92400e' }}
+                            style={{
+                                border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer',
+                                fontSize: '0.75rem', fontWeight: 800,
+                                background: resultMode === "rl" ? '#d97706' : 'transparent',
+                                color: resultMode === "rl" ? 'white' : '#64748b',
+                                transition: 'all 0.2s'
+                            }}
                         >
                             RL Agent
                         </button>
                         <button
                             className={resultMode === "ga_sa" ? "active-ga" : ""}
                             onClick={() => setResultMode("ga_sa")}
-                            style={{ border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 800, background: resultMode === "ga_sa" ? '#d97706' : 'transparent', color: resultMode === "ga_sa" ? 'white' : '#92400e' }}
+                            style={{
+                                border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer',
+                                fontSize: '0.75rem', fontWeight: 800,
+                                background: resultMode === "ga_sa" ? '#d97706' : 'transparent',
+                                color: resultMode === "ga_sa" ? 'white' : '#64748b',
+                                transition: 'all 0.2s'
+                            }}
                         >
                             GA+SA
                         </button>
@@ -183,9 +208,11 @@ export default function TimetablePage() {
                     <div className="empty-state" style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '12px', border: '2px dashed #e2e8f0' }}>
                         <h3 style={{ color: '#64748b', marginBottom: '8px' }}>Aucune solution trouvée</h3>
                         <p style={{ color: '#94a3b8' }}>
-                            {resultMode === "rl"
-                                ? "L'agent RL n'a pas encore généré de planning. Lancez main_rl.py pour commencer."
-                                : "Aucun planning généré par GA+SA n'est disponible."}
+                            {resultMode === "alns"
+                                ? "Le moteur ILS-ALNS n'a pas encore généré de résultat. Lancez main_alns.py pour optimiser."
+                                : resultMode === "rl"
+                                    ? "L'agent RL n'a pas encore généré de planning. Lancez main_rl.py pour commencer."
+                                    : "Aucun planning généré par GA+SA n'est disponible."}
                         </p>
                     </div>
                 ) : (
