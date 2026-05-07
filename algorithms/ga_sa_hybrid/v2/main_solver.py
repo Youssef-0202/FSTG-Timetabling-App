@@ -26,7 +26,7 @@ from engine import HybridEngine
 
 # 1. Parametres de l'Algorithme Genetique (GA) selon Grid Search
 POP_SIZE = 30          
-MAX_GEN = 300          # Large budget pour convergence totale
+MAX_GEN = 120          # Limité à 120 pour comparaison avec RL
 MUTATION_RATE = 0.40   # Record de performance en GS
 ELITISM = 2
 MAX_GEN_AFTER_H0 = 50
@@ -129,9 +129,10 @@ def run_optimization():
         print(f"        Initial H-Violations: {init_h} | Soft Score: {init_soft}")
     
     # ── ETAPE 3 : Evolution Memetique ──
-    CONVERGENCE_TARGET_REACHED = False
-    convergence_counter = 0
-    
+    PATIENCE = 20  # Même condition que RL : arrêt si pas d'amélioration pendant 20 gens
+    no_improve_count = 0
+    best_score_ever = float('inf')
+
     for gen in range(1, MAX_GEN + 1):
         gen_start = time.time()
         
@@ -141,6 +142,7 @@ def run_optimization():
         gen_dur = time.time() - gen_start
         
         best = engine.population[0]
+        current_score = best.fitness if best.fitness is not None else float('inf')
         
         # Affichage status console
         if VERBOSE:
@@ -150,18 +152,16 @@ def run_optimization():
         # Enregistrement CSV
         csv_logger.log(gen, best, gen_dur, mask=CONSTRAINTS_MASK, diversity=diversity, sa_impact=sa_impact)
         
-        # Critere d'Arret Anticipe (Si Hard=0 depusi N generations)
-        if engine.population[0].h_violations == 0:
-            if CONVERGENCE_TARGET_REACHED: 
-                convergence_counter += 1
-            else:
-                CONVERGENCE_TARGET_REACHED = True
-                convergence_counter = 1
+        # Critere d'Arret Anticipe (même logique que RL — score-based, PATIENCE=20)
+        if current_score < best_score_ever - 0.5:
+            best_score_ever = current_score
+            no_improve_count = 0
+        else:
+            no_improve_count += 1
+            if no_improve_count >= PATIENCE:
+                print(f"\n[STOP ANTICIPÉ] Pas d'amélioration depuis {PATIENCE} générations. Convergence atteinte à Gen {gen}.")
+                break
         
-        if convergence_counter >= MAX_GEN_AFTER_H0:
-            print("\n[FIN] Stagnation de la qualité ou perfection atteinte. Arrêt anticipé.")
-            break
-            
     # ── ETAPE 4 : Finalisation et Archivage ──
     total_duration = time.time() - start_time_exec
     best_final = engine.population[0]
