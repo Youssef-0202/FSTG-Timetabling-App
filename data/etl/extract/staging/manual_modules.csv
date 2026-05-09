@@ -1,0 +1,42 @@
+id,name,code,dept_id
+1,Biologie Animale et Végétale,MOD-001,1
+2,Thermodynamique & Mec. du Fluide,MOD-002,6
+3,Géodynamique externe,MOD-003,2
+4,Réactivité Chimique,MOD-004,5
+5,Langue Etrangère 2,MOD-005,6
+6,Culture digitale,MOD-006,3
+7,Bases de Données,MOD-007,3
+8,Analyse 2,MOD-008,7
+9,Algèbre 2,MOD-009,7
+10,Mecanique du point / Optique,MOD-010,6
+11,Structure de la matière,MOD-011,6
+12,Circuits électriques et électronique,MOD-012,6
+13,Electricité,MOD-013,4
+14,Analyse Numérique,MOD-014,7
+15,Structure des Données,MOD-015,3
+16,LTC2 Français,MOD-016,6
+17,Développement Personnel,MOD-017,6
+18,Systèmes d'Information et Bases de Données,MOD-018,3
+19,Analyse 4,MOD-019,7
+20,Analyse de Données,MOD-020,7
+21,Recherche Opérationnelle,MOD-021,6
+22,Programmation Web,MOD-022,3
+23,Optique Physique,MOD-023,4
+24,Mécanique des Fluides et Transfert Thermique,MOD-024,4
+25,Chimie Minérale 2,MOD-025,5
+26,Thermodynamique Chimique et Cinétique,MOD-026,5
+27,Chimie Organique 2,MOD-027,5
+28,Éléments de Génie Chimique,MOD-028,5
+29,Electrotechnique,MOD-029,4
+30,Automatique,MOD-030,4
+31,Métrologie Capteurs,MOD-031,4
+32,Inférence Statistique et Applications,MOD-032,7
+33,Modèles de Régression Linéaire,MOD-033,7
+34,Biologie Moléculaire et Génétique,MOD-034,1
+35,Méthodes d'analyse,MOD-035,6
+36,Biochimie Métabolique et Enzymologie,MOD-036,1
+37,Physiologie Animale et Végétale,MOD-037,1
+38,Géologie Structurale,MOD-038,2
+39,Méthodes d'analyse chimique et biologique,MOD-039,6
+40,Géomatique,MOD-040,2
+41,Pétrographie et Minéralogie,MOD-041,2

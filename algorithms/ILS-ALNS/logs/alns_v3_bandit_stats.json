@@ -1,0 +1,42 @@
+{
+    "StabilizeRoom": {
+        "count": 27104,
+        "avg_reward": 0.002583
+    },
+    "CompactProf": {
+        "count": 27292,
+        "avg_reward": 0.00526
+    },
+    "CompactSection": {
+        "count": 27533,
+        "avg_reward": 0.007765
+    },
+    "LunchFix": {
+        "count": 34313,
+        "avg_reward": 0.062688
+    },
+    "SwapSlotSameDay": {
+        "count": 26687,
+        "avg_reward": 0.0
+    },
+    "SwapSlot": {
+        "count": 26682,
+        "avg_reward": 0.0
+    },
+    "SwapRoomOnly": {
+        "count": 28564,
+        "avg_reward": 0.017154
+    },
+    "SwapModuleRooms": {
+        "count": 29680,
+        "avg_reward": 0.027965
+    },
+    "FixHardConflict": {
+        "count": 26640,
+        "avg_reward": 0.0
+    },
+    "RemoveSaturday": {
+        "count": 27602,
+        "avg_reward": 0.12938
+    }
+}
