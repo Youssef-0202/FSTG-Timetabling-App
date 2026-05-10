@@ -1,16 +1,16 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-09 17:09:33
+ Date : 2026-05-10 10:43:14
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Algorithme          : ILS-ALNS-UCB1-v3
- - Population Size      : 15
- - Max Generations      : 200
+ - Algorithme          : ILS-ALNS-v1-original
+ - Population Size      : 20
+ - Max Generations      : 150
  - Mutation Rate        : N/A
- - SA Iterations        : 2500
- - SA Temp Initial      : 60.0
- - SA Cooling           : 0.9985
+ - SA Iterations        : 1200
+ - SA Temp Initial      : 50.0
+ - SA Cooling           : 0.965
 
 2. STATISTIQUES DE LA BASE DE DONNEES :
  - Nombre d'Enseignants : 74
@@ -26,23 +26,26 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 5335.36 secondes
- Generations effectuees   : 200
+ Temps total d'execution  : 39841.00 secondes
+ Generations effectuees   : 150
 ------------------------------------------------------------
- Score Initial (Best)     : 67013900.0
- Score Final   (Best)     : 12753.25
- Amelioration Totale      : 100.0 %
+ Score Initial (Best)     : 66015376.0
+ Score Final   (Best)     : 8038927.5
+ Amelioration Totale      : 87.8 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 12753.25
-  - Pire Solution         : 12753.25
-  - Moyenne Population    : 12753.2
+  - Meilleure Solution    : 8038927.5
+  - Pire Solution         : 100070118.5
+  - Moyenne Population    : 67507044.8
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - S_Total              : 12753.25
-  - S3_Gaps              : 2520
-  - S4_Lunch             : 1440
-  - S6_Stab              : 5500
-  - S8_FreeApm           : 1100
-  - S10_Sat              : 0
+  - H_Total              : 8
+  - S_Total              : 38927.5
+  - H2_Salle             : 1
+  - H3_Grp               : 7
+  - S3_Gaps              : 3780
+  - S4_Lunch             : 2040
+  - S6_Stab              : 4000
+  - S8_FreeApm           : 1200
+  - S10_Sat              : 25000
 ============================================================

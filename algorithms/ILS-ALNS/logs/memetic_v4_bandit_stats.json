@@ -1,0 +1,26 @@
+{
+    "StabilizeRoom": {
+        "count": 0,
+        "avg_reward": 0.0
+    },
+    "SwapModuleRooms": {
+        "count": 0,
+        "avg_reward": 0.0
+    },
+    "SmartGapSwap": {
+        "count": 0,
+        "avg_reward": 0.0
+    },
+    "LunchFix": {
+        "count": 0,
+        "avg_reward": 0.0
+    },
+    "SwapSlot": {
+        "count": 0,
+        "avg_reward": 0.0
+    },
+    "SwapRoomOnly": {
+        "count": 0,
+        "avg_reward": 0.0
+    }
+}

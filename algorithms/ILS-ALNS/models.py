@@ -96,7 +96,7 @@ class Schedule : # un emploi du temps complet proposé par l'algo
         payload = []
         for a in self.assignments:
             payload.append({
-                "module_part_id": a.module_part.id, # a.module_part.id est l'ID de l'assignment source
+                "module_part_id": a.module_part.module_id, # FIX: module_id est la FK vers module_parts
                 "teacher_id": a.module_part.teacher_id,
                 "room_id": a.room.id,
                 "slot_id": a.timeslot.id,
