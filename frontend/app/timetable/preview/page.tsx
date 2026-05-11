@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Calendar, Users, Download, Clock, MapPin, User as UserIcon
+    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
     getAssignments, Assignment, getPreviewSchedule,
     getTeachers, Teacher,
@@ -11,12 +12,13 @@ import {
     getModuleParts, ModulePart,
     getTimeslots, Timeslot,
     getSections, Section, getTDGroups,
-    auditSection, AuditResult
+    auditSection, AuditResult, commitPreview
 } from "@/lib/api";
 
 const DAYS_ORDER = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 export default function TimetablePage() {
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -113,6 +115,17 @@ export default function TimetablePage() {
         return teachers.filter(t => assignments.some(a => String(a.teacher_id) === String(t.id)));
     }, [teachers, assignments]);
 
+    const sortedRooms = React.useMemo(() => {
+        const typePriority: Record<string, number> = { "AMPHI": 1, "SALLE_TD": 2, "SALLE_TP": 3 };
+        const naturalCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+        return [...rooms].sort((a, b) => {
+            const pa = typePriority[a.type] || 99;
+            const pb = typePriority[b.type] || 99;
+            if (pa !== pb) return pa - pb;
+            return naturalCollator.compare(a.name, b.name);
+        });
+    }, [rooms]);
+
     return (
         <div className="page-container">
             <div className="hero-section" style={{ background: "linear-gradient(90deg, #1e3a8a, #0f172a)" }}>
@@ -154,24 +167,71 @@ export default function TimetablePage() {
                     )}
 
                     <button className="btn-download"><Download size={16} /> Exporter PDF</button>
+
+                    <button
+                        onClick={async () => {
+                            if (confirm("Voulez-vous valider ce planning et passer à l'édition manuelle ?")) {
+                                try {
+                                    await commitPreview(resultMode);
+                                    router.push(`/timetable/interactive?mode=${resultMode}`);
+                                } catch (err) {
+                                    alert("Erreur lors de la validation : " + err);
+                                }
+                            }
+                        }}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
+                            background: '#10b981', color: 'white', border: 'none', borderRadius: '12px',
+                            fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3)'
+                        }}
+                    >
+                        <CheckCircle size={18} /> Valider & Éditer
+                    </button>
                 </div>
 
-                <div className="timetable-main-flex" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
-                    {/* SIDEBAR GAUCHE : AUDIT */}
+                <div className="timetable-main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    {/* EN-TÊTE AUDIT (Score + Indicateurs en haut) */}
                     {auditResult && viewMode === "section" && (
-                        <div className="audit-sidebar-left" style={{ width: '180px', position: 'sticky', top: '20px', background: 'white', padding: '24px 16px', borderRadius: '16px', border: '1px solid #e2e8f0', textAlign: 'center', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}>
-                            <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px' }}>Score Global</span>
-                            <div style={{ fontSize: '2.8rem', fontWeight: 900, color: auditResult.score > 75 ? '#16a34a' : auditResult.score > 50 ? '#d97706' : '#dc2626', margin: '12px 0', lineHeight: 1 }}>
-                                {auditResult.score}%
+                        <div className="audit-top-bar" style={{
+                            display: 'flex', gap: '24px', background: 'white',
+                            padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0',
+                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)',
+                            alignItems: 'center'
+                        }}>
+                            {/* Score à gauche */}
+                            <div className="score-block" style={{ paddingRight: '24px', borderRight: '1px solid #f1f5f9', textAlign: 'center', minWidth: '140px' }}>
+                                <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px' }}>Score Global</span>
+                                <div style={{ fontSize: '2.2rem', fontWeight: 900, color: auditResult.score > 75 ? '#16a34a' : auditResult.score > 50 ? '#d97706' : '#dc2626', margin: '4px 0' }}>
+                                    {auditResult.score}%
+                                </div>
+                                <div style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', display: 'inline-block', background: auditResult.score > 75 ? '#dcfce7' : auditResult.score > 50 ? '#fef3c7' : '#fef2f2', color: auditResult.score > 75 ? '#166534' : auditResult.score > 50 ? '#92400e' : '#991b1b' }}>
+                                    {auditResult.status}
+                                </div>
                             </div>
-                            <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', background: auditResult.score > 75 ? '#dcfce7' : auditResult.score > 50 ? '#fef3c7' : '#fef2f2', color: auditResult.score > 75 ? '#166534' : auditResult.score > 50 ? '#92400e' : '#991b1b' }}>
-                                {auditResult.status}
+
+                            {/* Indicateurs en ligne */}
+                            <div className="indicators-row" style={{ flex: 1, display: 'flex', gap: '40px' }}>
+                                {Object.entries(auditResult.details || {}).map(([key, value]) => (
+                                    <div key={key} style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', marginBottom: '6px', textTransform: 'uppercase' }}>
+                                            <span>{key}</span>
+                                            <span style={{ color: '#1e293b' }}>{value}%</span>
+                                        </div>
+                                        <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{
+                                                width: `${value}%`, height: '100%',
+                                                background: value > 80 ? '#22c55e' : value > 50 ? '#eab308' : '#ef4444',
+                                                transition: 'width 1s ease-out'
+                                            }}></div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
 
-                    {/* CENTRE : PLANNING */}
-                    <div className="timetable-center-area" style={{ flex: 1, minWidth: 0 }}>
+                    {/* ZONE PLANNING (Plein écran) */}
+                    <div className="timetable-grid-area" style={{ flex: 1, minWidth: 0 }}>
                         {loading ? (
                             <div className="loading-state">Chargement...</div>
                         ) : assignments.length === 0 ? (
@@ -179,37 +239,79 @@ export default function TimetablePage() {
                                 <h3>Aucun résultat trouvé</h3>
                             </div>
                         ) : viewMode !== "master" ? (
-                            <div className="grid-container">
-                                <table className="pure-table">
+                            <div style={{ width: '100%', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', margin: 0 }}>
                                     <thead>
-                                        <tr>
-                                            <th style={{ width: '100px' }}>HEURE</th>
-                                            {DAYS_ORDER.map(d => <th key={d}>{d.toUpperCase()}</th>)}
+                                        <tr style={{ background: '#f8fafc' }}>
+                                            <th style={{ width: '85px', padding: '16px 8px', fontSize: '0.7rem', fontWeight: 900, color: '#64748b', borderBottom: '2px solid #e2e8f0', textTransform: 'uppercase' }}>
+                                                HEURE
+                                            </th>
+                                            {DAYS_ORDER.map(day => (
+                                                <th key={day} style={{ padding: '16px 8px', fontSize: '0.7rem', fontWeight: 900, color: '#475569', borderBottom: '2px solid #e2e8f0', borderLeft: '1px solid #f1f5f9', textTransform: 'uppercase', textAlign: 'center' }}>
+                                                    {day}
+                                                </th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {uniqueHours.map(time => (
                                             <tr key={time}>
-                                                <td className="time-header"><Clock size={12} /> {time}</td>
+                                                <td style={{ textAlign: 'center', background: '#f8fafc', borderBottom: '1px solid #cbd5e1', borderRight: '2px solid #cbd5e1' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 800, color: '#1e293b' }}>
+                                                        <Clock size={12} color="#64748b" /> {time}
+                                                    </div>
+                                                </td>
                                                 {DAYS_ORDER.map(day => {
                                                     const courses = getCoursesAt(day, time);
                                                     return (
-                                                        <td key={day} className={courses.length > 0 ? "cell-filled" : ""}>
-                                                            {courses.map(c => {
-                                                                const mp = moduleParts.find(p => p.id === c.module_part_id);
-                                                                const mod = modules.find(m => m.id === mp?.module_id);
-                                                                const teacher = teachers.find(t => t.id === c.teacher_id);
-                                                                const room = rooms.find(r => r.id === c.room_id);
-                                                                return (
-                                                                    <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`}>
-                                                                        <div className="c-name">{mod?.name}</div>
-                                                                        <div className="c-info-row">
-                                                                            <div className="c-room"><MapPin size={10} /> {room?.name}</div>
-                                                                            <div className="c-teacher">{teacher?.name}</div>
+                                                        <td key={day} style={{ padding: '12px', borderBottom: '1px solid #cbd5e1', borderLeft: '1px solid #cbd5e1', verticalAlign: 'top', height: '140px' }}>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                                {courses.map(c => {
+                                                                    const mp = moduleParts.find(p => p.id === c.module_part_id);
+                                                                    const mod = modules.find(m => m.id === mp?.module_id);
+                                                                    const teacher = teachers.find(t => t.id === c.teacher_id);
+                                                                    const room = rooms.find(r => r.id === c.room_id);
+
+                                                                    // Résolution des noms des groupes par leurs IDs
+                                                                    const isTDorTP = mp?.type.toLowerCase() !== 'cm';
+                                                                    const groupLabel = isTDorTP && c.td_groups && c.td_groups.length > 0
+                                                                        ? c.td_groups.map(g => {
+                                                                            const gid = typeof g === 'object' ? g.id : g;
+                                                                            const found = tdGroups.find(tg => String(tg.id) === String(gid));
+                                                                            if (!found) return "";
+                                                                            const parts = found.name.split(" ");
+                                                                            const grIndex = parts.findIndex((p: string) => p.toLowerCase() === "gr");
+                                                                            return grIndex !== -1 ? parts.slice(grIndex).join(" ") : found.name;
+                                                                        }).filter(n => n !== "").join('+')
+                                                                        : null;
+
+                                                                    return (
+                                                                        <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`} style={{ margin: 0, padding: '10px', borderRadius: '8px', borderLeft: '5px solid' }}>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                                                                                <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '0.75rem', lineHeight: 1.2, flex: 1 }}>
+                                                                                    {mod?.name}
+                                                                                </div>
+                                                                                {groupLabel && (
+                                                                                    <div style={{ background: '#1e293b', padding: '2px 6px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 900, color: 'white', marginLeft: '6px' }}>
+                                                                                        {groupLabel}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.65rem', fontWeight: 600 }}>
+                                                                                {/* Ligne 2 : Professeur */}
+                                                                                <div style={{ color: '#475569', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                                                                    {teacher ? `Pr. ${teacher.name}` : '—'}
+                                                                                </div>
+
+                                                                                {/* Ligne 3 : Salle */}
+                                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b' }}>
+                                                                                    <MapPin size={10} color="#94a3b8" /> {room?.name || '—'}
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         </td>
                                                     );
                                                 })}
@@ -219,52 +321,96 @@ export default function TimetablePage() {
                                 </table>
                             </div>
                         ) : (
-                            /* Simplified Master view for space */
-                            <div className="grid-container master-grid-view">
-                                <div className="scroll-box">
-                                    <table className="pure-table">
-                                        <thead>
-                                            <tr>
-                                                <th className="sticky-cell">HEURE</th>
-                                                {rooms.map(r => <th key={r.id}>{r.name}</th>)}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {timeslots.slice(0, 20).map(slot => ( // Just a slice for example
-                                                <tr key={slot.id}>
-                                                    <td className="sticky-cell">{slot.day} {slot.start_time}</td>
-                                                    {rooms.map(room => {
-                                                        const a = assignments.find(asgn => asgn.slot_id === slot.id && asgn.room_id === room.id);
-                                                        return <td key={room.id}>{a ? modules.find(m => m.id === moduleParts.find(p => p.id === a.module_part_id)?.module_id)?.name : ""}</td>;
-                                                    })}
-                                                </tr>
+                            <div style={{
+                                width: '100%', height: 'calc(100vh - 350px)',
+                                background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0',
+                                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'auto',
+                                position: 'relative'
+                            }}>
+                                <table style={{ borderCollapse: 'separate', borderSpacing: 0, width: 'max-content', minWidth: '100%' }}>
+                                    <thead>
+                                        <tr>
+                                            <th style={{
+                                                position: 'sticky', top: 0, left: 0, zIndex: 10,
+                                                background: '#f8fafc', padding: '16px', fontSize: '0.7rem', fontWeight: 900,
+                                                color: '#64748b', borderBottom: '2px solid #e2e8f0', borderRight: '2px solid #e2e8f0'
+                                            }}>HEURE / SALLE</th>
+                                            {sortedRooms.map(r => (
+                                                <th key={r.id} style={{
+                                                    position: 'sticky', top: 0, zIndex: 5,
+                                                    background: '#f8fafc', padding: '16px', fontSize: '0.7rem', fontWeight: 900,
+                                                    color: '#475569', borderBottom: '2px solid #e2e8f0', borderLeft: '1px solid #f1f5f9',
+                                                    textTransform: 'uppercase', textAlign: 'center', minWidth: '180px'
+                                                }}>
+                                                    {r.name}
+                                                    <div style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 600 }}>{r.type} • Cap. {r.capacity}</div>
+                                                </th>
                                             ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {DAYS_ORDER.map(day => (
+                                            <React.Fragment key={day}>
+                                                <tr style={{ background: '#f1f5f9' }}>
+                                                    <td colSpan={sortedRooms.length + 1} style={{ padding: '8px 20px', fontSize: '0.75rem', fontWeight: 900, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid #e2e8f0' }}>
+                                                        {day}
+                                                    </td>
+                                                </tr>
+                                                {uniqueHours.map(time => (
+                                                    <tr key={`${day}-${time}`}>
+                                                        <td style={{
+                                                            position: 'sticky', left: 0, zIndex: 4,
+                                                            background: '#f8fafc', padding: '12px', borderBottom: '1px solid #cbd5e1',
+                                                            borderRight: '2px solid #cbd5e1', textAlign: 'center', fontWeight: 800, fontSize: '0.75rem'
+                                                        }}>
+                                                            {time}
+                                                        </td>
+                                                        {sortedRooms.map(room => {
+                                                            const a = assignments.find(asgn => {
+                                                                const ts = timeslots.find(t => t.id === asgn.slot_id);
+                                                                if (!ts) return false;
+                                                                const dayMatch = ts.day.toLowerCase().trim() === day.toLowerCase().trim();
+                                                                const timeMatch = ts.start_time.substring(0, 5) === time;
+                                                                return dayMatch && timeMatch && asgn.room_id === room.id;
+                                                            });
+
+                                                            if (!a) return <td key={room.id} style={{ borderBottom: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9', background: 'white' }}></td>;
+
+                                                            const mp = moduleParts.find(p => p.id === a.module_part_id);
+                                                            const mod = modules.find(m => m.id === mp?.module_id);
+                                                            const teacher = teachers.find(t => t.id === a.teacher_id);
+                                                            const sec = sections.find(s => s.id === a.section_id);
+
+                                                            const type = mp?.type.toLowerCase() || 'cm';
+                                                            const color = type === 'cm' ? '#3b82f6' : type === 'td' ? '#22c55e' : '#ec4899';
+                                                            const bg = type === 'cm' ? '#eff6ff' : type === 'td' ? '#f0fdf4' : '#fdf2f8';
+
+                                                            return (
+                                                                <td key={room.id} style={{ padding: '8px', borderBottom: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9', background: 'white', verticalAlign: 'top' }}>
+                                                                    <div style={{
+                                                                        padding: '8px', borderRadius: '8px', borderLeft: `4px solid ${color}`,
+                                                                        background: bg, fontSize: '0.65rem'
+                                                                    }}>
+                                                                        <div style={{ fontWeight: 800, color: '#1e3a8a', marginBottom: '4px', lineHeight: 1.2 }}>{mod?.name}</div>
+                                                                        <div style={{ color: '#475569', fontSize: '0.6rem', textTransform: 'uppercase', marginBottom: '2px' }}>
+                                                                            {teacher ? `Pr. ${teacher.name}` : '—'}
+                                                                        </div>
+                                                                        <div style={{ fontWeight: 700, color: '#64748b', fontSize: '0.6rem' }}>
+                                                                            {sec ? sec.name : a.td_groups && a.td_groups.length > 0 ? a.td_groups.map(g => g.name).join('+') : '—'}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </React.Fragment>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </div>
-
-                    {/* SIDEBAR DROITE : DETAILS AUDIT */}
-                    {auditResult && viewMode === "section" && (
-                        <div className="audit-sidebar-right" style={{ width: '200px', position: 'sticky', top: '20px', background: 'white', padding: '24px 16px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}>
-                            <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px', display: 'block', marginBottom: '20px' }}>Indicateurs</span>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                                {Object.entries(auditResult.details || {}).map(([key, value]) => (
-                                    <div key={key}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>
-                                            <span style={{ textTransform: 'uppercase' }}>{key}</span>
-                                            <span>{value}%</span>
-                                        </div>
-                                        <div style={{ height: '4px', background: '#f1f5f9', borderRadius: '2px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${value}%`, height: '100%', background: value > 80 ? '#22c55e' : value > 50 ? '#eab308' : '#ef4444' }}></div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
 

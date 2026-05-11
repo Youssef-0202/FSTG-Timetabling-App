@@ -516,6 +516,45 @@ def get_preview_schedule(mode: str = "ga_sa"):
         except:
             return []
 
+@app.post("/commit-preview", status_code=201)
+def commit_preview(mode: str = "alns", db: Session = Depends(get_db)):
+    """
+    Prend le contenu d'un fichier de preview (JSON) et l'injecte officiellement
+    dans la base de données SQL des affectations.
+    """
+    if mode == "rl": filename = "generated_timetable_rl.json"
+    elif mode == "alns": filename = "generated_timetable_alns.json"
+    else: filename = "generated_timetable.json"
+
+    file_path = os.path.join(os.path.dirname(__file__), filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Fichier de preview introuvable")
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # On convertit le format JSON en objets schemas.AssignmentCreate
+        assignments_to_save = []
+        for item in data:
+            # Conversion des td_groups (qui sont des objets complets dans le JSON) en IDs
+            group_ids = [g['id'] for g in item.get('td_groups', [])]
+            
+            assignments_to_save.append(schemas.AssignmentCreate(
+                module_part_id=item['module_part_id'],
+                teacher_id=item['teacher_id'],
+                room_id=item['room_id'],
+                slot_id=item['slot_id'],
+                section_id=item.get('section_id'),
+                is_locked=item.get('is_locked', False),
+                tdgroup_ids=group_ids
+            ))
+
+        # On utilise la fonction de sauvegarde existante
+        return save_assignments(assignments_to_save, db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur de commit : {str(e)}")
+
 
 # --- GESTION DES RÉSULTATS D'OPTIMISATION ---
 

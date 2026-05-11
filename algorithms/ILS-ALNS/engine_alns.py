@@ -1,11 +1,14 @@
 # ==============================================================================
-# engine_alns.py — Moteur ILS-ALNS v1 ORIGINAL
-# VERSION QUI A PRODUIT S=9217, H=0
+# engine_alns.py — ILS-ALNS VERSION ORIGINALE (score 9217, H=0)
 #
-# NE PAS MODIFIER CETTE VERSION.
-# Paramètres du run gagnant :
-#   pop_size=20, sa_iterations=1200, sa_temp=50, sa_cooling=0.965
-#   MAX_GEN=150, ELITISM=2, PATIENCE=25
+# Paramètres du run gagnant (à utiliser dans main_alns.py) :
+#   POP_SIZE      = 20
+#   MAX_GEN       = 150
+#   SA_ITERATIONS = 1200
+#   SA_TEMP       = 50.0
+#   SA_COOLING    = 0.965
+#   ELITISM       = 2
+#   PATIENCE      = 20
 # ==============================================================================
 
 import random
@@ -21,6 +24,7 @@ from constraints import calculate_fitness_full
 # ==============================================================================
 
 class UCB1Bandit:
+
     def __init__(self, n_operators, exploration_c=1.5):
         self.n        = n_operators
         self.C        = exploration_c
@@ -53,11 +57,11 @@ class UCB1Bandit:
 
 
 # ==============================================================================
-# SECTION B : 8 OPÉRATEURS (KempeChain inclus dans le SA — c'est voulu)
+# SECTION B : 8 OPÉRATEURS
 # ==============================================================================
 
 def op_random_shift(schedule, unlocked, dm):
-    """Op 0 : Déplacement aléatoire complet (salle + créneau)."""
+    """Op 0 : Déplacement aléatoire complet (salle + créneau). Exploration pure."""
     idx = random.choice(unlocked)
     a = schedule.assignments[idx]
     valid_rooms = [r for r in dm.rooms if r.capacity >= a.module_part.group_size]
@@ -65,7 +69,8 @@ def op_random_shift(schedule, unlocked, dm):
         valid_rooms = [r for r in valid_rooms if r.type == a.module_part.required_room_type]
     if not valid_rooms:
         valid_rooms = dm.rooms
-    valid_slots = [s for s in dm.timeslots if not (a.module_part.type == "CM" and s.day == "SAMEDI")]
+    valid_slots = [s for s in dm.timeslots
+                   if not (a.module_part.type == "CM" and s.day == "SAMEDI")]
     old = (a.room, a.timeslot)
     a.room     = random.choice(valid_rooms)
     a.timeslot = random.choice(valid_slots)
@@ -101,29 +106,25 @@ def op_stabilize_room(schedule, unlocked, dm):
         key = (schedule.assignments[i].module_part.module_id,
                schedule.assignments[i].module_part.type)
         module_groups.setdefault(key, []).append(i)
-
     if not module_groups:
         return op_random_shift(schedule, unlocked, dm)
-
     multi = [k for k, v in module_groups.items() if len(v) >= 2]
-    key = random.choice(multi if multi else list(module_groups.keys()))
+    key     = random.choice(multi if multi else list(module_groups.keys()))
     indices = module_groups[key]
-
-    max_cap = max(schedule.assignments[i].module_part.group_size for i in indices)
+    max_cap  = max(schedule.assignments[i].module_part.group_size for i in indices)
     req_type = schedule.assignments[indices[0]].module_part.required_room_type
-    valid_rooms = [r for r in dm.rooms if r.capacity >= max_cap]
+    valid    = [r for r in dm.rooms if r.capacity >= max_cap]
     if req_type:
-        valid_rooms = [r for r in valid_rooms if r.type == req_type]
-    if not valid_rooms:
-        valid_rooms = dm.rooms
-
-    target_room = random.choice(valid_rooms)
-    saved_indices, saved_states = [], []
+        valid = [r for r in valid if r.type == req_type]
+    if not valid:
+        valid = dm.rooms
+    target_room = random.choice(valid)
+    si, ss = [], []
     for i in indices:
-        saved_indices.append(i)
-        saved_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
+        si.append(i)
+        ss.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
         schedule.assignments[i].room = target_room
-    return saved_indices, saved_states
+    return si, ss
 
 
 def op_compact_day_prof(schedule, unlocked, dm):
@@ -131,25 +132,25 @@ def op_compact_day_prof(schedule, unlocked, dm):
     if not unlocked:
         return op_random_shift(schedule, unlocked, dm)
     idx = random.choice(unlocked)
-    a = schedule.assignments[idx]
-    prof_id = a.module_part.teacher_id
-    if not prof_id:
+    a   = schedule.assignments[idx]
+    pid = a.module_part.teacher_id
+    if not pid:
         return op_random_shift(schedule, unlocked, dm)
     prof_assigns = [i for i in unlocked
-                    if schedule.assignments[i].module_part.teacher_id == prof_id and i != idx]
+                    if schedule.assignments[i].module_part.teacher_id == pid and i != idx]
     if not prof_assigns:
         return op_random_shift(schedule, unlocked, dm)
     day_counts = {}
     for i in prof_assigns:
         d = schedule.assignments[i].timeslot.day
         day_counts[d] = day_counts.get(d, 0) + 1
-    anchor_day = max(day_counts, key=day_counts.get)
-    slots_on_day = [s for s in dm.timeslots if s.day == anchor_day]
+    anchor_day    = max(day_counts, key=day_counts.get)
+    slots_on_day  = [s for s in dm.timeslots if s.day == anchor_day]
     if not slots_on_day:
         return op_random_shift(schedule, unlocked, dm)
-    old_state = (a.room, a.timeslot)
+    old = (a.room, a.timeslot)
     a.timeslot = random.choice(slots_on_day)
-    return [idx], [old_state]
+    return [idx], [old]
 
 
 def op_compact_day_section(schedule, unlocked, dm):
@@ -157,7 +158,7 @@ def op_compact_day_section(schedule, unlocked, dm):
     if not unlocked:
         return op_random_shift(schedule, unlocked, dm)
     idx = random.choice(unlocked)
-    a = schedule.assignments[idx]
+    a   = schedule.assignments[idx]
     sec_id = a.module_part.section_id
     if not sec_id:
         return op_random_shift(schedule, unlocked, dm)
@@ -169,13 +170,13 @@ def op_compact_day_section(schedule, unlocked, dm):
     for i in sec_assigns:
         d = schedule.assignments[i].timeslot.day
         day_counts[d] = day_counts.get(d, 0) + 1
-    anchor_day = max(day_counts, key=day_counts.get)
+    anchor_day   = max(day_counts, key=day_counts.get)
     slots_on_day = [s for s in dm.timeslots if s.day == anchor_day]
     if not slots_on_day:
         return op_random_shift(schedule, unlocked, dm)
-    old_state = (a.room, a.timeslot)
+    old = (a.room, a.timeslot)
     a.timeslot = random.choice(slots_on_day)
-    return [idx], [old_state]
+    return [idx], [old]
 
 
 def op_lunch_fix(schedule, unlocked, dm):
@@ -187,64 +188,59 @@ def op_lunch_fix(schedule, unlocked, dm):
     if not lunch_indices:
         return op_compact_day_section(schedule, unlocked, dm)
     idx = random.choice(lunch_indices)
-    a = schedule.assignments[idx]
+    a   = schedule.assignments[idx]
     current_day = a.timeslot.day
     alt_slots = [s for s in dm.timeslots
                  if s.day == current_day and
                  '12' not in str(getattr(s, 'start_time', ''))]
     if not alt_slots:
         return op_random_shift(schedule, unlocked, dm)
-    old_state = (a.room, a.timeslot)
+    old = (a.room, a.timeslot)
     a.timeslot = random.choice(alt_slots)
-    return [idx], [old_state]
+    return [idx], [old]
 
 
 def op_swap_room_only(schedule, unlocked, dm):
     """Op 6 : Réallocation de salle uniquement."""
-    idx = random.choice(unlocked)
-    a = schedule.assignments[idx]
-    valid_rooms = [r for r in dm.rooms if r.capacity >= a.module_part.group_size]
+    idx   = random.choice(unlocked)
+    a     = schedule.assignments[idx]
+    valid = [r for r in dm.rooms if r.capacity >= a.module_part.group_size]
     if a.module_part.required_room_type:
-        valid_rooms = [r for r in valid_rooms if r.type == a.module_part.required_room_type]
-    if not valid_rooms:
-        valid_rooms = dm.rooms
-    old_state = (a.room, a.timeslot)
-    a.room = random.choice(valid_rooms)
-    return [idx], [old_state]
+        valid = [r for r in valid if r.type == a.module_part.required_room_type]
+    if not valid:
+        valid = dm.rooms
+    old    = (a.room, a.timeslot)
+    a.room = random.choice(valid)
+    return [idx], [old]
 
 
 def op_kempe_chain(schedule, unlocked, dm):
-    """
-    Op 7 : Kempe Chain — échange complet de deux créneaux.
-    INCLUS DANS LE SA (contrairement aux versions v2/v3).
-    C'est lui qui permet de sortir des optima locaux profonds.
-    """
+    """Op 7 : Kempe Chain — échange complet de deux créneaux."""
     if len(dm.timeslots) < 2:
         return op_swap_slots(schedule, unlocked, dm)
     slot_a, slot_b = random.sample(dm.timeslots, 2)
-    assignments_a = [i for i in unlocked if schedule.assignments[i].timeslot.id == slot_a.id]
-    assignments_b = [i for i in unlocked if schedule.assignments[i].timeslot.id == slot_b.id]
-    if not assignments_a and not assignments_b:
+    aa = [i for i in unlocked if schedule.assignments[i].timeslot.id == slot_a.id]
+    bb = [i for i in unlocked if schedule.assignments[i].timeslot.id == slot_b.id]
+    if not aa and not bb:
         return op_swap_slots(schedule, unlocked, dm)
-    for i in assignments_a:
+    for i in aa:
         if schedule.assignments[i].module_part.type == "CM" and slot_b.day == "SAMEDI":
             return op_swap_slots(schedule, unlocked, dm)
-    for i in assignments_b:
+    for i in bb:
         if schedule.assignments[i].module_part.type == "CM" and slot_a.day == "SAMEDI":
             return op_swap_slots(schedule, unlocked, dm)
-    saved_indices, saved_states = [], []
-    for i in assignments_a:
-        saved_indices.append(i)
-        saved_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
+    si, ss = [], []
+    for i in aa:
+        si.append(i)
+        ss.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
         schedule.assignments[i].timeslot = slot_b
-    for i in assignments_b:
-        saved_indices.append(i)
-        saved_states.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
+    for i in bb:
+        si.append(i)
+        ss.append((schedule.assignments[i].room, schedule.assignments[i].timeslot))
         schedule.assignments[i].timeslot = slot_a
-    return saved_indices, saved_states
+    return si, ss
 
 
-# 8 opérateurs — KempeChain (op 7) EST dans le pool SA
 OPERATORS = [
     op_random_shift,        # 0
     op_swap_slots,          # 1
@@ -253,7 +249,7 @@ OPERATORS = [
     op_compact_day_section, # 4
     op_lunch_fix,           # 5
     op_swap_room_only,      # 6
-    op_kempe_chain,         # 7  ← clé du score 9217
+    op_kempe_chain,         # 7
 ]
 OP_NAMES = [
     "RandomShift", "SwapSlots", "StabilizeRoom", "CompactProf",
@@ -263,46 +259,41 @@ N_OPERATORS = len(OPERATORS)
 
 
 # ==============================================================================
-# SECTION C : SA-ALNS (recuit avec bandit — KempeChain inclus)
+# SECTION C : SA-ALNS
 # ==============================================================================
 
 def sa_alns(schedule, dm, constraints_mask, bandit,
             sa_iterations=1200, sa_temp=50.0, sa_cooling=0.965):
-    """
-    SA-ALNS v1 original.
-    T=50, cooling=0.965, iterations=1200 → T finale ≈ 0.6
-    KempeChain fait partie des bras du bandit.
-    """
+
     def get_score(sch):
         if sch.fitness is None:
             s, h, soft, _ = calculate_fitness_full(sch, mask=constraints_mask)
-            sch.fitness       = s
-            sch.h_violations  = h
-            sch.soft_penalty  = soft
+            sch.fitness      = s
+            sch.h_violations = h
+            sch.soft_penalty = soft
         return sch.fitness
 
-    current_fit = get_score(schedule)
-    best_fit    = current_fit
-    best_state  = [(a.room, a.timeslot) for a in schedule.assignments]
+    current_fit  = get_score(schedule)
+    best_fit     = current_fit
+    best_state   = [(a.room, a.timeslot) for a in schedule.assignments]
 
-    temp     = max(sa_temp, current_fit * 0.04)
-    unlocked = [i for i, a in enumerate(schedule.assignments) if not a.module_part.is_locked]
+    temp         = max(sa_temp, current_fit * 0.04)
+    unlocked     = [i for i, a in enumerate(schedule.assignments)
+                    if not a.module_part.is_locked]
     if not unlocked:
         return schedule
 
-    stag        = 0
+    stag         = 0
     reheat_count = 0
 
     for it in range(sa_iterations):
-        # Reheat si stagnation > 15% du budget (max 3 fois)
         if stag > sa_iterations // 6 and reheat_count < 3:
             temp         = sa_temp * (0.5 ** reheat_count)
             stag         = 0
             reheat_count += 1
 
         arm      = bandit.select()
-        operator = OPERATORS[arm]
-        saved_indices, saved_states = operator(schedule, unlocked, dm)
+        saved_i, saved_s = OPERATORS[arm](schedule, unlocked, dm)
 
         schedule.fitness = None
         neighbor_fit     = get_score(schedule)
@@ -311,23 +302,22 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
         if delta < 0 or (temp > 1e-10 and random.random() < math.exp(-delta / temp)):
             current_fit = neighbor_fit
             stag        = 0
-            reward      = max(0.0, -delta / max(1.0, abs(best_fit))) * 100
+            reward = max(0.0, -delta / max(1.0, abs(best_fit))) * 100
             bandit.update(arm, reward)
             if current_fit < best_fit:
-                best_fit  = current_fit
+                best_fit   = current_fit
                 best_state = [(a.room, a.timeslot) for a in schedule.assignments]
         else:
-            for i, (r, s) in zip(saved_indices, saved_states):
+            for i, (r, s) in zip(saved_i, saved_s):
                 schedule.assignments[i].room     = r
                 schedule.assignments[i].timeslot = s
             schedule.fitness = current_fit
-            stag            += 1
+            stag += 1
             if stag % 50 == 0:
                 bandit.update(arm, 0.0)
 
         temp *= sa_cooling
 
-    # Restauration du meilleur état
     for i, (r, s) in enumerate(best_state):
         schedule.assignments[i].room     = r
         schedule.assignments[i].timeslot = s
@@ -341,9 +331,9 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
 # ==============================================================================
 
 def ils_perturbation(schedule, dm, constraints_mask, strength=0.08):
-    """Perturbation ILS : Kempe Chains aléatoires pour sortir de l'optimum local."""
     perturbed = copy.deepcopy(schedule)
-    unlocked  = [i for i, a in enumerate(perturbed.assignments) if not a.module_part.is_locked]
+    unlocked  = [i for i, a in enumerate(perturbed.assignments)
+                 if not a.module_part.is_locked]
     if not unlocked:
         return perturbed
     n_kicks = max(1, int(len(unlocked) * strength))
@@ -363,12 +353,6 @@ def ils_perturbation(schedule, dm, constraints_mask, strength=0.08):
 # ==============================================================================
 
 class HybridEngine:
-    """
-    Moteur ILS-ALNS v1 — version originale ayant produit S=9217.
-
-    Interface compatible avec main_alns.py :
-      create_initial_population() / evolve() / inject_diversity()
-    """
 
     def __init__(self, data_manager,
                  pop_size=20,
@@ -395,8 +379,6 @@ class HybridEngine:
             "S_FATIGUE": True, "S_SATURDAY": True,
             "S_MIXING": True, "S_CM_DISPERSION": True
         }
-
-        # Bandit UCB1 simple (sans fenêtre glissante — v1 originale)
         self.bandit        = UCB1Bandit(N_OPERATORS, exploration_c=1.5)
         self.generation    = 0
         self.best_ever     = None
@@ -414,7 +396,8 @@ class HybridEngine:
         self.population = []
         n_greedy = int(self.pop_size * 0.8)
         for k in range(self.pop_size):
-            ind = self._build_greedy_individual() if k < n_greedy else self._build_random_individual()
+            ind = self._build_greedy_individual() if k < n_greedy \
+                  else self._build_random_individual()
             self.get_score(ind)
             self.population.append(ind)
         self.population.sort(key=lambda x: x.fitness)
@@ -425,8 +408,10 @@ class HybridEngine:
         assignments = []
         for mp in self.dm.module_parts:
             if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
-                room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
-                slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id), random.choice(self.dm.timeslots))
+                room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id),
+                            random.choice(self.dm.rooms))
+                slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id),
+                            random.choice(self.dm.timeslots))
             else:
                 room = random.choice(self.dm.rooms)
                 slot = random.choice(self.dm.timeslots)
@@ -434,7 +419,6 @@ class HybridEngine:
         return Schedule(self.dm, assignments)
 
     def _build_greedy_individual(self):
-        assignments       = []
         teacher_slot_used = {}
         room_slot_used    = {}
         group_slot_used   = {}
@@ -460,6 +444,7 @@ class HybridEngine:
 
         mps = list(self.dm.module_parts)
         random.shuffle(mps)
+        result = []
 
         for mp in mps:
             is_cm  = (mp.type == "CM")
@@ -467,13 +452,17 @@ class HybridEngine:
             sec_id = mp.section_id
 
             if mp.is_locked and mp.fixed_room_id and mp.fixed_slot_id:
-                room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id), random.choice(self.dm.rooms))
-                slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id), random.choice(self.dm.timeslots))
+                room = next((r for r in self.dm.rooms if r.id == mp.fixed_room_id),
+                            random.choice(self.dm.rooms))
+                slot = next((s for s in self.dm.timeslots if s.id == mp.fixed_slot_id),
+                            random.choice(self.dm.timeslots))
             else:
                 best_room, best_slot, best_cost = None, None, float('inf')
-                valid_slots = [s for s in self.dm.timeslots if not (is_cm and s.day == "SAMEDI")]
+                valid_slots = [s for s in self.dm.timeslots
+                               if not (is_cm and s.day == "SAMEDI")]
                 cand_slots  = random.sample(valid_slots, min(15, len(valid_slots)))
-                cand_rooms  = [r for r in self.dm.rooms if r.capacity >= mp.group_size] or self.dm.rooms
+                cand_rooms  = [r for r in self.dm.rooms
+                               if r.capacity >= mp.group_size] or self.dm.rooms
 
                 for sc in cand_slots:
                     for rc in cand_rooms:
@@ -512,16 +501,16 @@ class HybridEngine:
                 sec_occupancy[k2]['any'] = True
                 if is_cm:  sec_occupancy[k2]['cm'] = True
                 if is_gr6: sec_occupancy[k2]['gr6'] = True
-            assignments.append(Assignment(mp, room, slot))
+            result.append(Assignment(mp, room, slot))
 
-        return Schedule(self.dm, assignments)
+        return Schedule(self.dm, result)
 
     def evolve(self):
         self.generation += 1
         self.population.sort(key=lambda x: self.get_score(x))
         new_gen, impact_list = [], []
 
-        # Élites : SA-ALNS direct
+        # Élites : SA direct
         for i in range(self.elitism):
             ind     = copy.deepcopy(self.population[i])
             old_fit = self.get_score(ind)
@@ -532,13 +521,14 @@ class HybridEngine:
             impact_list.append(max(0, old_fit - ind.fitness))
             new_gen.append(ind)
 
-        # Non-élites : ILS (perturbation + SA)
+        # Non-élites : ILS + SA
         strength = max(0.04, 0.12 - self.generation * 0.001)
         while len(new_gen) < self.pop_size:
             tournament = random.sample(self.population, min(4, len(self.population)))
             parent     = min(tournament, key=lambda x: x.fitness)
             old_fit    = self.get_score(parent)
-            perturbed  = ils_perturbation(parent, self.dm, self.constraints_mask, strength=strength)
+            perturbed  = ils_perturbation(parent, self.dm, self.constraints_mask,
+                                          strength=strength)
             improved   = sa_alns(perturbed, self.dm, self.constraints_mask, self.bandit,
                                  sa_iterations=self.sa_iterations,
                                  sa_temp=self.sa_temp * 0.6,
@@ -568,7 +558,8 @@ class HybridEngine:
                     sa_cooling=self.sa_cooling)
             self.get_score(ind)
             new_blood.append(ind)
-        self.population = kept + new_blood + self.population[self.elitism:self.pop_size - n_replace]
+        self.population = (kept + new_blood +
+                           self.population[self.elitism:self.pop_size - n_replace])
         self.population.sort(key=lambda x: self.get_score(x))
 
     def simulated_annealing_search(self, schedule):

@@ -1,8 +1,3 @@
-# ==============================================================================
-# main_alns.py — Paramètres exacts du run S=9217
-# NE PAS CHANGER LES PARAMÈTRES SA AVANT D'AVOIR REPRODUIT LE 9217.
-# ==============================================================================
-
 import os
 import json
 import time
@@ -14,14 +9,14 @@ from engine_alns import HybridEngine
 from reporting import (print_generation_status, generate_final_report,
                        initialize_log_file, HistoryLogger)
 
-# ── PARAMÈTRES DU RUN GAGNANT (S=9217) ───────────────────────────────────────
+# ── PARAMÈTRES EXACTS DU RUN 9217 ────────────────────────────────────────────
 POP_SIZE      = 20
 MAX_GEN       = 150
 MUTATION_RATE = 0.40
 ELITISM       = 2
-SA_ITERATIONS = 1200   # ← valeur du run 9217
-SA_TEMP       = 50.0   # ← valeur du run 9217
-SA_COOLING    = 0.965  # ← valeur du run 9217
+SA_ITERATIONS = 1200
+SA_TEMP       = 50.0
+SA_COOLING    = 0.965
 
 CONSTRAINTS_MASK = {
     "H1": True, "H2": True, "H3": True, "H4": True,
@@ -35,8 +30,7 @@ CONSTRAINTS_MASK = {
 
 def run_alns_optimization():
     print("=" * 60)
-    print("  ILS-ALNS v1 — VERSION ORIGINALE (S=9217)")
-    print("  Objectif : reproduire puis améliorer ce score")
+    print("  ILS-ALNS v1 — PARAMÈTRES EXACTS DU RUN 9217")
     print("=" * 60)
 
     dm = DataManager()
@@ -54,7 +48,7 @@ def run_alns_optimization():
     params = {
         "POP_SIZE": POP_SIZE, "MAX_GEN": MAX_GEN,
         "SA_ITERATIONS": SA_ITERATIONS, "SA_TEMP": SA_TEMP,
-        "SA_COOLING": SA_COOLING, "ALGORITHM": "ILS-ALNS-v1-original"
+        "SA_COOLING": SA_COOLING, "ALGORITHM": "ILS-ALNS-v1"
     }
 
     initialize_log_file(params, db_stats)
@@ -72,14 +66,14 @@ def run_alns_optimization():
         sa_cooling=SA_COOLING,
     )
 
-    print("\n[STEP 1] Population initiale...")
+    print("\n[STEP 1] Population initiale (Greedy 80% + Random 20%)...")
     engine.create_initial_population()
     init_score = engine.population[0].fitness
     print(f"  Score Initial : {init_score:.1f} | H: {engine.population[0].h_violations}")
 
     print("\n[STEP 2] Évolution...\n")
 
-    PATIENCE         = 25
+    PATIENCE         = 20
     no_improve_count = 0
     best_score_ever  = float('inf')
 
@@ -115,7 +109,7 @@ def run_alns_optimization():
     generate_final_report(engine, total_dur, init_score, CONSTRAINTS_MASK, actual_generations=gen)
 
     bandit_stats = engine.get_bandit_stats()
-    print("\n[BANDIT UCB1] Opérateurs :")
+    print("\n[BANDIT UCB1] Statistiques :")
     print(f"  {'Opérateur':<18} {'Count':>8} {'Avg Reward':>12}")
     print("  " + "-" * 42)
     for name, s in sorted(bandit_stats.items(), key=lambda x: -x[1]['avg_reward']):
@@ -128,6 +122,7 @@ def run_alns_optimization():
 
     best_final = engine.population[0]
     if hasattr(best_final, 'sync_to_db'):
+        print("[DB] Synchronisation...")
         best_final.sync_to_db()
 
     try:
@@ -135,7 +130,7 @@ def run_alns_optimization():
         export_path = os.path.join(root_dir, "backend", "generated_timetable_alns_v1.json")
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
-        print(f"\n[EXPORT] {export_path}")
+        print(f"[EXPORT] {export_path}")
         try:
             from export_excel_rl import run_export
             run_export()

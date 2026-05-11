@@ -1,10 +1,10 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-10 10:43:14
+ Date : 2026-05-10 23:23:37
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Algorithme          : ILS-ALNS-v1-original
+ - Algorithme          : ILS-ALNS-v1
  - Population Size      : 20
  - Max Generations      : 150
  - Mutation Rate        : N/A
@@ -26,26 +26,23 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 39841.00 secondes
+ Temps total d'execution  : 41777.14 secondes
  Generations effectuees   : 150
 ------------------------------------------------------------
- Score Initial (Best)     : 66015376.0
- Score Final   (Best)     : 8038927.5
- Amelioration Totale      : 87.8 %
+ Score Initial (Best)     : 70016499.5
+ Score Final   (Best)     : 10220.0
+ Amelioration Totale      : 100.0 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 8038927.5
-  - Pire Solution         : 100070118.5
-  - Moyenne Population    : 67507044.8
+  - Meilleure Solution    : 10220.0
+  - Pire Solution         : 14109330.0
+  - Moyenne Population    : 5242574.0
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - H_Total              : 8
-  - S_Total              : 38927.5
-  - H2_Salle             : 1
-  - H3_Grp               : 7
-  - S3_Gaps              : 3780
-  - S4_Lunch             : 2040
-  - S6_Stab              : 4000
-  - S8_FreeApm           : 1200
-  - S10_Sat              : 25000
+  - S_Total              : 10220.0
+  - S3_Gaps              : 1610
+  - S4_Lunch             : 1480
+  - S6_Stab              : 4400
+  - S8_FreeApm           : 900
+  - S10_Sat              : 0
 ============================================================

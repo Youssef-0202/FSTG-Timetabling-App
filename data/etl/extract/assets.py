@@ -13,31 +13,31 @@ def get_extract_path():
 
 def get_base_project_path():
     """Retourne la racine du projet (_Project_PFE)."""
-    # On remonte de 3 niveaux : extract -> Etl -> data -> _Project_PFE
+    # extract -> Etl -> data -> _Project_PFE
     return os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# --- PHASE 1: EXTRACTION (THE SOURCE FOR POWER BI) ---
 
 @asset(group_name="extraction")
 def database_raw_export(context: AssetExecutionContext):
-    """EXTRACTION : Donnees manuelles de PostgreSQL."""
+    """EXPORTER: Recupere les tables manuelles de PostgreSQL vers CSV."""
     engine = create_engine(DB_URL)
     save_dir = get_extract_path()
-    
     tables = ["professors", "modules", "sections", "departments"]
     for table in tables:
         try:
             df = pl.read_database(f"SELECT * FROM {table}", connection=engine)
             df.write_csv(os.path.join(save_dir, f"manual_{table}.csv"))
-            context.log.info(f"Table {table} extraite avec succes.")
+            context.log.info(f"Fichier manual_{table}.csv cree.")
         except Exception as e:
-            context.log.warning(f"Erreur extraction {table}: {e}")
+            context.log.warning(f"Note: Table {table} non trouvee ou vide.")
     return save_dir
 
 @asset(group_name="extraction")
 def raw_excel_assignments(context: AssetExecutionContext):
-    """EXTRACTION : Excel officiel des affectations."""
+    """EXPORTER: Lit l'Excel officiel pour Power BI."""
     base_dir = get_base_project_path()
     excel_path = os.path.join(base_dir, "data", "Modules-Enseignants_Emploi.xlsx")
-    
     df = pl.read_excel(excel_path)
     filiere_cols = ['GP', 'GI', 'MSD', 'GES', 'GC', 'GB', 'GEG']
     results = []
@@ -48,7 +48,7 @@ def raw_excel_assignments(context: AssetExecutionContext):
             for fil in active_filieres:
                 results.append({
                     "section": fil, 
-                    "semester": str(row.get('SEMESTRE', 'S2')),
+                    "semester": str(row.get('SEMESTRE', 'S2')), 
                     "module": str(mod), 
                     "teacher": f"{row.get('Nom')} {row.get('Prénom')}"
                 })
@@ -56,7 +56,7 @@ def raw_excel_assignments(context: AssetExecutionContext):
 
 @asset(group_name="extraction")
 def master_assignments_file(context: AssetExecutionContext, raw_excel_assignments: list):
-    """Fichier CSV final des affectations extraites."""
+    """Genere le CSV final des affectations Excel."""
     save_dir = get_extract_path()
     path = os.path.join(save_dir, "master_assignments.csv")
     pl.DataFrame(raw_excel_assignments).write_csv(path)
@@ -64,29 +64,28 @@ def master_assignments_file(context: AssetExecutionContext, raw_excel_assignment
 
 @asset(group_name="extraction")
 def master_rooms_file(context: AssetExecutionContext):
-    """EXTRACTION : Fusion et nettoyage des salles (Excel + CSV)."""
+    """EXPORTER: Fusion Salles (Excel + Master CSV)."""
     base_dir = get_base_project_path()
     ex_path = os.path.join(base_dir, "data", "occupation_locaux_printemps_25-26.xlsx")
     csv_path = os.path.join(base_dir, "data", "salles.csv")
-
+    
     df_ex = pl.read_excel(ex_path).rename({
         pl.read_excel(ex_path).columns[4]: "name", 
         pl.read_excel(ex_path).columns[5]: "capacity"
     }).select(["name", "capacity"]).with_columns(pl.col("name").str.replace_all(" ", "").alias("jk"))
-
+    
     df_csv = pl.read_csv(csv_path, separator=';', encoding='latin1').rename({
         pl.read_csv(csv_path, separator=';', encoding='latin1').columns[0]: "sc", 
         pl.read_csv(csv_path, separator=';', encoding='latin1').columns[3]: "tr",
         pl.read_csv(csv_path, separator=';', encoding='latin1').columns[2]: "cap"
     }).with_columns(pl.col("sc").str.replace_all(" ", "").alias("jk"))
-
+    
     res = df_ex.join(df_csv, on="jk", how="outer").with_columns([
-        pl.col("name").fill_null(pl.col("sc")),
-        pl.col("capacity").fill_null(pl.col("cap")),
+        pl.col("name").fill_null(pl.col("sc")), 
+        pl.col("capacity").fill_null(pl.col("cap")), 
         pl.when(pl.col("tr").str.to_lowercase().str.contains("amphi")).then(pl.lit("AMPHI")).otherwise(pl.lit("SALLE")).alias("type")
     ]).filter(pl.col("name").is_not_null()).select(["name", "capacity", "type"])
     
-    save_dir = get_extract_path()
-    path = os.path.join(save_dir, "master_rooms.csv")
+    path = os.path.join(get_extract_path(), "master_rooms.csv")
     res.write_csv(path)
     return path

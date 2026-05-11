@@ -228,6 +228,9 @@ export const updateAssignment = (id: number, data: Partial<AssignmentCreate>) =>
 export const deleteAssignment = (id: number) =>
   apiFetch<void>(`/assignments/${id}`, { method: "DELETE" });
 
+export const commitPreview = (mode: string = "alns") =>
+  apiFetch<{ message: string }>(`/commit-preview?mode=${mode}`, { method: "POST" });
+
 // ─── Auditing ───
 export interface AuditResult {
   section: string;
