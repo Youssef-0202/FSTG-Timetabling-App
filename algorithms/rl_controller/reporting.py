@@ -1,8 +1,10 @@
-
 import time
 import statistics
 import os
 import sys
+
+# Chargement des contraintes communes
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
 
 def get_log_path():
     """Détermine le chemin absolu du fichier de log (Force V2 Logs)."""

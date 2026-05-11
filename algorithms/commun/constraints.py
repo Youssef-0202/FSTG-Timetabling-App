@@ -168,8 +168,12 @@ def calculate_fitness_full(schedule, mask=None):
                 # S9: Fatigue (14:30 = +10, 16h35 = +20)
                 if "14:30" in ts.start_time: s_fatigue += 10
                 if "16:35" in ts.start_time: s_fatigue += 20
-                # S10: Samedi (Malus TD le samedi)
-                if ts.day == "SAMEDI": s_saturday += 5000
+                # S10: Samedi (Malus TD le samedi APM - Autorise TD le Samedi Matin sans pénalité)
+                if ts.day == "SAMEDI":
+                    is_morning = any(h in ts.start_time for h in ["08:30", "10:35"])
+                    is_td_tp = (mp.type != "CM") # TD ou TP
+                    if not (is_td_tp and is_morning):
+                        s_saturday += 5000
                 # Tracking des après-midis occupés (pour S8)
                 if any(h in ts.start_time for h in ["14:30", "16:35"]): busy_afternoons.add(day)
 

@@ -1,8 +1,12 @@
 
 import os
+import sys
 import json
 import time
 import copy
+
+# Chargement des contraintes communes
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
 from data_manager import DataManager
 from models import Schedule
 from constraints import calculate_fitness_full

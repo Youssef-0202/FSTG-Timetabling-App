@@ -4,6 +4,9 @@ import json
 import time
 from datetime import datetime
 
+# Chargement des contraintes communes
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
+
 # Imports locaux
 from data_manager import DataManager
 from models import Schedule

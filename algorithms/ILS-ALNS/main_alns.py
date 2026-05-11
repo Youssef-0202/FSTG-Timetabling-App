@@ -1,6 +1,10 @@
 import os
 import json
 import time
+import sys
+
+# Chargement des contraintes communes
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
 
 from data_manager import DataManager
 from models import Schedule
