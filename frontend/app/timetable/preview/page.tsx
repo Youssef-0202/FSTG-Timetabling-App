@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle
+    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -75,34 +75,57 @@ export default function TimetablePage() {
             const ts = timeslots.find(t => t.id === a.slot_id);
             if (!ts) return false;
             if (ts.day.toLowerCase().trim() !== day.toLowerCase().trim()) return false;
-            if (!ts.start_time.startsWith(startTime)) return false;
+            if (!ts.start_time.substring(0, 5).startsWith(startTime.substring(0, 5))) return false;
 
             if (viewMode === "section") {
-                if (String(a.section_id) === String(selectedId)) return true;
-                const hasLocalGroup = a.td_groups?.some(g => {
-                    const fullGroup = tdGroups.find(tg => tg.id === g.id);
+                const mp = moduleParts.find(p => p.id === a.module_part_id);
+                const isDirect = String(a.section_id) === String(selectedId);
+                const isGroupLocal = a.td_groups?.some(g => {
+                    const gid = typeof g === 'object' ? g.id : g;
+                    const fullGroup = tdGroups.find(tg => String(tg.id) === String(gid));
                     return fullGroup && String(fullGroup.section_id) === String(selectedId);
                 });
-                if (hasLocalGroup) return true;
+
+                if (isDirect || isGroupLocal) return true;
 
                 if (showFiliereAudit) {
-                    const mp = moduleParts.find(p => p.id === a.module_part_id);
-                    if (auditGhostType === "CM" && mp?.type !== "CM") return false;
                     const selectedS = sections.find(s => String(s.id) === String(selectedId));
-                    if (selectedS && selectedS.groupes) {
-                        const localFiliereIds = selectedS.groupes.map(g => g.filiere_id);
-                        const courseSection = sections.find(s => String(s.id) === String(a.section_id));
-                        if (courseSection && courseSection.groupes?.some(g => localFiliereIds.includes(g.filiere_id))) return true;
-                        const hasRelatedGroup = a.td_groups?.some(g => {
-                            const fullGroup = tdGroups.find(tg => tg.id === g.id);
-                            if (fullGroup) {
-                                const fullGroupSec = sections.find(s => String(s.id) === String(fullGroup.section_id));
-                                return fullGroupSec?.groupes?.some(fg => localFiliereIds.includes(fg.filiere_id));
-                            }
-                            return false;
+                    if (!selectedS || !selectedS.groupes) return false;
+                    const localFiliereIds = selectedS.groupes.map(g => g.filiere_id);
+                    const currentSemester = selectedS.name.split(" ").pop();
+
+                    // RÈGLE : Pas d'audit si on est en S4
+                    if (currentSemester === "S4") return false;
+
+                    const otherLevelSections = sections.filter((s: any) =>
+                        s.groupes?.some((g: any) => localFiliereIds.includes(g.filiere_id)) &&
+                        s.name.split(" ").pop() !== currentSemester
+                    );
+
+                    const isBlueInOtherLevel = otherLevelSections.some((rs: any) => {
+                        const isDirectMatch = String(a.section_id) === String(rs.id);
+                        const sharesGroupsWithRs = a.td_groups?.some((g: any) => {
+                            const gid = typeof g === 'object' ? g.id : g;
+                            const foundG = tdGroups.find(tg => String(tg.id) === String(gid));
+                            return foundG && String(foundG.section_id) === String(rs.id);
                         });
-                        if (hasRelatedGroup) return true;
-                    }
+                        const isRelated = isDirectMatch || sharesGroupsWithRs;
+                        const isCMorSectionWide = mp?.type === "CM" || !a.td_groups || a.td_groups.length === 0;
+                        return isRelated && isCMorSectionWide;
+                    });
+
+                    if (isBlueInOtherLevel) return true;
+
+                    const isRelatedGr6 = a.td_groups?.some((g: any) => {
+                        const gid = typeof g === 'object' ? g.id : g;
+                        const found = tdGroups.find(tg => String(tg.id) === String(gid));
+                        if (found && (found.name.toLowerCase().includes("gr 6") || found.name.toLowerCase().includes("gr6"))) {
+                            const grSec = sections.find((s: any) => String(s.id) === String(found.section_id));
+                            return grSec && grSec.groupes?.some((fg: any) => localFiliereIds.includes(fg.filiere_id)) && grSec.name.split(" ").pop() !== currentSemester;
+                        }
+                        return false;
+                    });
+                    if (isRelatedGr6) return true;
                 }
             } else if (viewMode === "teacher") {
                 return String(a.teacher_id) === String(selectedId);
@@ -140,16 +163,46 @@ export default function TimetablePage() {
                         <button className={viewMode === "teacher" ? "active" : ""} onClick={() => { setViewMode("teacher"); if (activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id)); }}><UserIcon size={16} /> Par Prof</button>
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
+                    <button
+                        onClick={() => router.push("/timetable/interactive")}
+                        style={{
+                            background: '#10b981', color: 'white', padding: '8px 16px',
+                            borderRadius: '10px', border: 'none', fontWeight: 800,
+                            fontSize: '0.75rem', cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)'
+                        }}
+                    >
+                        <Edit2 size={14} /> Édition Manuelle
+                    </button>
                     {viewMode === "section" && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: showFiliereAudit ? '#fee2e2' : '#f1f5f9', borderRadius: '8px', border: `1px solid ${showFiliereAudit ? '#fca5a5' : '#e2e8f0'}`, cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => setShowFiliereAudit(!showFiliereAudit)}>
+                        <div
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
+                                background: showFiliereAudit ? '#fee2e2' : '#f1f5f9',
+                                borderRadius: '8px', border: `1px solid ${showFiliereAudit ? '#fca5a5' : '#e2e8f0'}`,
+                                cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer',
+                                opacity: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 0.5 : 1,
+                                transition: 'all 0.2s'
+                            }}
+                            onClick={() => {
+                                if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
+                                    setShowFiliereAudit(!showFiliereAudit);
+                                }
+                            }}
+                        >
                             <input
                                 type="checkbox"
-                                checked={showFiliereAudit}
-                                onChange={(e) => setShowFiliereAudit(e.target.checked)}
-                                style={{ accentColor: '#ef4444', cursor: 'pointer' }}
+                                checked={showFiliereAudit && !sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
+                                onChange={(e) => {
+                                    if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
+                                        setShowFiliereAudit(e.target.checked);
+                                    }
+                                }}
+                                disabled={sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
+                                style={{ accentColor: '#ef4444', cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer' }}
                             />
-                            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: showFiliereAudit ? '#b91c1c' : '#64748b', cursor: 'pointer', userSelect: 'none' }}>
-                                Audit : Chevauchement Filières (Gr 6 / CM)
+                            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: showFiliereAudit ? '#b91c1c' : '#64748b', cursor: 'inherit', userSelect: 'none' }}>
+                                Audit : Chevauchement Filières
                             </label>
                         </div>
                     )}
@@ -202,7 +255,6 @@ export default function TimetablePage() {
                 </div>
 
                 <div className="timetable-main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    {/* EN-TÊTE AUDIT (Score + Indicateurs en haut) */}
                     {auditResult && viewMode === "section" && (
                         <div className="audit-top-bar" style={{
                             display: 'flex', gap: '24px', background: 'white',
@@ -210,7 +262,6 @@ export default function TimetablePage() {
                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)',
                             alignItems: 'center'
                         }}>
-                            {/* Score à gauche */}
                             <div className="score-block" style={{ paddingRight: '24px', borderRight: '1px solid #f1f5f9', textAlign: 'center', minWidth: '140px' }}>
                                 <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px' }}>Score Global</span>
                                 <div style={{ fontSize: '2.2rem', fontWeight: 900, color: auditResult.score > 75 ? '#16a34a' : auditResult.score > 50 ? '#d97706' : '#dc2626', margin: '4px 0' }}>
@@ -221,7 +272,6 @@ export default function TimetablePage() {
                                 </div>
                             </div>
 
-                            {/* Indicateurs en ligne */}
                             <div className="indicators-row" style={{ flex: 1, display: 'flex', gap: '40px' }}>
                                 {Object.entries(auditResult.details || {}).map(([key, value]) => (
                                     <div key={key} style={{ flex: 1 }}>
@@ -242,7 +292,6 @@ export default function TimetablePage() {
                         </div>
                     )}
 
-                    {/* ZONE PLANNING (Plein écran) */}
                     <div className="timetable-grid-area" style={{ flex: 1, minWidth: 0 }}>
                         {loading ? (
                             <div className="loading-state">Chargement...</div>
@@ -270,21 +319,28 @@ export default function TimetablePage() {
                                             <tr key={time}>
                                                 <td style={{ textAlign: 'center', background: '#f8fafc', borderBottom: '1px solid #cbd5e1', borderRight: '2px solid #cbd5e1' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 800, color: '#1e293b' }}>
-                                                        <Clock size={12} color="#64748b" /> {time}
+                                                        <Clock size={14} color="#64748b" /> {time}
                                                     </div>
                                                 </td>
                                                 {DAYS_ORDER.map(day => {
                                                     const courses = getCoursesAt(day, time);
                                                     return (
-                                                        <td key={day} style={{ padding: '12px', borderBottom: '1px solid #cbd5e1', borderLeft: '1px solid #cbd5e1', verticalAlign: 'top', height: '140px' }}>
+                                                        <td key={day} style={{ padding: '12px', borderBottom: '1px solid #cbd5e1', borderLeft: '1px solid #cbd5e1', verticalAlign: 'top' }}>
                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                                                 {courses.map(c => {
                                                                     const mp = moduleParts.find(p => p.id === c.module_part_id);
                                                                     const mod = modules.find(m => m.id === mp?.module_id);
                                                                     const teacher = teachers.find(t => t.id === c.teacher_id);
                                                                     const room = rooms.find(r => r.id === c.room_id);
+                                                                    const cSection = sections.find(s => s.id === c.section_id);
 
-                                                                    // Résolution des noms des groupes par leurs IDs
+                                                                    const isDirect = String(c.section_id) === String(selectedId);
+                                                                    const isGroupLocal = c.td_groups?.some(g => {
+                                                                        const gid = typeof g === 'object' ? g.id : g;
+                                                                        const found = tdGroups.find(tg => String(tg.id) === String(gid));
+                                                                        return found && String(found.section_id) === String(selectedId);
+                                                                    });
+
                                                                     const isTDorTP = mp?.type.toLowerCase() !== 'cm';
                                                                     const groupLabel = isTDorTP && c.td_groups && c.td_groups.length > 0
                                                                         ? c.td_groups.map(g => {
@@ -297,8 +353,54 @@ export default function TimetablePage() {
                                                                         }).filter(n => n !== "").join('+')
                                                                         : null;
 
+                                                                    let isGhost = false;
+                                                                    let ghostSectionName = cSection?.name || "FILIÈRE";
+                                                                    const selectedS = sections.find(s => String(s.id) === String(selectedId));
+
+                                                                    if (showFiliereAudit && !isDirect && !isGroupLocal) {
+                                                                        isGhost = true;
+                                                                        if (selectedS?.groupes) {
+                                                                            const localFiliereIds = selectedS.groupes.map(g => g.filiere_id);
+                                                                            const currentSem = selectedS.name.split(" ").pop();
+
+                                                                            // On collecte TOUTES les sections de l'autre niveau qui partagent ce cours
+                                                                            const otherLevelSections = sections.filter(s =>
+                                                                                s.groupes?.some(g => localFiliereIds.includes(g.filiere_id)) &&
+                                                                                s.name.split(" ").pop() !== currentSem
+                                                                            );
+
+                                                                            const sharingSections = otherLevelSections.filter(rs => {
+                                                                                // Match direct ?
+                                                                                const isDirectMatch = String(c.section_id) === String(rs.id) && (mp?.type === "CM" || !c.td_groups || c.td_groups.length === 0);
+                                                                                if (isDirectMatch) return true;
+                                                                                // Match via groupe ?
+                                                                                return c.td_groups?.some(g => {
+                                                                                    const gid = typeof g === 'object' ? g.id : g;
+                                                                                    const fullG = tdGroups.find(tg => String(tg.id) === String(gid));
+                                                                                    return fullG && String(fullG.section_id) === String(rs.id);
+                                                                                });
+                                                                            });
+
+                                                                            if (sharingSections.length > 0) {
+                                                                                ghostSectionName = sharingSections.map(s => s.name).join(' + ');
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    const bgColor = isGhost ? '#fff1f2' : undefined;
+
                                                                     return (
-                                                                        <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`} style={{ margin: 0, padding: '10px', borderRadius: '8px', borderLeft: '5px solid' }}>
+                                                                        <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`} style={{
+                                                                            margin: 0, padding: '10px', borderRadius: '8px',
+                                                                            borderLeft: `5px solid ${isGhost ? '#ef4444' : (mp?.type.toLowerCase() === 'cm' ? '#3b82f6' : '#22c55e')}`,
+                                                                            background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : bgColor,
+                                                                            pointerEvents: isGhost ? 'none' : 'auto',
+                                                                            position: 'relative',
+                                                                            boxShadow: isGhost ? '0 4px 6px -1px rgba(239, 68, 68, 0.1)' : undefined
+                                                                        }}>
+                                                                            {isGhost && (
+                                                                                <div style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', fontSize: '0.6rem', padding: '3px 6px', borderRadius: '4px', fontWeight: 900, boxShadow: '0 2px 4px rgba(0,0,0,0.2)', zIndex: 20 }}>{ghostSectionName}</div>
+                                                                            )}
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
                                                                                 <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '0.75rem', lineHeight: 1.2, flex: 1 }}>
                                                                                     {mod?.name}
@@ -310,12 +412,9 @@ export default function TimetablePage() {
                                                                                 )}
                                                                             </div>
                                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.65rem', fontWeight: 600 }}>
-                                                                                {/* Ligne 2 : Professeur */}
                                                                                 <div style={{ color: '#475569', textTransform: 'uppercase', fontSize: '0.6rem' }}>
                                                                                     {teacher ? `Pr. ${teacher.name}` : '—'}
                                                                                 </div>
-
-                                                                                {/* Ligne 3 : Salle */}
                                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b' }}>
                                                                                     <MapPin size={10} color="#94a3b8" /> {room?.name || '—'}
                                                                                 </div>
@@ -361,7 +460,7 @@ export default function TimetablePage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {DAYS_ORDER.map(day => (
+                                        {DAYS_ORDER.map((day, dayIdx) => (
                                             <React.Fragment key={day}>
                                                 <tr style={{ background: '#f1f5f9' }}>
                                                     <td colSpan={sortedRooms.length + 1} style={{ padding: '8px 20px', fontSize: '0.75rem', fontWeight: 900, color: '#1e3a8a', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid #e2e8f0' }}>
@@ -372,8 +471,8 @@ export default function TimetablePage() {
                                                     <tr key={`${day}-${time}`}>
                                                         <td style={{
                                                             position: 'sticky', left: 0, zIndex: 4,
-                                                            background: '#f8fafc', padding: '12px', borderBottom: '1px solid #cbd5e1',
-                                                            borderRight: '2px solid #cbd5e1', textAlign: 'center', fontWeight: 800, fontSize: '0.75rem'
+                                                            background: '#f8fafc', padding: '12px', borderBottom: '1px solid #e2e8f0', borderRight: '2px solid #cbd5e1',
+                                                            fontSize: '0.75rem', fontWeight: 800, color: '#475569', textAlign: 'center'
                                                         }}>
                                                             {time}
                                                         </td>
@@ -398,7 +497,7 @@ export default function TimetablePage() {
                                                             const bg = type === 'cm' ? '#eff6ff' : type === 'td' ? '#f0fdf4' : '#fdf2f8';
 
                                                             return (
-                                                                <td key={room.id} style={{ padding: '8px', borderBottom: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9', background: 'white', verticalAlign: 'top' }}>
+                                                                <td key={room.id} style={{ padding: '4px', border: '1px solid #e2e8f0', verticalAlign: 'top', background: '#f8fafc', position: 'relative' }}>
                                                                     <div style={{
                                                                         padding: '8px', borderRadius: '8px', borderLeft: `4px solid ${color}`,
                                                                         background: bg, fontSize: '0.65rem'

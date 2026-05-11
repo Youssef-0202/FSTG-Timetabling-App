@@ -41,15 +41,24 @@ function CourseCard({
     modName, teacherName, roomName, type, groupLabel,
     isDragging = false, isOverlay = false,
     dragListeners, dragRef, dragAttributes, transform,
-    conflicts = [],
+    conflicts = [], isGhost = false, sectionName = null,
+    showAudit = false,
 }: {
     modName: string; teacherName: string; roomName: string; type: string; groupLabel?: string | null;
     isDragging?: boolean; isOverlay?: boolean;
     dragListeners?: object; dragRef?: (el: HTMLElement | null) => void;
     dragAttributes?: object; transform?: { x: number; y: number } | null;
     conflicts?: string[];
+    isGhost?: boolean;
+    sectionName?: string | null;
+    showAudit?: boolean;
 }) {
+    const isGr6 = showAudit && (groupLabel?.toLowerCase().includes("gr 6") || groupLabel?.toLowerCase().includes("gr6"));
     const { border, bg, nameColor } = typeStyle(type);
+
+    const finalBorder = isGr6 ? "#f97316" : border;
+    const finalBg = isGr6 ? "#fff7ed" : bg;
+
     const hasConflicts = conflicts.length > 0;
     const conflictMsg = hasConflicts ? "CONFLITS :\n" + conflicts.map(c => "• " + c).join("\n") : "";
 
@@ -57,14 +66,16 @@ function CourseCard({
         padding: "9px 10px",
         borderRadius: "8px",
         fontSize: "0.75rem",
-        borderLeft: `5px solid ${border}`,
-        border: hasConflicts ? "2px solid #ef4444" : undefined,
-        boxShadow: hasConflicts ? "0 0 10px rgba(239, 68, 68, 0.15)" : undefined,
-        background: bg,
-        cursor: isDragging ? "grabbing" : "grab",
-        opacity: isDragging && !isOverlay ? 0 : 1,
+        borderLeft: isGhost ? "5px solid #ef4444" : `5px solid ${finalBorder}`,
+        border: hasConflicts ? "2px solid #ef4444" : isGhost ? '2px solid #ef4444' : (isGr6 ? "1px solid #fdba74" : undefined),
+        boxShadow: hasConflicts ? "0 0 10px rgba(239, 68, 68, 0.15)" : isGhost ? '0 4px 6px -1px rgba(239, 68, 68, 0.1)' : undefined,
+        background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : finalBg,
+        cursor: isDragging ? "grabbing" : isGhost ? 'default' : "grab",
+        opacity: isDragging && !isOverlay ? 0 : isGhost ? 0.72 : 1,
         userSelect: "none",
         position: "relative" as const,
+        pointerEvents: isGhost && !isOverlay ? 'none' : 'auto',
+        filter: isGhost ? 'grayscale(10%)' : 'none',
         ...(transform ? {
             transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
             zIndex: 1000,
@@ -72,7 +83,10 @@ function CourseCard({
     };
 
     return (
-        <div ref={dragRef} style={boxStyle} {...dragListeners} {...dragAttributes} title={conflictMsg}>
+        <div ref={dragRef} style={boxStyle} {...dragListeners} {...dragAttributes} title={isGhost ? `COURS DE LA SECTION : ${sectionName}` : conflictMsg}>
+            {isGhost && (
+                <div style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', fontSize: '0.55rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 900, zIndex: 20, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>{sectionName || 'FILIÈRE'}</div>
+            )}
             <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4
             }}>
@@ -106,18 +120,22 @@ function CourseCard({
     );
 }
 
-function DraggableCourse({ assignment, modName, teacherName, roomName, type, groupLabel, conflicts, onContextMenu }: {
+function DraggableCourse({ assignment, modName, teacherName, roomName, type, groupLabel, conflicts, onContextMenu, isGhost = false, sectionName = null, showAudit = false }: {
     assignment: Assignment; modName: string; teacherName: string; roomName: string; type: string; groupLabel?: string | null;
     conflicts: string[];
     onContextMenu: (e: React.MouseEvent, asgn: Assignment) => void;
+    isGhost?: boolean;
+    sectionName?: string | null;
+    showAudit?: boolean;
 }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: `course-${assignment.id}`,
         data: { assignment },
+        disabled: isGhost
     });
 
     return (
-        <div onContextMenu={(e) => onContextMenu(e, assignment)}>
+        <div onContextMenu={(e) => !isGhost && onContextMenu(e, assignment)}>
             <CourseCard
                 modName={modName}
                 teacherName={teacherName}
@@ -130,6 +148,9 @@ function DraggableCourse({ assignment, modName, teacherName, roomName, type, gro
                 dragAttributes={attributes}
                 transform={transform}
                 conflicts={conflicts}
+                isGhost={isGhost}
+                sectionName={sectionName}
+                showAudit={showAudit}
             />
         </div>
     );
@@ -181,6 +202,7 @@ export default function InteractiveEditor() {
     const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
     const [editingAsgn, setEditingAsgn] = useState<Assignment | null>(null);
     const [editData, setEditData] = useState<{ roomId: number | null, slotId: number | null, teacherId: number }>({ roomId: null, slotId: null, teacherId: 0 });
+    const [showFiliereAudit, setShowFiliereAudit] = useState(false);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -282,12 +304,15 @@ export default function InteractiveEditor() {
             }).filter(n => n !== "").join('+')
             : null;
 
+        const section = sectionById[String(a.section_id)];
+
         return {
             modName: mod?.name ?? "—",
             teacherName: teacher?.name ?? "—",
             roomName: room?.name ?? "—",
             type: part?.type ?? "CM",
             groupLabel,
+            sectionName: section?.name ?? null
         };
     }
 
@@ -299,16 +324,66 @@ export default function InteractiveEditor() {
             if (ts.day.toLowerCase().trim() !== day.toLowerCase().trim()) return false;
             if (!ts.start_time.startsWith(startTime)) return false;
 
-            // Logique de filtrage par section identique à Preview
-            if (String(a.section_id) === String(selectedId)) return true;
-
-            const hasRelatedGroup = a.td_groups?.some(g => {
+            const mp = modulePartById[a.module_part_id];
+            const isDirect = String(a.section_id) === String(selectedId);
+            const isGroupLocal = a.td_groups?.some(g => {
                 const gid = typeof g === 'object' ? g.id : g;
                 const fullGroup = tdGroups.find(tg => String(tg.id) === String(gid));
                 return fullGroup && String(fullGroup.section_id) === String(selectedId);
             });
 
-            return hasRelatedGroup || false;
+            if (isDirect || isGroupLocal) return true;
+
+            if (showFiliereAudit) {
+                // Détection intelligente des cours communs (CM de la même filière) -> Affichés en NORMAL car partagés
+                const selectedS = sectionById[String(selectedId)];
+                if (!selectedS || !selectedS.groupes) return false;
+                const localFiliereIds = selectedS.groupes.map(g => g.filiere_id);
+
+                if (mp?.type === "CM") {
+                    const courseSection = sectionById[String(a.section_id)];
+                    if (courseSection && courseSection.groupes?.some(g => localFiliereIds.includes(g.filiere_id))) {
+                        return true;
+                    }
+                }
+
+                if (showFiliereAudit) {
+                    const selectedS = sectionById[String(selectedId)];
+                    if (!selectedS || !selectedS.groupes) return false;
+                    const localFiliereIds = selectedS.groupes.map(g => g.filiere_id);
+                    const currentSemester = selectedS.name.split(" ").pop();
+
+                    // RÈGLE : Pas d'audit si on est en S4
+                    if (currentSemester === "S4") return false;
+
+                    const relatedSections = Object.values(sectionById).filter(s =>
+                        String(s.id) !== String(selectedId) &&
+                        s.groupes?.some(g => localFiliereIds.includes(g.filiere_id)) &&
+                        s.name.split(" ").pop() !== currentSemester
+                    );
+
+                    const isBlueElsewhere = relatedSections.some(rs => {
+                        const isForThisSection = String(a.section_id) === String(rs.id);
+                        const isCMorSectionWide = mp?.type === "CM" || !a.td_groups || a.td_groups.length === 0;
+                        return isForThisSection && isCMorSectionWide;
+                    });
+
+                    if (isBlueElsewhere) return true;
+
+                    const isRelatedGr6 = a.td_groups?.some((g: any) => {
+                        const gid = typeof g === 'object' ? g.id : g;
+                        const found = tdGroups.find(tg => String(tg.id) === String(gid));
+                        if (found && (found.name.toLowerCase().includes("gr 6") || found.name.toLowerCase().includes("gr6"))) {
+                            const grSec = sectionById[String(found.section_id)];
+                            return grSec && grSec.groupes?.some(fg => localFiliereIds.includes(fg.filiere_id)) && grSec.name.split(" ").pop() !== currentSemester;
+                        }
+                        return false;
+                    });
+                    if (isRelatedGr6) return true;
+                }
+            }
+
+            return false;
         });
     }
 
@@ -561,6 +636,37 @@ export default function InteractiveEditor() {
                         <RotateCcw size={14} /> Réinitialiser
                     </button>
 
+                    <div
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
+                            background: showFiliereAudit ? '#fee2e2' : '#f1f5f9',
+                            borderRadius: '10px', border: `1px solid ${showFiliereAudit ? '#fca5a5' : '#e2e8f0'}`,
+                            cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer',
+                            opacity: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 0.5 : 1,
+                            transition: 'all 0.2s'
+                        }}
+                        onClick={() => {
+                            if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
+                                setShowFiliereAudit(!showFiliereAudit);
+                            }
+                        }}
+                    >
+                        <input
+                            type="checkbox"
+                            checked={showFiliereAudit && !sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
+                            onChange={(e) => {
+                                if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
+                                    setShowFiliereAudit(e.target.checked);
+                                }
+                            }}
+                            disabled={sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
+                            style={{ accentColor: '#ef4444', cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer' }}
+                        />
+                        <label style={{ fontSize: '0.7rem', fontWeight: 800, color: showFiliereAudit ? '#b91c1c' : '#64748b', cursor: 'inherit', userSelect: 'none' }}>
+                            Audit Filière
+                        </label>
+                    </div>
+
                     <select
                         value={selectedId}
                         onChange={e => setSelectedId(e.target.value)}
@@ -659,6 +765,46 @@ export default function InteractiveEditor() {
                                                         {courses.map(c => {
                                                             const card = resolveCard(c);
                                                             const conflicts = getConflicts(c, c.slot_id);
+                                                            const isDirect = String(c.section_id) === String(selectedId);
+                                                            const isGroupLocal = c.td_groups?.some(g => {
+                                                                const gid = typeof g === 'object' ? g.id : g;
+                                                                const found = tdGroups.find(tg => String(tg.id) === String(gid));
+                                                                return found && String(found.section_id) === String(selectedId);
+                                                            });
+
+                                                            let isGhost = false;
+                                                            let ghostSectionName = card.sectionName;
+
+                                                            if (showFiliereAudit && !isDirect && !isGroupLocal) {
+                                                                isGhost = true;
+                                                                const selectedS = sections.find(s => String(s.id) === String(selectedId));
+                                                                if (selectedS?.groupes) {
+                                                                    const localFiliereIds = selectedS.groupes.map(fg => fg.filiere_id);
+                                                                    const currentSem = selectedS.name.split(" ").pop();
+                                                                    const mp = moduleParts.find(p => p.id === c.module_part_id);
+
+                                                                    // Sections de l'autre niveau
+                                                                    const otherLevelSections = sections.filter(s =>
+                                                                        s.groupes?.some(g => localFiliereIds.includes(g.filiere_id)) &&
+                                                                        s.name.split(" ").pop() !== currentSem
+                                                                    );
+
+                                                                    const sharingSections = otherLevelSections.filter(rs => {
+                                                                        const isDirectMatch = String(c.section_id) === String(rs.id) && (mp?.type === "CM" || !c.td_groups || c.td_groups.length === 0);
+                                                                        if (isDirectMatch) return true;
+                                                                        return c.td_groups?.some(g => {
+                                                                            const gid = typeof g === 'object' ? g.id : g;
+                                                                            const fullG = tdGroups.find(tg => String(tg.id) === String(gid));
+                                                                            return fullG && String(fullG.section_id) === String(rs.id);
+                                                                        });
+                                                                    });
+
+                                                                    if (sharingSections.length > 0) {
+                                                                        ghostSectionName = sharingSections.map(s => s.name).join(' + ');
+                                                                    }
+                                                                }
+                                                            }
+
                                                             return (
                                                                 <DraggableCourse
                                                                     key={c.id}
@@ -669,6 +815,9 @@ export default function InteractiveEditor() {
                                                                     type={card.type}
                                                                     groupLabel={card.groupLabel}
                                                                     conflicts={conflicts}
+                                                                    isGhost={isGhost}
+                                                                    sectionName={isGhost ? ghostSectionName : card.sectionName}
+                                                                    showAudit={showFiliereAudit}
                                                                     onContextMenu={(e, asgn) => {
                                                                         e.preventDefault();
                                                                         setEditingAsgn(asgn);
@@ -756,9 +905,20 @@ export default function InteractiveEditor() {
                                     <div style={{ padding: '20px 32px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                                         <button onClick={() => setEditingAsgn(null)} style={{ padding: '10px 24px', borderRadius: '10px', border: '1px solid #cbd5e1', background: 'white', color: '#475569', fontWeight: 700, cursor: 'pointer' }}>Annuler</button>
                                         <button
-                                            onClick={() => {
-                                                setAssignments(prev => prev.map(a => a.id === editingAsgn.id ? { ...a, room_id: editData.roomId, slot_id: editData.slotId, teacher_id: editData.teacherId } : a));
-                                                setEditingAsgn(null);
+                                            onClick={async () => {
+                                                try {
+                                                    // On persiste dans l'API
+                                                    await updateAssignment(editingAsgn.id, {
+                                                        room_id: editData.roomId,
+                                                        slot_id: editData.slotId,
+                                                        teacher_id: editData.teacherId
+                                                    });
+                                                    // On met à jour l'UI
+                                                    setAssignments(prev => prev.map(a => a.id === editingAsgn.id ? { ...a, room_id: editData.roomId, slot_id: editData.slotId, teacher_id: editData.teacherId } : a));
+                                                    setEditingAsgn(null);
+                                                } catch (err) {
+                                                    alert("Erreur lors de la sauvegarde : " + err);
+                                                }
                                             }}
                                             style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: '#0f172a', color: 'white', fontWeight: 700, cursor: 'pointer' }}
                                         >Valider</button>
