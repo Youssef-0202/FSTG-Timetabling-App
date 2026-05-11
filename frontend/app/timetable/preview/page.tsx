@@ -140,7 +140,19 @@ export default function TimetablePage() {
                         <button className={viewMode === "teacher" ? "active" : ""} onClick={() => { setViewMode("teacher"); if (activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id)); }}><UserIcon size={16} /> Par Prof</button>
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
-
+                    {viewMode === "section" && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: showFiliereAudit ? '#fee2e2' : '#f1f5f9', borderRadius: '8px', border: `1px solid ${showFiliereAudit ? '#fca5a5' : '#e2e8f0'}`, cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => setShowFiliereAudit(!showFiliereAudit)}>
+                            <input
+                                type="checkbox"
+                                checked={showFiliereAudit}
+                                onChange={(e) => setShowFiliereAudit(e.target.checked)}
+                                style={{ accentColor: '#ef4444', cursor: 'pointer' }}
+                            />
+                            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: showFiliereAudit ? '#b91c1c' : '#64748b', cursor: 'pointer', userSelect: 'none' }}>
+                                Audit : Chevauchement Filières (Gr 6 / CM)
+                            </label>
+                        </div>
+                    )}
                     <div className="result-mode-selector" style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
                         {["alns", "rl", "ga_sa"].map(mode => (
                             <button
