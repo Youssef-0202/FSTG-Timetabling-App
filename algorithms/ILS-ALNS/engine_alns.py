@@ -268,6 +268,12 @@ N_OPERATORS = len(OPERATORS)
 
 def sa_alns(schedule, dm, constraints_mask, bandit,
             sa_iterations=1200, sa_temp=50.0, sa_cooling=0.965):
+    """
+    Recherche Locale par Recuit Simulé (SA) pilotée par un Bandit ALNS.
+    
+    C'est le 'cœur' de l'optimisation. Cette fonction polit une solution en alternant
+    entre des opérateurs de voisinage choisis dynamiquement par le Bandit UCB1.
+    """
 
     def get_score(sch):
         if sch.fitness is None:
@@ -279,6 +285,8 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
 
     current_fit  = get_score(schedule)
     best_fit     = current_fit
+    #  enregistre l'état exact de l'élite 
+    # on restaure systématiquement le meilleur état rencontré durant les 1200 itérations au cas de mauvais result
     best_state   = [(a.room, a.timeslot) for a in schedule.assignments]
 
     temp         = max(sa_temp, current_fit * 0.04)
@@ -286,42 +294,57 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
                     if not a.module_part.is_locked]
     if not unlocked:
         return schedule
-
-    stag         = 0
+    
+    # Détection de stagnation (nombre d'itérations sans amélioration)
+    stag         = 0 
     reheat_count = 0
 
     for it in range(sa_iterations):
-        if stag > sa_iterations // 6 and reheat_count < 3:
+        # 1. MÉCANISME DE REHEATING (SÉCURITÉ ANTI-BLOCAGE)
+        # Si aucune amélioration après 1/6 du temps total, on remonte brusquement la température
+        if stag > sa_iterations // 6 and reheat_count < 3: 
             temp         = sa_temp * (0.5 ** reheat_count)
             stag         = 0
             reheat_count += 1
 
-        arm      = bandit.select()
+        # 2. SÉLECTION ET ACTION
+        # Le Bandit choisit un opérateur via la formule UCB1 (Exploration vs Exploitation)
+        arm       = bandit.select()
+        # On sauvegarde l'état avant modif pour un éventuel ROLLBACK O(1)
         saved_i, saved_s = OPERATORS[arm](schedule, unlocked, dm)
 
         schedule.fitness = None
         neighbor_fit     = get_score(schedule)
         delta            = neighbor_fit - current_fit
 
+        # 3. CRITÈRE DE METROPOLIS (ACCEPTATION)
+        # On accepte si c'est mieux (delta < 0) OU via une probabilité décroissante
         if delta < 0 or (temp > 1e-10 and random.random() < math.exp(-delta / temp)):
+            # MOUVEMENT ACCEPTÉ
             current_fit = neighbor_fit
             stag        = 0
+            # Calcul de la RÉCOMPENSE pour le feedback du Bandit
             reward = max(0.0, -delta / max(1.0, abs(best_fit))) * 150
             bandit.update(arm, reward)
+            
             if current_fit < best_fit:
                 best_fit   = current_fit
                 best_state = [(a.room, a.timeslot) for a in schedule.assignments]
         else:
+            # MOUVEMENT REFUSÉ : On restaure l'ancien état (Undo)
             for i, (r, s) in zip(saved_i, saved_s):
                 schedule.assignments[i].room     = r
                 schedule.assignments[i].timeslot = s
             schedule.fitness = current_fit
             stag += 1
+            # Signal de stagnation à l'opérateur après 50 échecs
             if stag % 50 == 0:
                 bandit.update(arm, 0.0)
 
+        # Refroidissement géométrique
         temp *= sa_cooling
 
+    # FIN DE SESSION : On restaure le meilleur état absolu rencontré durant le polissage
     for i, (r, s) in enumerate(best_state):
         schedule.assignments[i].room     = r
         schedule.assignments[i].timeslot = s
@@ -335,17 +358,34 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
 # ==============================================================================
 
 def ils_perturbation(schedule, dm, constraints_mask, strength=0.08):
+    """
+    Mécanisme de 'Kick' ILS (Iterated Local Search).
+    Détruit partiellement la solution pour l'envoyer dans une autre vallée 
+    de l'espace de recherche (Diversification).
+    """
+    # 1. Copie intégrale pour créer un enfant sans modifier le parent
     perturbed = copy.deepcopy(schedule)
+    
+    # 2. Filtrage des cours modifiables (évite de toucher aux créneaux verrouillés/bloqués)
     unlocked  = [i for i, a in enumerate(perturbed.assignments)
                  if not a.module_part.is_locked]
     if not unlocked:
         return perturbed
+    
+    # 3. Calcul du nombre de mouvements de choc (Kicks)
+    # Plus la 'strength' est haute, plus on déstructure la solution
     n_kicks = max(1, int(len(unlocked) * strength))
+    
+    # 4. Boucle de choc : Application de mouvements radicaux
     for _ in range(n_kicks):
+        # 60% de chances d'utiliser Kempe Chain : Échange de blocs de créneaux complexes
         if len(dm.timeslots) >= 2 and random.random() < 0.6:
             op_kempe_chain(perturbed, unlocked, dm)
+        # 40% de chances de stabiliser les salles d'un module
         else:
             op_stabilize_room(perturbed, unlocked, dm)
+            
+    # 5. Invalidation du cache de fitness pour forcer un recalcul ultérieur
     perturbed.fitness      = None
     perturbed.h_violations = None
     perturbed.soft_penalty = None
@@ -510,14 +550,21 @@ class HybridEngine:
         return Schedule(self.dm, result)
 
     def evolve(self):
+        """
+        Cycle d'évolution complet d'une génération.
+        L'algorithme sépare les tâches : Intensification (Élites) vs Diversification (ILS).
+        """
         self.generation += 1
+        # Tri de la population par score de fitness (le plus bas est le meilleur)
         self.population.sort(key=lambda x: self.get_score(x))
         new_gen, impact_list = [], []
 
-        # Élites : SA direct
+        # --- ÉLITES : SA direct (LA PHASE D'INTENSIFICATION) ---
+        # On ne secoue pas les élites, on se contente de les "polir" chirurgicalement
         for i in range(self.elitism):
             ind     = copy.deepcopy(self.population[i])
             old_fit = self.get_score(ind)
+            # Polissage direct par Recuit Simulé + ALNS Bandit
             ind     = sa_alns(ind, self.dm, self.constraints_mask, self.bandit,
                               sa_iterations=self.sa_iterations,
                               sa_temp=self.sa_temp,
@@ -525,27 +572,38 @@ class HybridEngine:
             impact_list.append(max(0, old_fit - ind.fitness))
             new_gen.append(ind)
 
-        # Non-élites : ILS + SA
+        # --- NON-ÉLITES : ILS + SA (LA PHASE DE DIVERSIFICATION) ---
+        # La 'strength' (force du Kick) diminue légèrement au fil des générations 
+        # pour stabiliser la recherche vers la fin du processus.
         strength = max(0.04, 0.12 - self.generation * 0.001)
+        
         while len(new_gen) < self.pop_size:
+            # Sélection par tournoi de 4 individus
             tournament = random.sample(self.population, min(4, len(self.population)))
             parent     = min(tournament, key=lambda x: x.fitness)
             old_fit    = self.get_score(parent)
+            
+            # ÉTAPE A : Perturbation ILS (Le Kick) - On rejette le parent dans une nouvelle zone
             perturbed  = ils_perturbation(parent, self.dm, self.constraints_mask,
                                           strength=strength)
+            
+            # ÉTAPE B : Polissage SA-ALNS (Intensification) - On optimise cette nouvelle zone
             improved   = sa_alns(perturbed, self.dm, self.constraints_mask, self.bandit,
                                  sa_iterations=self.sa_iterations,
                                  sa_temp=self.sa_temp,
                                  sa_cooling=self.sa_cooling)
+                                 
             impact_list.append(max(0, old_fit - improved.fitness))
             new_gen.append(improved)
 
+        # Tri de la nouvelle génération et sauvegarde du record historique
         new_gen.sort(key=lambda x: x.fitness)
         if new_gen[0].fitness < self.best_ever_fit:
             self.best_ever     = copy.deepcopy(new_gen[0])
             self.best_ever_fit = new_gen[0].fitness
 
         self.population = new_gen
+        # Calcul des statistiques de performance (gain moyen et diversité)
         return (sum(impact_list) / max(1, len(impact_list)),
                 self._calculate_population_diversity(new_gen))
 

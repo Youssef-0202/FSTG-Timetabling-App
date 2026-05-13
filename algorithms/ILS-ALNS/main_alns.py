@@ -70,7 +70,7 @@ def run_alns_optimization():
         sa_cooling=SA_COOLING,
     )
 
-    print("\n[STEP 1] Population initiale (Greedy 80% + Random 20%)...")
+    print("\n[STEP 1] Population initiale ...") # (Greedy 80% + Random 20%)
     engine.create_initial_population()
     init_score = engine.population[0].fitness
     print(f"  Score Initial : {init_score:.1f} | H: {engine.population[0].h_violations}")
