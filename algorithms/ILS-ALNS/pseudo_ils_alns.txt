@@ -1,0 +1,137 @@
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME ILS-ALNS (V1.0)
+--------------------------------------------------
+
+1. ARCHITECTURE GLOBALE
+-----------------------
+L'algorithme ILS-ALNS est une métaheuristique hybride combinant la puissance de la recherche locale adaptative (ALNS) et la robustesse de la recherche locale itérée (ILS), le tout intégré dans une structure de population évolutive.
+
+Les piliers de l'approche :
+- Bandit UCB1 : Sélectionne intelligemment l'opérateur de voisinage le plus performant à chaque étape du recuit simulé.
+- Perturbation ILS : Applique des "secousses" (kicks) structurelles pour s'échapper des minima locaux profonds.
+- SA-ALNS (Polissage) : Utilise le recuit simulé couplé à une bibliothèque d'opérateurs métiers pour affiner les solutions.
+- Population Hybride : Combine des individus construits par heuristique gloutonne et des individus aléatoires.
+
+2. PSEUDO-CODE :
+----------------
+
+Procedure MAIN_ALNS_SOLVER()
+----------------------------
+1 :  DM = Charger_Données()
+2 :  Population = INITIALISER_POPULATION(Pop_Size=20)
+3 :  
+4 :  Tant que Gen < MAX_GEN :
+5 :      (Gain_Moyen, Diversité) = EVOLVE(Population)
+6 :      
+7 :      Meilleur = Population[0]
+8 :      Si stagnation détectée :
+9 :          INJECTER_DIVERSITE(Population)
+10:      
+11:      Afficher_Progrès(Gen, Meilleur.Score, Bandit_Stats)
+12:      Gen = Gen + 1
+13:  Fin Tant que
+14:  Exporter_Meilleur_Résultat(Meilleur)
+
+Procedure EVOLVE(Population)
+----------------------------
+1 :  Trier(Population, par fitness)
+2 :  Nouvelle_Pop = []
+3 :  
+4 :  // 1. ÉLITISME AVEC POLISSAGE DIRECT
+5 :  Pour i = 0 à (ELITISM - 1) :
+6 :      Elite = Copy(Population[i])
+7 :      Elite = SA_ALNS(Elite, Iters=1200)
+8 :      Nouvelle_Pop.Ajouter(Elite)
+9 :  
+10:  // 2. REPRODUCTION AVEC PERTURBATION ILS
+11:  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+12:      Parent = Sélection_Tournoi(Population, k=4)
+13:      
+14:      // Kick ILS (Diversification)
+15:      Enfant = ILS_PERTURBATION(Parent, Force_Adaptative)
+16:      
+17:      // Polissage ALNS (Intensification)
+18:      Enfant = SA_ALNS(Enfant, Iters=1200)
+19:      
+20:      Nouvelle_Pop.Ajouter(Enfant)
+21:  Fin Tant que
+22:  
+23:  Population = Nouvelle_Pop
+24:  Retourner Métriques
+
+Procedure SA_ALNS(Individu, Iters)
+----------------------------------
+1 :  T = Max(T0, Fitness * 0.04)
+2 :  Meilleur_Etat = Sauvegarder(Individu)
+3 :  
+4 :  Pour i = 1 à Iters :
+5 :      // Sélection de l'opérateur via le Bandit UCB1
+6 :      Op_ID = BANDIT.SELECT() 
+7 :      
+8 :      // Application In-Place
+9 :      Sauvegarde_Locale = Appliquer_Opérateur(Individu, Op_ID)
+10:     
+11:     Delta = Calculer_Delta_Score(Individu)
+12:     
+13:     // Critère de Metropolis
+14:     Si Delta < 0 OU (T > 0 et Random() < exp(-Delta / T)) :
+15:         // Acceptation
+16:         Récompense = Max(0, -Delta / Best_Fit) * 150
+17:         BANDIT.UPDATE(Op_ID, Récompense)
+18:         Si Individu.Score < Meilleur_Etat.Score :
+19:             Meilleur_Etat = Sauvegarder(Individu)
+20:     Sinon :
+21:         // Rejet : UNDO
+22:         Restaurer(Individu, Sauvegarde_Locale)
+23:         Si Stagnation_Op : BANDIT.UPDATE(Op_ID, 0)
+24:     Fin Si
+25:     
+26:     T = T * Cooling_Rate
+27:  Fin Pour
+28:  Restaurer(Individu, Meilleur_Etat)
+29:  Retourner Individu
+
+Procedure ILS_PERTURBATION(Individu, Strength)
+----------------------------------------------
+1 :  Perturbé = Copy(Individu)
+2 :  N_Kicks = Taille(Individu) * Strength
+3 :  
+4 :  Pour _ = 1 à N_Kicks :
+5 :      Si Random() < 0.6 :
+6 :          Appliquer_Kempe_Chain(Perturbé) // Mouvement global complexe
+7 :      Sinon :
+8 :          Appliquer_Stabilize_Room(Perturbé) // Réorganisation thématique
+9 :      Fin Si
+10:  Fin Pour
+11:  Retourner Perturbé
+
+Procedure BANDIT.SELECT()
+-------------------------
+1 :  Pour chaque Opérateur i :
+2 :      Si Counts[i] == 0 : Retourner i // Exploration initiale forcée
+3 :  
+4 :  Pour chaque Opérateur i :
+5 :      UCB[i] = (Rewards[i] / Counts[i]) + C * sqrt(log(Total) / Counts[i])
+6 :  
+7 :  Retourner Argmax(UCB)
+
+3. BIBLIOTHÈQUE D'OPÉRATEURS (NEIGHBORHOODS)
+-------------------------------------------
+1. RandomShift     : Déplacement aléatoire (Exploration pure)
+2. SwapSlots       : Échange de créneaux intra-section
+3. StabilizeRoom   : Alignement de toutes les séances d'un module sur une salle
+4. CompactProf     : Regroupement des séances d'un professeur
+5. CompactSection  : Regroupement des séances d'une section
+6. LunchFix        : Correction des séances sur le créneau du déjeuner
+7. SwapRoomOnly    : Mutation de salle uniquement
+8. KempeChain      : Échange de blocs de créneaux avec résolution de collisions
+
+4. FORMULATION MATHÉMATIQUE
+---------------------------
+Fitness(x) = (10^6 * Hard_Violations) + Soft_Penalties
+
+- Hard_Violations : Conflits Profs, Salles, Groupes, Samedi (CM).
+- Soft_Penalties : Gaps, Stabilité Salles, Fatigue, Dispersion CM.
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT ILS-ALNS V1.0
+--------------------------------------------------------------------------------
