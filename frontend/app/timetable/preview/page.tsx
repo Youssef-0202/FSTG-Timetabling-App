@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2
+    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2, FileSpreadsheet, AlertTriangle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -163,17 +163,7 @@ export default function TimetablePage() {
                         <button className={viewMode === "teacher" ? "active" : ""} onClick={() => { setViewMode("teacher"); if (activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id)); }}><UserIcon size={16} /> Par Prof</button>
                         <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
                     </div>
-                    <button
-                        onClick={() => router.push("/timetable/interactive")}
-                        style={{
-                            background: '#10b981', color: 'white', padding: '8px 16px',
-                            borderRadius: '10px', border: 'none', fontWeight: 800,
-                            fontSize: '0.75rem', cursor: 'pointer', display: 'flex',
-                            alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)'
-                        }}
-                    >
-                        <Edit2 size={14} /> Édition Manuelle
-                    </button>
+
                     {viewMode === "section" && (
                         <div
                             style={{
@@ -231,14 +221,24 @@ export default function TimetablePage() {
                         </select>
                     )}
 
-                    <button className="btn-download"><Download size={16} /> Exporter PDF</button>
-
+                    <button
+                        onClick={() => window.open(`/api/export-excel?mode=${resultMode}`, "_blank")}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
+                            background: 'white', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '12px',
+                            fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontSize: '0.85rem'
+                        }}
+                    >
+                        <FileSpreadsheet size={18} color="#10b981" /> Exporter Excel
+                    </button>
                     <button
                         onClick={async () => {
                             if (confirm("Voulez-vous valider ce planning et passer à l'édition manuelle ?")) {
                                 try {
-                                    await commitPreview(resultMode);
-                                    router.push(`/timetable/interactive?mode=${resultMode}`);
+                                    const res = await commitPreview(resultMode);
+                                    if (res.message) {
+                                        router.push(`/timetable/interactive?algo=${resultMode}`);
+                                    }
                                 } catch (err) {
                                     alert("Erreur lors de la validation : " + err);
                                 }
@@ -264,30 +264,47 @@ export default function TimetablePage() {
                         }}>
                             <div className="score-block" style={{ paddingRight: '24px', borderRight: '1px solid #f1f5f9', textAlign: 'center', minWidth: '140px' }}>
                                 <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', letterSpacing: '1px' }}>Score Global</span>
-                                <div style={{ fontSize: '2.2rem', fontWeight: 900, color: auditResult.score > 75 ? '#16a34a' : auditResult.score > 50 ? '#d97706' : '#dc2626', margin: '4px 0' }}>
+                                <div style={{ fontSize: '2.2rem', fontWeight: 900, color: auditResult.score > 70 ? '#16a34a' : auditResult.score > 50 ? '#d97706' : '#dc2626', margin: '4px 0' }}>
                                     {auditResult.score}%
                                 </div>
-                                <div style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', display: 'inline-block', background: auditResult.score > 75 ? '#dcfce7' : auditResult.score > 50 ? '#fef3c7' : '#fef2f2', color: auditResult.score > 75 ? '#166534' : auditResult.score > 50 ? '#92400e' : '#991b1b' }}>
+                                <div style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', display: 'inline-block', background: auditResult.score > 70 ? '#dcfce7' : auditResult.score > 50 ? '#fef3c7' : '#fef2f2', color: auditResult.score > 70 ? '#166534' : auditResult.score > 50 ? '#92400e' : '#991b1b' }}>
                                     {auditResult.status}
                                 </div>
                             </div>
 
-                            <div className="indicators-row" style={{ flex: 1, display: 'flex', gap: '40px' }}>
-                                {Object.entries(auditResult.details || {}).map(([key, value]) => (
-                                    <div key={key} style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', marginBottom: '6px', textTransform: 'uppercase' }}>
-                                            <span>{key}</span>
-                                            <span style={{ color: '#1e293b' }}>{value}%</span>
+                            <div className="indicators-row" style={{ flex: 1, display: 'flex', gap: '30px' }}>
+                                {Object.entries(auditResult.details || {}).map(([key, value]) => {
+                                    const labels: any = {
+                                        compacite: { title: "Compacité", desc: "Absence de trous" },
+                                        pause_dejeuner: { title: "Pause Déjeuner", desc: "Respect du 12h30" },
+                                        rythme_fatigue: { title: "Rythme & Samedi", desc: "Équilibre fin de journée" },
+                                        pedagogie_cm: { title: "Pédagogie CM", desc: "Cours Magistraux le matin" }
+                                    };
+                                    const info = labels[key] || { title: key, desc: "" };
+                                    const isCritical = value < 40;
+
+                                    return (
+                                        <div key={key} style={{ flex: 1, position: 'relative' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                                <span style={{ fontSize: '0.7rem', fontWeight: 800, color: isCritical ? '#ef4444' : '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    {isCritical && <AlertTriangle size={12} />} {info.title}
+                                                </span>
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#1e293b' }}>{Math.round(value)}%</span>
+                                            </div>
+                                            <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)' }}>
+                                                <div style={{
+                                                    width: `${value}%`, height: '100%',
+                                                    background: value > 80 ? 'linear-gradient(90deg, #22c55e, #4ade80)' : value > 50 ? '#eab308' : 'linear-gradient(90deg, #ef4444, #f87171)',
+                                                    transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                                    boxShadow: value > 50 ? '0 0 10px rgba(34, 197, 94, 0.2)' : 'none'
+                                                }}></div>
+                                            </div>
+                                            <div style={{ fontSize: '0.55rem', color: isCritical ? '#ef4444' : '#94a3b8', marginTop: '4px', fontWeight: 600 }}>
+                                                {isCritical ? "Séquence critique / Tunnel" : info.desc}
+                                            </div>
                                         </div>
-                                        <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
-                                            <div style={{
-                                                width: `${value}%`, height: '100%',
-                                                background: value > 80 ? '#22c55e' : value > 50 ? '#eab308' : '#ef4444',
-                                                transition: 'width 1s ease-out'
-                                            }}></div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

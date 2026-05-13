@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Calendar, Users, Download, Clock, MapPin, User as UserIcon
+    Calendar, Users, Download, Clock, MapPin, User as UserIcon, FileSpreadsheet
 } from "lucide-react";
 import {
     getAssignments, Assignment,
@@ -75,7 +75,16 @@ export default function TimetablePage() {
                             {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
                     )}
-                    <button className="btn-download"><Download size={16} /> Exporter PDF</button>
+                    <button
+                        onClick={() => window.open("/api/export-excel", "_blank")}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
+                            background: 'white', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '12px',
+                            fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontSize: '0.85rem'
+                        }}
+                    >
+                        <FileSpreadsheet size={18} color="#10b981" /> Exporter Excel
+                    </button>
                 </div>
 
                 {loading ? (

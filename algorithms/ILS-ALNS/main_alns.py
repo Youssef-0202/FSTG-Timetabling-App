@@ -14,13 +14,13 @@ from reporting import (print_generation_status, generate_final_report,
                        initialize_log_file, HistoryLogger)
 
 # ── PARAMÈTRES EXACTS DU RUN 9217 ────────────────────────────────────────────
-POP_SIZE      = 20
-MAX_GEN       = 150
+POP_SIZE      = 40
+MAX_GEN       = 200
 MUTATION_RATE = 0.40
 ELITISM       = 2
-SA_ITERATIONS = 1200
+SA_ITERATIONS = 1500
 SA_TEMP       = 50.0
-SA_COOLING    = 0.965
+SA_COOLING    = 0.98
 
 CONSTRAINTS_MASK = {
     "H1": True, "H2": True, "H3": True, "H4": True,
@@ -77,9 +77,11 @@ def run_alns_optimization():
 
     print("\n[STEP 2] Évolution...\n")
 
-    PATIENCE         = 20
+    PATIENCE         = 30
     no_improve_count = 0
     best_score_ever  = float('inf')
+    inject_count     = 0
+    MAX_INJECTIONS   = 4  # Limite 4 injections max pour ne pas boucler indéfiniment
 
     for gen in range(1, MAX_GEN + 1):
         gen_start            = time.time()
@@ -99,14 +101,15 @@ def run_alns_optimization():
         else:
             no_improve_count += 1
 
-        if no_improve_count == PATIENCE // 2:
+        if no_improve_count == PATIENCE // 2 and inject_count < MAX_INJECTIONS:
             n_inj = max(2, POP_SIZE // 3)
-            print(f"\n  [DIVERSITÉ] Plateau Gen {gen} → injection {n_inj} individus")
+            inject_count += 1
+            print(f"\n  [DIVERSITE] Plateau Gen {gen} -> injection {n_inj} individus (#{inject_count}/{MAX_INJECTIONS})")
             engine.inject_diversity(n_replace=n_inj)
-            no_improve_count = 0
+            no_improve_count = 0  # Reset uniquement si on injecte encore
 
         if no_improve_count >= PATIENCE:
-            print(f"\n[STOP] Convergence à Gen {gen}.")
+            print(f"\n[STOP] Convergence a Gen {gen}.")
             break
 
     total_dur = time.time() - start_time
@@ -130,18 +133,36 @@ def run_alns_optimization():
         best_final.sync_to_db()
 
     try:
+        import requests
+        from datetime import datetime
+        
+        # Préparation des données pour l'archivage en DB
+        result_payload = {
+            "algo_type": "alns",
+            "created_at": datetime.now().isoformat(),
+            "score_hard": int(best_final.h_violations),
+            "score_soft": float(best_final.s_score),
+            "data": best_final.to_dict(),
+            "is_validated": False
+        }
+        
+        # Envoi au backend
+        API_URL = "http://localhost:8000/timetable-results"
+        response = requests.post(API_URL, json=result_payload)
+        
+        if response.status_code == 201:
+            print(f"[DB-ARCHIVE] Résultat ALNS sauvegardé avec succès en base de données.")
+        else:
+            print(f"[WARN] Échec de l'archivage en DB ({response.status_code}): {response.text}")
+
+        # Pour compatibilité, on peut quand même garder une trace locale si besoin
         root_dir    = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        export_path = os.path.join(root_dir, "backend", "generated_timetable_alns_v1.json")
+        export_path = os.path.join(root_dir, "backend", "generated_timetable_alns.json")
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
-        print(f"[EXPORT] {export_path}")
-        try:
-            from export_excel_rl import run_export
-            run_export()
-        except Exception as e:
-            print(f"[WARN] Excel : {e}")
+            
     except Exception as e:
-        print(f"[WARN] Export : {e}")
+        print(f"[WARN] Erreur lors de l'archivage/export : {e}")
 
 
 if __name__ == "__main__":

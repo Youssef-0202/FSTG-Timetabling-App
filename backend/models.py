@@ -244,6 +244,7 @@ class TimetableResult(Base):
     """
     __tablename__ = "timetable_results"
     id = Column(Integer, primary_key=True, index=True)
+    algo_type = Column(String, index=True) # "alns", "rl", "ga_sa"
     created_at = Column(String)     # Date et heure de génération (ISO)
     score_hard = Column(Integer)    # Nombre de violations Hard (Cible 0)
     score_soft = Column(Float)      # Score de qualité Soft

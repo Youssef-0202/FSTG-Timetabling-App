@@ -124,26 +124,39 @@ def run_rl_optimization():
         print("[DB] Synchronisation de la solution RL dans la base de données...")
         best_final.sync_to_db()
 
-    # 2. Export JSON pour le Frontend (Next.js)
+    # 2. Exportation et Archivage en Base de Données
     try:
-        # On remonte de algorithms/rl_controller vers la racine _Project_PFE
+        import requests
+        
+        # Préparation des données pour l'archivage en DB
+        _, h_final, s_final, _ = calculate_fitness_full(best_final, CONSTRAINTS_MASK)
+        
+        result_payload = {
+            "algo_type": "rl",
+            "created_at": datetime.now().isoformat(),
+            "score_hard": int(h_final),
+            "score_soft": float(s_final),
+            "data": best_final.to_dict(),
+            "is_validated": False
+        }
+        
+        # Envoi au backend
+        API_URL = "http://localhost:8000/timetable-results"
+        response = requests.post(API_URL, json=result_payload)
+        
+        if response.status_code == 201:
+            print(f"[DB-ARCHIVE] Résultat RL sauvegardé avec succès en base de données.")
+        else:
+            print(f"[WARN] Échec de l'archivage en DB ({response.status_code}): {response.text}")
+
+        # Export JSON local pour compatibilité
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         export_path = os.path.join(root_dir, "backend", "generated_timetable_rl.json")
-        
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
-        print(f"[EXPORT] Solution RL sauvegardee : {export_path}")
-        
-        # 3. Export Excel (Premium)
-        try:
-            print("[EXCEL] Génération du fichier Excel Premium (RL)...")
-            from export_excel_rl import run_export
-            run_export()
-        except Exception as e:
-            print(f"[ERREUR] Export Excel RL echoue : {e}")
             
     except Exception as e:
-        print(f"[ERREUR] Export UI echoue : {e}")
+        print(f"[ERREUR] Archivage/Export UI échoué : {e}")
 
 if __name__ == "__main__":
     run_rl_optimization()

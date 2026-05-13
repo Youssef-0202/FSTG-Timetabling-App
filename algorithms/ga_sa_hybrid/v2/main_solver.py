@@ -173,16 +173,39 @@ def run_optimization():
     # Correction : Respect de l'ordre (engine, duration, init_score, mask, gens)
     generate_final_report(engine, total_duration, init_score, CONSTRAINTS_MASK, actual_generations=gen)
     
-    # 3. Export JSON pour le Frontend
+    # 3. Exportation et Archivage en Base de Données
     try:
-        # Correction : Remonter 4 niveaux pour atteindre _Project_PFE
+        import requests
+        
+        # Préparation des données pour l'archivage en DB
+        _, h_final, s_final, _ = calculate_fitness_full(best_final, CONSTRAINTS_MASK)
+        
+        result_payload = {
+            "algo_type": "ga_sa",
+            "created_at": datetime.now().isoformat(),
+            "score_hard": int(h_final),
+            "score_soft": float(s_final),
+            "data": best_final.to_dict(),
+            "is_validated": False
+        }
+        
+        # Envoi au backend pour stockage centralisé
+        API_URL = "http://localhost:8000/timetable-results"
+        response = requests.post(API_URL, json=result_payload)
+        
+        if response.status_code == 201:
+            print(f"[DB-ARCHIVE] Résultat GA-SA sauvegardé avec succès en base de données.")
+        else:
+            print(f"[WARN] Échec de l'archivage en DB ({response.status_code}): {response.text}")
+
+        # On garde quand même l'export JSON local pour compatibilité
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         export_path = os.path.join(root_dir, "backend", "generated_timetable.json")
         with open(export_path, 'w', encoding='utf-8') as f:
             json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
-        print(f"[EXPORT] Solution sauvegardee dans : {os.path.basename(export_path)}")
+            
     except Exception as e:
-        print(f"[ERREUR] Export echoue : {e}")
+        print(f"[ERREUR] Archivage/Export échoué : {e}")
 
 if __name__ == "__main__":
     run_optimization()

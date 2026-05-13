@@ -306,7 +306,7 @@ def sa_alns(schedule, dm, constraints_mask, bandit,
         if delta < 0 or (temp > 1e-10 and random.random() < math.exp(-delta / temp)):
             current_fit = neighbor_fit
             stag        = 0
-            reward = max(0.0, -delta / max(1.0, abs(best_fit))) * 100
+            reward = max(0.0, -delta / max(1.0, abs(best_fit))) * 150
             bandit.update(arm, reward)
             if current_fit < best_fit:
                 best_fit   = current_fit
@@ -383,7 +383,7 @@ class HybridEngine:
             "S_FATIGUE": True, "S_SATURDAY": True,
             "S_MIXING": True, "S_CM_DISPERSION": True
         }
-        self.bandit        = UCB1Bandit(N_OPERATORS, exploration_c=1.5)
+        self.bandit        = UCB1Bandit(N_OPERATORS, exploration_c=1.1)
         self.generation    = 0
         self.best_ever     = None
         self.best_ever_fit = float('inf')
@@ -535,7 +535,7 @@ class HybridEngine:
                                           strength=strength)
             improved   = sa_alns(perturbed, self.dm, self.constraints_mask, self.bandit,
                                  sa_iterations=self.sa_iterations,
-                                 sa_temp=self.sa_temp * 0.6,
+                                 sa_temp=self.sa_temp,
                                  sa_cooling=self.sa_cooling)
             impact_list.append(max(0, old_fit - improved.fitness))
             new_gen.append(improved)
@@ -557,7 +557,7 @@ class HybridEngine:
         for _ in range(n_replace):
             ind = self._build_greedy_individual()
             sa_alns(ind, self.dm, self.constraints_mask, self.bandit,
-                    sa_iterations=self.sa_iterations // 3,
+                    sa_iterations=self.sa_iterations // 2,
                     sa_temp=self.sa_temp,
                     sa_cooling=self.sa_cooling)
             self.get_score(ind)

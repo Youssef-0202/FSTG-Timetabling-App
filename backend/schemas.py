@@ -194,9 +194,12 @@ class AssignmentCreate(BaseModel):
     teacher_id: int
     room_id: Optional[int] = None
     slot_id: Optional[int] = None
-    section_id: Optional[int] = None     # Pour les CM
-    tdgroup_ids: List[int] = []          # Pour les TD/TP
+    section_id: Optional[int] = None
+    tdgroup_ids: List[int] = []
     is_locked: bool = False
+
+    class Config:
+        extra = "allow"
 
 class AssignmentUpdate(BaseModel):
     module_part_id: Optional[int] = None
@@ -206,6 +209,9 @@ class AssignmentUpdate(BaseModel):
     section_id: Optional[int] = None
     tdgroup_ids: Optional[List[int]] = None
     is_locked: Optional[bool] = None
+
+    class Config:
+        extra = "allow"
 
 class Assignment(BaseModel):
     id: int
@@ -232,6 +238,7 @@ class DashboardStats(BaseModel):
 
 # ─── TIMETABLE RESULT ───────────────────────────────────────
 class TimetableResultBase(BaseModel):
+    algo_type: str  # "alns", "rl", "ga_sa"
     created_at: str
     score_hard: int
     score_soft: float

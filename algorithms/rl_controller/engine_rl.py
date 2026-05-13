@@ -475,11 +475,14 @@ class HybridEngine:
         # Détermination de la phase active
         active_phase = 'hard' if schedule.h_violations > 0 else 'soft'
         
-        # RL STATE INITIAL
+        # RL STATE INITIAL — utilise les données déjà calculées, sans recalcul complet
         def fetch_state(sch, progress):
-            _, h, s, details = calculate_fitness_full(sch, mask=self.constraints_mask)
-            # Normalisation brute pour l agent
-            return [h, details.get('S3_Gaps', 0), details.get('S6_Stab', 0), progress]
+            h = sch.h_violations if sch.h_violations is not None else 0
+            # Estimation légère depuis le score soft déjà connu (pas de recalcul complet)
+            soft = sch.soft_penalty if hasattr(sch, 'soft_penalty') and sch.soft_penalty is not None else 0
+            gaps_est = soft * 0.08   # approximation S3 depuis le soft total
+            stab_est = soft * 0.35   # approximation S6 depuis le soft total
+            return [h, gaps_est, stab_est, progress]
 
         current_state = fetch_state(current_sch, 0.0)
 
@@ -528,6 +531,9 @@ class HybridEngine:
             if delta < 0 or (temp > 0 and random.random() < math.exp(-delta / temp)):
                 # Mouvement accepté
                 current_fit = neighbor_fit
+                # Mise à jour du cache h_violations pour fetch_state léger
+                if hasattr(schedule, 'h_violations'):
+                    schedule.h_violations = schedule.h_violations  # déjà mis à jour par get_score
                 if current_fit < best_fit:
                     best_fit = current_fit
                     best_state = [(a.room, a.timeslot) for a in schedule.assignments]
@@ -550,8 +556,8 @@ class HybridEngine:
             # --- APPRENTISSAGE RL ---
             if active_phase == 'soft' and chosen_action != -1:
                 next_state = fetch_state(schedule, it / self.sa_iterations)
-                # Récompense = Amélioration du score Soft (plus c'est positif, mieux c'est)
-                reward = (current_fit - neighbor_fit) / 100.0 # Scaling
+                # Récompense = Amélioration du score Soft (scaling fort pour Q-table)
+                reward = (current_fit - neighbor_fit) / 10.0  # Scaling x10 vs avant
                 self.agent.learn(current_state, chosen_action, reward, next_state)
                 current_state = next_state
 

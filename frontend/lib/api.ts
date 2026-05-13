@@ -159,6 +159,11 @@ export const deleteGroupeFiliere = (id: number) =>
 export const updateGroupeFiliere = (id: number, data: Partial<GroupeFiliere>) =>
   apiFetch<GroupeFiliere>(`/groupe-filieres/${id}`, { method: "PUT", body: JSON.stringify(data) });
 
+export const getAvailableResources = (slotId: number, assignmentId?: number) =>
+  apiFetch<{ available_rooms: Room[]; available_teachers: Teacher[] }>(
+    `/available-resources?slot_id=${slotId}${assignmentId ? `&assignment_id=${assignmentId}` : ""}`
+  );
+
 // ─── Sections 
 export const getSections = () => apiFetch<Section[]>("/sections");
 export const createSection = (data: Omit<Section, "id" | "groupes"> & { groupe_ids: number[] }) =>
@@ -231,6 +236,9 @@ export const deleteAssignment = (id: number) =>
 export const commitPreview = (mode: string = "alns") =>
   apiFetch<{ message: string }>(`/commit-preview?mode=${mode}`, { method: "POST" });
 
+export const resetAssignments = (mode?: string) =>
+  apiFetch<{ message: string }>(mode ? `/assignments/reset?mode=${mode}` : "/assignments/reset", { method: "POST" });
+
 // ─── Auditing ───
 export interface AuditResult {
   section: string;
@@ -246,3 +254,17 @@ export interface AuditResult {
 
 export const auditSection = (sectionId: number, mode: string) => 
   apiFetch<AuditResult>(`/audit/section/${sectionId}?mode=${mode}`);
+
+// ─── Algorithms ───
+export const runAlgorithm = async (algo: "ga_sa" | "alns" | "rl") => {
+  const res = await fetch("/api/run-algo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ algo }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || "Erreur de lancement");
+  }
+  return res.json();
+};
