@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@db:5432/fstm_timetable")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user_pfe:password_pfe@db:5432/fstm_timetable")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

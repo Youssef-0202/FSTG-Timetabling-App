@@ -9,18 +9,26 @@ const execAsync = promisify(exec);
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const mode = searchParams.get('mode') || 'ga_sa';
+        const mode = searchParams.get('mode');
+        const dbId = searchParams.get('id');
         
-        const scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\export_excel.py";
-        const fileSuffix = ["alns", "rl"].includes(mode) ? `_${mode.toUpperCase()}` : "";
-        const outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}.xlsx`;
+        let scriptPath, outputPath;
         
-        // Execute the python script with the mode argument
-        await execAsync(`python "${scriptPath}" ${mode}`);
+        if (dbId) {
+            scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\backend\\export_excel_db.py";
+            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\backend\\export_result_${dbId}.xlsx`;
+            await execAsync(`python "${scriptPath}" ${dbId}`);
+        } else {
+            const safeMode = mode || 'ga_sa';
+            scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\export_excel.py";
+            const fileSuffix = ["alns", "rl"].includes(safeMode) ? `_${safeMode.toUpperCase()}` : "";
+            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}.xlsx`;
+            await execAsync(`python "${scriptPath}" ${safeMode}`);
+        }
         
         // Read the generated Excel file
         if (!fs.existsSync(outputPath)) {
-            return NextResponse.json({ error: `File not generated for mode ${mode}` }, { status: 500 });
+            return NextResponse.json({ error: `File not generated` }, { status: 500 });
         }
         
         const fileBuffer = fs.readFileSync(outputPath);
@@ -29,7 +37,7 @@ export async function GET(request: Request) {
         return new NextResponse(fileBuffer, {
             headers: {
                 "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "Content-Disposition": `attachment; filename=Emploi_du_temps_FSTG${fileSuffix}.xlsx`,
+                "Content-Disposition": `attachment; filename=Emploi_du_temps_FSTG_${dbId ? 'Archive' : 'Actuel'}.xlsx`,
             },
         });
     } catch (error) {

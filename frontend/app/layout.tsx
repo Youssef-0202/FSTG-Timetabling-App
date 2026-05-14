@@ -6,8 +6,8 @@ import Navbar from "@/components/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FST Marrakech — Espace Administration",
-  description: "Système de gestion des emplois du temps — FST de Marrakech (Gueliz)",
+  title: "Système de Planification Intelligente",
+  description: "Plateforme universelle d'optimisation algorithmique pour établissements d'enseignement.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

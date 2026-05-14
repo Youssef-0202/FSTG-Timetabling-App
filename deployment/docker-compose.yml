@@ -26,7 +26,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/fstm_timetable
+      DATABASE_URL: postgresql://user_pfe:password_pfe@db:5432/fstm_timetable
 
 volumes:
   postgres_data:

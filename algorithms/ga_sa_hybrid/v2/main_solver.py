@@ -17,7 +17,7 @@ from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from commun.data_manager import DataManager
 from commun.models import Schedule
-from commun.constraints import calculate_fitness_full
+from constraints_optimized import calculate_fitness_full
 from engine import HybridEngine
 
 
@@ -26,7 +26,7 @@ from engine import HybridEngine
 
 # 1. Parametres de l'Algorithme Genetique (GA) selon Grid Search
 POP_SIZE = 30          
-MAX_GEN = 120          # Limité à 120 pour comparaison avec RL
+MAX_GEN = 100          # Limité à 120 pour comparaison avec RL
 MUTATION_RATE = 0.40   # Record de performance en GS
 ELITISM = 2
 MAX_GEN_AFTER_H0 = 50
@@ -167,7 +167,7 @@ def run_optimization():
     best_final = engine.population[0]
     
     # 1. Mise a jour SQL (Archive)
-    best_final.sync_to_db()
+    # best_final.sync_to_db()
     
     # 2. Rapport Final
     # Correction : Respect de l'ordre (engine, duration, init_score, mask, gens)

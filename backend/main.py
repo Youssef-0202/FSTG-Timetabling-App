@@ -552,9 +552,9 @@ import json
 
 @app.get("/preview-schedule")
 def get_preview_schedule(mode: str = "alns", db: Session = Depends(get_db)):
-    """Récupère le dernier résultat généré pour un mode donné depuis la DB."""
+    """Récupère le dernier résultat BRUT (is_validated=False) pour un mode donné."""
     result = db.query(models.TimetableResult)\
-               .filter(models.TimetableResult.algo_type == mode)\
+               .filter(models.TimetableResult.algo_type == mode, models.TimetableResult.is_validated == False)\
                .order_by(models.TimetableResult.id.desc())\
                .first()
     
@@ -563,28 +563,25 @@ def get_preview_schedule(mode: str = "alns", db: Session = Depends(get_db)):
         
     return result.data
 
+from typing import Optional
+
 @app.post("/commit-preview", status_code=201)
-def commit_preview(mode: str = "alns", db: Session = Depends(get_db)):
+def commit_preview(mode: str = "alns", result_id: Optional[int] = None, db: Session = Depends(get_db)):
     """
-    1. Marque le dernier résultat de ce mode comme 'validé' (Archive).
+    1. Marque le dernier résultat (ou celui par id) comme 'validé' (Archive).
     2. Copie les données du JSON vers la table 'assignments' pour édition manuelle.
     """
     try:
-        # 1. On cherche le dernier résultat pour ce mode
-        res = db.query(models.TimetableResult)\
-                .filter(models.TimetableResult.algo_type == mode)\
-                .order_by(models.TimetableResult.id.desc())\
-                .first()
+        if result_id:
+            res = db.query(models.TimetableResult).filter(models.TimetableResult.id == result_id).first()
+        else:
+            res = db.query(models.TimetableResult)\
+                    .filter(models.TimetableResult.algo_type == mode)\
+                    .order_by(models.TimetableResult.id.desc())\
+                    .first()
         
         if not res:
-            raise HTTPException(status_code=404, detail="Aucun résultat trouvé pour ce mode")
-
-        # 2. On dévalide les autres pour ce mode
-        db.query(models.TimetableResult)\
-          .filter(models.TimetableResult.algo_type == mode)\
-          .update({models.TimetableResult.is_validated: False})
-        
-        res.is_validated = True
+            raise HTTPException(status_code=404, detail="Aucun résultat trouvé")
 
         # 3. RÉINITIALISATION ET MISE À JOUR DE LA TABLE DE TRAVAIL (assignments)
         # Étape A : On "vide" le planning actuel et les groupes associés
@@ -632,8 +629,106 @@ def commit_preview(mode: str = "alns", db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Erreur lors du commit : {str(e)}")
 
+@app.post("/save-manual-session", status_code=201)
+def save_manual_session(
+    name: Optional[str] = "Version Manuelle", 
+    edit_id: Optional[int] = None, 
+    score_hard: Optional[int] = 0,
+    score_soft: Optional[float] = 0.0,
+    algo_type: Optional[str] = "manual",
+    db: Session = Depends(get_db)
+):
+    """
+    Prend le planning actuel dans la table 'assignments', 
+    génère un snapshot JSON et le sauvegarde dans 'timetable_results'.
+    Si edit_id est fourni, met à jour la version existante, sinon crée une nouvelle version validée.
+    """
+    from datetime import datetime
+    try:
+        # 1. On récupère TOUTES les affectations actuelles
+        all_asgn = db.query(models.Assignment).all()
+        
+        # 2. On prépare le JSON de données
+        json_data = []
+        hard_conflicts = 0
+        
+        # On va aussi charger les timeslots pour les calculs de conflits
+        for a in all_asgn:
+            # Conversion pour le JSON
+            json_data.append({
+                "id": a.id,
+                "module_part_id": a.module_part_id,
+                "teacher_id": a.teacher_id,
+                "room_id": a.room_id,
+                "slot_id": a.slot_id,
+                "section_id": a.section_id,
+                "is_locked": True, # On les marque comme verrouillés pour la trace
+                "td_groups": [g.id for g in a.td_groups]
+            })
+            
+            # 3. Vérification basique des conflits Hard (Doubles réservations)
+            if a.slot_id:
+                # Professeur (sauf prof 'A Déterminer' ID 231)
+                prof_conflict = db.query(models.Assignment).filter(
+                    models.Assignment.id != a.id,
+                    models.Assignment.slot_id == a.slot_id,
+                    models.Assignment.teacher_id == a.teacher_id,
+                    models.Assignment.teacher_id != 231
+                ).first()
+                if prof_conflict: hard_conflicts += 1
+                
+                # Salle
+                if a.room_id:
+                    room_conflict = db.query(models.Assignment).filter(
+                        models.Assignment.id != a.id,
+                        models.Assignment.slot_id == a.slot_id,
+                        models.Assignment.room_id == a.room_id
+                    ).first()
+                    if room_conflict: hard_conflicts += 1
+
+        if hard_conflicts > 0:
+             raise HTTPException(status_code=400, detail=f"Le planning contient {hard_conflicts} conflits majeurs. Merci de les corriger avant de sauvegarder.")
+
+        # 4. Enregistrement en BD (UPDATE si edit_id, sinon INSERT)
+        validated_res = None
+        if edit_id:
+            validated_res = db.query(models.TimetableResult).filter(models.TimetableResult.id == edit_id).first()
+            
+        if not validated_res:
+             validated_res = models.TimetableResult(algo_type=algo_type, is_validated=True)
+             db.add(validated_res)
+
+        if name:
+             validated_res.name = name
+        elif not validated_res.name:
+             validated_res.name = "Version Manuelle"
+             
+        validated_res.created_at = datetime.now().isoformat()
+        validated_res.data = json_data
+        validated_res.score_hard = score_hard
+        validated_res.score_soft = score_soft
+        validated_res.is_validated = True
+        
+        db.commit()
+        
+        return {"status": "success", "message": "Planning de production mis à jour avec succès."}
+        
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la sauvegarde : {str(e)}")
+
 
 # --- GESTION DES RÉSULTATS D'OPTIMISATION ---
+
+@app.get("/timetable-results/{res_id}", response_model=schemas.TimetableResult)
+def get_timetable_result(res_id: int, db: Session = Depends(get_db)):
+    """Récupère un résultat spécifique par son ID."""
+    res = db.query(models.TimetableResult).filter(models.TimetableResult.id == res_id).first()
+    if not res:
+        raise HTTPException(status_code=404, detail="Résultat introuvable")
+    return res
 
 @app.get("/timetable-results", response_model=List[schemas.TimetableResult])
 def list_timetable_results(db: Session = Depends(get_db)):

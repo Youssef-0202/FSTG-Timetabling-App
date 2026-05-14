@@ -1,14 +1,16 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-14 11:33:32
+ Date : 2026-05-12 14:54:50
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Population Size      : 30
- - Max Generations      : 120
- - Mutation Rate        : 0.4
- - SA Iterations        : 1200
+ - Algorithme          : ILS-ALNS-v1
+ - Population Size      : 40
+ - Max Generations      : 200
+ - Mutation Rate        : N/A
+ - SA Iterations        : 1500
  - SA Temp Initial      : 50.0
+ - SA Cooling           : 0.98
 
 2. STATISTIQUES DE LA BASE DE DONNEES :
  - Nombre d'Enseignants : 74
@@ -24,23 +26,23 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 3740.19 secondes
- Generations effectuees   : 120
+ Temps total d'execution  : 25102.30 secondes
+ Generations effectuees   : 200
 ------------------------------------------------------------
- Score Initial (Best)     : 91012836.25
- Score Final   (Best)     : 9703.25
+ Score Initial (Best)     : 66018082.75
+ Score Final   (Best)     : 8241.5
  Amelioration Totale      : 100.0 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 9703.25
-  - Pire Solution         : 5146832.0
-  - Moyenne Population    : 799891.6
+  - Meilleure Solution    : 8241.5
+  - Pire Solution         : 43087841.5
+  - Moyenne Population    : 14082364.2
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - S_Total              : 9703.25
-  - S3_Gaps              : 740
-  - S4_Lunch             : 1480
-  - S6_Stab              : 4600
-  - S8_FreeApm           : 1100
+  - S_Total              : 8241.5
+  - S3_Gaps              : 730
+  - S4_Lunch             : 960
+  - S6_Stab              : 4000
+  - S8_FreeApm           : 700
   - S10_Sat              : 0
 ============================================================

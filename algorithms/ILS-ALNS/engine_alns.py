@@ -17,10 +17,10 @@ import random
 import copy
 import math
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models import Schedule, Assignment
-from constraints import calculate_fitness_full
+from constraints_optimized import calculate_fitness_full
 
 
 # ==============================================================================

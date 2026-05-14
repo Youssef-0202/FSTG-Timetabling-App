@@ -238,10 +238,11 @@ class DashboardStats(BaseModel):
 
 # ─── TIMETABLE RESULT ───────────────────────────────────────
 class TimetableResultBase(BaseModel):
+    name: Optional[str] = None
     algo_type: str  # "alns", "rl", "ga_sa"
     created_at: str
-    score_hard: int
-    score_soft: float
+    score_hard: Optional[int] = 0
+    score_soft: Optional[float] = 0.0
     data: List[Any]
     is_validated: bool = False
 

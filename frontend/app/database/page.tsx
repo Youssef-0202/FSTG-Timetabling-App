@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, Suspense } from "react";
+import { motion } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Plus, RefreshCw, Pencil, Trash2,
@@ -273,18 +274,18 @@ function DatabaseContent() {
     };
 
     const tabs: { key: Tab, label: string, count: number, Icon: any }[] = [
-        { key: "assignments", label: "Affectations", count: assignments.length, Icon: ClipboardList },
-        { key: "teachers", label: "Enseignants", count: teachers.length, Icon: Users },
+        { key: "teachers", label: "Professeurs", count: teachers.length, Icon: Users },
         { key: "rooms", label: "Salles", count: rooms.length, Icon: DoorOpen },
         { key: "filieres", label: "Filières", count: filieres.length, Icon: Building2 },
-        { key: "sections", label: "Sections (CM)", count: sections.length, Icon: Layers },
-        { key: "td_groups", label: "Groupes TD", count: tdGroups.length, Icon: Users2 },
-        { key: "cohortes", label: "Groupes (Cohortes)", count: cohortes.length, Icon: GraduationCap },
-        { key: "modules", label: "Modules", count: modules.length, Icon: BookOpen },
-        { key: "groupe_modules", label: "Pools Modules", count: groupeModules.length, Icon: Users },
-        { key: "module_parts", label: "Composantes", count: moduleParts.length, Icon: Grid },
-        { key: "timeslots", label: "Créneaux Horaires", count: timeslots.length, Icon: CalendarDays },
+        { key: "sections", label: "Cours (CM)", count: sections.length, Icon: Layers },
+        { key: "cohortes", label: "Cohortes", count: cohortes.length, Icon: GraduationCap },
+        { key: "td_groups", label: "Gr. TD", count: tdGroups.length, Icon: Users2 },
         { key: "departments", label: "Dépt.", count: departments.length, Icon: Building2 },
+        { key: "modules", label: "Modules", count: modules.length, Icon: BookOpen },
+        { key: "groupe_modules", label: "Pools", count: groupeModules.length, Icon: Users },
+        { key: "module_parts", label: "Unités", count: moduleParts.length, Icon: Grid },
+        { key: "timeslots", label: "Horaires", count: timeslots.length, Icon: CalendarDays },
+        { key: "assignments", label: "Séances", count: assignments.length, Icon: ClipboardList },
     ];
 
     const sectionTitles: Record<Tab, string> = {
@@ -304,16 +305,27 @@ function DatabaseContent() {
 
     return (
         <>
-            <div className="hero">
-                <h1>Gestion Universitaire FSTG</h1>
-                <p>Définissez l'arborescence (Cohortes → Sections → TD) pour que l'algorithme génère les bons créneaux.</p>
+            <div className="sub-header">
+                <motion.h1
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                >
+                    Infrastructure & Ressources
+                </motion.h1>
+                <p>
+                    Configuration globale de l&apos;architecture pédagogique
+                    <span style={{ margin: "0 12px", opacity: 0.2 }}>|</span>
+                    <span style={{ color: online ? "#10b981" : "#ef4444", fontWeight: 700, fontSize: '0.75rem' }}>
+                        ● {online ? "ENGINE ONLINE" : "ENGINE OFFLINE"}
+                    </span>
+                </p>
             </div>
 
             <div className="stats-row">
                 {[
-                    { cls: "blue", Icon: Users, val: teachers.length, label: "Enseignants", t: "teachers" as Tab },
+                    { cls: "blue", Icon: Users, val: teachers.length, label: "Professeurs", t: "teachers" as Tab },
                     { cls: "gold", Icon: DoorOpen, val: rooms.length, label: "Salles", t: "rooms" as Tab },
-                    { cls: "teal", Icon: Layers, val: sections.length, label: "Sections CM", t: "sections" as Tab },
+                    { cls: "teal", Icon: Layers, val: sections.length, label: "Cours (CM)", t: "sections" as Tab },
                     { cls: "sky", Icon: BookOpen, val: modules.length, label: "Modules", t: "modules" as Tab },
                 ].map(({ cls, Icon, val, label, t }) => (
                     <div key={t} className={`stat-card ${cls}`} onClick={() => switchTab(t)}>
@@ -324,17 +336,6 @@ function DatabaseContent() {
             </div>
 
             <div className="page-content">
-                <div className="api-bar">
-                    <div className={`api-dot ${online ? "" : "offline"}`}></div>
-                    <b>FastAPI</b>
-                    <span className="api-url">http://192.168.56.1:8000</span>
-                    <button className="btn btn-outline btn-sm" onClick={loadData}>
-                        <RefreshCw size={13} /> Actualiser
-                    </button>
-                    <span className="api-ping" style={{ color: online ? "var(--teal)" : "var(--danger)" }}>
-                        {online ? <><CheckCircle2 size={13} style={{ display: "inline", marginRight: 4 }} />Connecté</> : <><XCircle size={13} style={{ display: "inline", marginRight: 4 }} />Hors ligne</>}
-                    </span>
-                </div>
 
                 <div className="tab-strip" style={{ flexWrap: "wrap" }}>
                     {tabs.map(({ key, label, count, Icon }) => (
@@ -355,10 +356,10 @@ function DatabaseContent() {
                             <select className="filter-select" value={filterVal} onChange={(e) => setFilterVal(e.target.value)}>
                                 <option value="">Toutes les sections</option>
                                 {sections.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
-                                    <option key={s.id} value={`sec-${s.id}`}>📍 {s.name}</option>
+                                    <option key={s.id} value={`sec-${s.id}`}>{s.name}</option>
                                 ))}
-                                <option value="locked">🔒 Déjà fixées</option>
-                                <option value="unlocked">⏳ À assigner</option>
+                                <option value="locked">Déjà fixées</option>
+                                <option value="unlocked">À assigner</option>
                             </select>
                         </>
                     )}
@@ -434,13 +435,12 @@ function DatabaseContent() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    {teacher?.name === "PROF" ? (
-                                                        <span style={{ fontStyle: "italic", color: "var(--navy)", fontWeight: 500 }}>
-                                                            Pr. {mod?.name?.split(' ').slice(0, 2).join(' ')} {a.td_groups?.length > 0 ? a.td_groups[0].name : (sec?.name || "")}
-                                                        </span>
-                                                    ) : (
-                                                        teacher?.name || "?"
-                                                    )}
+                                                    <span style={{ fontStyle: "italic", color: "var(--navy)", fontWeight: 500 }}>
+                                                        Pr. {teacher?.name === "PROF"
+                                                            ? (`${mod?.name?.split(' ').slice(0, 2).join(' ')} ${a.td_groups?.length > 0 ? a.td_groups[0].name : (sec?.name || "")}`)
+                                                            : (teacher?.name || "?")
+                                                        }
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     {(() => {
@@ -462,12 +462,11 @@ function DatabaseContent() {
                                                                             {(s as any).name}
                                                                         </span>
                                                                     ))}
-                                                                    {detectedSections.length > 1 && <span style={{ fontSize: "0.62rem", color: "#0284c7", fontWeight: 800 }}>[FUSIONNÉ]</span>}
                                                                 </div>
                                                             );
                                                         } else {
                                                             return (
-                                                                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", flexDirection: "column" }}>
+                                                                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                                                                     <div style={{ display: "flex", gap: "3px", flexWrap: "wrap" }}>
                                                                         {a.td_groups?.map(g => (
                                                                             <span key={g.id} className="badge" style={{ backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0", fontSize: "0.65rem" }}>
@@ -475,9 +474,7 @@ function DatabaseContent() {
                                                                             </span>
                                                                         ))}
                                                                     </div>
-                                                                    <span style={{ fontSize: "0.6rem", opacity: 0.7 }}>
-                                                                        Section: {detectedSections.map(s => (s as any).name).join(' / ')}
-                                                                    </span>
+
                                                                 </div>
                                                             );
                                                         }
@@ -492,7 +489,7 @@ function DatabaseContent() {
                                                             <b>{room?.name}</b><br />
                                                             {timeslots.find(ts => ts.id === a.slot_id)?.day || "Créneau ?"}
                                                         </div>
-                                                    ) : <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>L'Algo décide</div>}
+                                                    ) : <div style={{ fontSize: "1.1rem", color: "var(--muted)", fontWeight: 300, textAlign: "center", width: "40px" }}>—</div>}
                                                 </td>
                                                 <td><div className="actions-cell">
                                                     <button className="btn btn-outline btn-sm" onClick={() => openEdit(a as any)}><Pencil size={13} /></button>
@@ -1010,43 +1007,34 @@ function DatabaseContent() {
                                         />
                                     </div>
                                     <div className="form-group full">
-                                        <label style={{ fontSize: "0.8rem", color: "var(--navy)", fontWeight: 600 }}>Périmètre de cours (Cible)</label>
-                                        <div style={{ padding: "10px", border: "1px dashed var(--border)", borderRadius: "6px", fontSize: "0.85rem" }}>
+                                        <label style={{ fontSize: "0.85rem", color: "var(--navy)", fontWeight: 800, marginBottom: "12px", textAlign: "center", display: "block" }}>PÉRIMÈTRE DE COURS (CIBLE)</label>
+                                        <div style={{ backgroundColor: "#f8fafc", padding: "18px", borderRadius: "14px", border: "1px solid var(--border)" }}>
                                             {(() => {
                                                 const mPart = moduleParts.find(mp => mp.id === Number(modal.data.module_part_id));
                                                 const isCM = mPart?.type === "CM";
                                                 if (isCM) {
                                                     return (
                                                         <div className="form-group">
-                                                            <label>Cibles Sections (Fusion pour CM)</label>
-                                                            <div style={{ maxHeight: "150px", overflowY: "auto", border: "1px solid var(--border)", padding: "8px", borderRadius: "4px", backgroundColor: "#fff" }}>
+                                                            <label style={{ color: "#64748b", textTransform: "none", letterSpacing: 0, textAlign: "center" }}>Sections rattachées (Cours Magistral)</label>
+                                                            <div style={{ maxHeight: "120px", overflowY: "auto", border: "1px solid var(--border)", padding: "10px", borderRadius: "10px", backgroundColor: "#fff", marginTop: "8px" }}>
                                                                 {sections.sort((a, b) => a.name.localeCompare(b.name)).map(s => {
                                                                     const currentIds = Array.isArray(modal.data.section_ids) ? modal.data.section_ids : (modal.data.section_id ? [Number(modal.data.section_id)] : []);
                                                                     const checked = currentIds.includes(s.id);
                                                                     return (
-                                                                        <label key={s.id} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", cursor: "pointer" }}>
+                                                                        <label key={s.id} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px", cursor: "pointer", fontSize: "0.88rem", fontWeight: 500 }}>
                                                                             <input
                                                                                 type="checkbox"
                                                                                 checked={checked}
+                                                                                style={{ width: "17px", height: "17px" }}
                                                                                 onChange={(e) => {
                                                                                     let newIds = [...currentIds];
                                                                                     if (e.target.checked) newIds.push(s.id);
                                                                                     else newIds = newIds.filter(id => id !== s.id);
-
                                                                                     const allGids = tdGroups.filter(g => newIds.includes(Number(g.section_id))).map(g => g.id);
-
-                                                                                    setModal(m => ({
-                                                                                        ...m,
-                                                                                        data: {
-                                                                                            ...m.data,
-                                                                                            section_ids: newIds,
-                                                                                            section_id: newIds.length > 0 ? newIds[0] : null,
-                                                                                            tdgroup_ids: allGids
-                                                                                        }
-                                                                                    }));
+                                                                                    setModal(m => ({ ...m, data: { ...m.data, section_ids: newIds, section_id: newIds.length > 0 ? newIds[0] : null, tdgroup_ids: allGids } }));
                                                                                 }}
                                                                             />
-                                                                            {s.name} ({s.total_capacity} étu.)
+                                                                            {s.name}
                                                                         </label>
                                                                     );
                                                                 })}
@@ -1055,60 +1043,66 @@ function DatabaseContent() {
                                                     );
                                                 } else {
                                                     return (
-                                                        <>
-                                                            <div className="form-group">
-                                                                <label>1. Cible Section (Parent)</label>
-                                                                <select value={String(modal.data.section_id || "")} onChange={(e) => {
-                                                                    setField("section_id", e.target.value);
-                                                                    setField("tdgroup_ids", []);
+                                                        <div style={{ display: "grid", gap: "14px" }}>
+                                                            <div className="form-group" style={{ textAlign: "center" }}>
+                                                                <label style={{ color: "#64748b", textTransform: "none", letterSpacing: 0, marginBottom: "5px" }}>1. Section Parente</label>
+                                                                <select style={{ textAlign: "center", textAlignLast: "center" }} value={String(modal.data.section_id || "")} onChange={(e) => {
+                                                                    const sid = e.target.value;
+                                                                    setModal(m => ({ ...m, data: { ...m.data, section_id: sid, tdgroup_ids: [] } }));
                                                                 }}>
                                                                     <option value="">Sélectionner une section</option>
                                                                     {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                                                                 </select>
                                                             </div>
                                                             <div className="form-group">
-                                                                <label>2. Cible Groupes TD</label>
-                                                                <div style={{ maxHeight: "150px", overflowY: "auto", border: "1px solid var(--border)", padding: "8px", borderRadius: "4px", backgroundColor: "#fff" }}>
+                                                                <label style={{ color: "#64748b", textTransform: "none", letterSpacing: 0, marginBottom: "5px", textAlign: "center" }}>2. Groupes TD Ciblés</label>
+                                                                <div style={{ maxHeight: "120px", overflowY: "auto", border: "1px solid var(--border)", padding: "10px", borderRadius: "10px", backgroundColor: "#fff" }}>
                                                                     {tdGroups.filter(g => Number(g.section_id) === Number(modal.data.section_id)).map(g => (
-                                                                        <label key={g.id} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px", cursor: "pointer" }}>
-                                                                            <input type="checkbox" checked={Array.isArray(modal.data.tdgroup_ids) && modal.data.tdgroup_ids.includes(g.id)} onChange={(e) => {
+                                                                        <label key={g.id} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px", cursor: "pointer", fontSize: "0.88rem", fontWeight: 500 }}>
+                                                                            <input type="checkbox" checked={Array.isArray(modal.data.tdgroup_ids) && modal.data.tdgroup_ids.includes(g.id)} style={{ width: "17px", height: "17px" }} onChange={(e) => {
                                                                                 const current = Array.isArray(modal.data.tdgroup_ids) ? [...modal.data.tdgroup_ids] : [];
                                                                                 if (e.target.checked) current.push(g.id);
                                                                                 else { const idx = current.indexOf(g.id); if (idx > -1) current.splice(idx, 1); }
                                                                                 setField("tdgroup_ids", current);
                                                                             }} />
-                                                                            {g.name} ({g.size} étu.)
+                                                                            {g.name}
                                                                         </label>
                                                                     ))}
+                                                                    {tdGroups.filter(g => Number(g.section_id) === Number(modal.data.section_id)).length === 0 && <div style={{ fontSize: "0.8rem", color: "#94a3b8", padding: "15px", textAlign: "center" }}>Sélectionnez d&apos;abord une section</div>}
                                                                 </div>
                                                             </div>
-                                                        </>
+                                                        </div>
                                                     );
                                                 }
                                             })()}
                                         </div>
                                     </div>
-                                    <div className="form-group full">
-                                        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                                    <div className="form-group full" style={{ marginTop: "15px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "18px", background: "rgba(11,31,75,0.03)", borderRadius: "12px", textAlign: "center" }}>
+                                        <div style={{ marginBottom: "12px" }}>
+                                            <div style={{ fontWeight: 800, color: "var(--navy)", fontSize: "0.95rem" }}>Planification Manuelle</div>
+                                            <div style={{ fontSize: "0.78rem", color: "#64748b" }}>Fixer l&apos;horaire et la salle manuellement</div>
+                                        </div>
+                                        <label className="switch">
                                             <input type="checkbox" checked={!!modal.data.is_locked} onChange={(e) => setField("is_locked", e.target.checked)} />
-                                            TYPE 1 (FIXÉE MANUELLEMENT)
+                                            <span className="slider"></span>
                                         </label>
                                     </div>
 
                                     {modal.data.is_locked && (
-                                        <div style={{ padding: "12px", background: "#f1f5f9", borderRadius: "8px", border: "1px solid #cbd5e1", marginTop: "-10px", marginBottom: "15px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                                        <div style={{ padding: "18px", background: "#fff", borderRadius: "12px", border: "1px solid var(--navy)", marginTop: "12px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", boxShadow: "0 4px 15px rgba(11,31,75,0.05)" }}>
                                             <div className="form-group">
-                                                <label style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>Salle Imposée</label>
+                                                <label style={{ fontSize: "0.75rem", color: "var(--navy)", fontWeight: 800, letterSpacing: "0.5px" }}>SALLE</label>
                                                 <select value={String(modal.data.room_id || "")} onChange={(e) => setField("room_id", e.target.value)}>
                                                     <option value="">-- Choisir --</option>
-                                                    {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.type})</option>)}
+                                                    {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                                 </select>
                                             </div>
                                             <div className="form-group">
-                                                <label style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 700 }}>Créneau Imposé</label>
+                                                <label style={{ fontSize: "0.75rem", color: "var(--navy)", fontWeight: 800, letterSpacing: "0.5px" }}>CRÉNEAU</label>
                                                 <select value={String(modal.data.slot_id || "")} onChange={(e) => setField("slot_id", e.target.value)}>
                                                     <option value="">-- Choisir --</option>
-                                                    {timeslots.map(ts => <option key={ts.id} value={ts.id}>{ts.day} {ts.start_time.substring(0, 5)}</option>)}
+                                                    {timeslots.map(ts => <option key={ts.id} value={ts.id}>{ts.day} à {ts.start_time.substring(0, 5)}</option>)}
                                                 </select>
                                             </div>
                                         </div>

@@ -4,11 +4,11 @@ import time
 import sys
 
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from data_manager import DataManager
-from models import Schedule
-from constraints import calculate_fitness_full
+from commun.data_manager import DataManager
+from commun.models import Schedule
+from constraints_optimized import calculate_fitness_full
 from engine_alns import HybridEngine
 from reporting import (print_generation_status, generate_final_report,
                        initialize_log_file, HistoryLogger)
@@ -128,9 +128,9 @@ def run_alns_optimization():
         json.dump(bandit_stats, f, indent=4)
 
     best_final = engine.population[0]
-    if hasattr(best_final, 'sync_to_db'):
-        print("[DB] Synchronisation...")
-        best_final.sync_to_db()
+    # if hasattr(best_final, 'sync_to_db'):
+    #     print("[DB] Synchronisation...")
+    #     best_final.sync_to_db()
 
     try:
         import requests

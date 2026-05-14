@@ -18,7 +18,7 @@ def reset_and_init():
             # Création d'une affectation vierge
             new_a = models.Assignment(
                 module_part_id=p.id,
-                teacher_id=p.teacher_id, # On met le prof par défaut défini dans le module_part
+                teacher_id=None,
                 room_id=None,
                 slot_id=None,
                 is_locked=False

@@ -1,11 +1,27 @@
 "use client";
-import React, { useState } from "react";
-import { Cpu, Zap, BrainCircuit, Play, Settings2, CheckCircle2, Clock } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Cpu, Zap, BrainCircuit, Play, Clock } from "lucide-react";
 import { runAlgorithm } from "@/lib/api";
+import { motion } from "framer-motion";
 
 export default function AlgorithmsPage() {
     const [runningAlgo, setRunningAlgo] = useState<string | null>(null);
     const [logs, setLogs] = useState<Record<string, string[]>>({});
+    const [online, setOnline] = useState(true);
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/");
+                setOnline(res.ok);
+            } catch {
+                setOnline(false);
+            }
+        };
+        checkStatus();
+        const interval = setInterval(checkStatus, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
     const startSim = async (algo: "ga_sa" | "alns" | "rl") => {
         setRunningAlgo(algo);
@@ -22,20 +38,31 @@ export default function AlgorithmsPage() {
     };
 
     return (
-        <div style={{ background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
-            <header style={{ padding: "30px 40px", background: "white", borderBottom: "1px solid #e2e8f0" }}>
-                <h1 style={{ margin: 0, fontSize: "1.8rem", fontWeight: 900, color: "#1e293b", letterSpacing: "-0.5px" }}>
-                    Centre d'Optimisation
-                </h1>
-                <p style={{ margin: "5px 0 0", color: "#64748b", fontSize: "0.9rem", fontWeight: 500 }}>
-                    Contrôle et exécution des moteurs de résolution (GA-SA, ALNS, RL)
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}
+        >
+            <div className="sub-header" style={{ paddingBottom: "110px" }}>
+                <motion.h1
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                >
+                    Centre d&apos;Optimisation IA
+                </motion.h1>
+                <p>
+                    Pilotage des moteurs de résolution par <span style={{ color: 'var(--gold)', fontWeight: 800 }}>MÉTA-HEURISTIQUES</span>
+                    <span style={{ margin: "0 12px", opacity: 0.2 }}>|</span>
+                    <span style={{ color: online ? "#10b981" : "#ef4444", fontWeight: 700, fontSize: '0.75rem' }}>
+                        ● {online ? "ENGINE ONLINE" : "ENGINE OFFLINE"}
+                    </span>
                 </p>
-            </header>
+            </div>
 
-            <main style={{ padding: "40px", maxWidth: 1400, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+            <main style={{ padding: "0 40px 40px", maxWidth: 1600, margin: "-70px auto 0", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", position: "relative", zIndex: 10 }}>
 
                 {/* --- GA-SA --- */}
-                <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e2e8f0", borderTop: "5px solid #3b82f6", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
+                <div style={{ background: "white", borderRadius: "18px", padding: "28px", border: "1px solid #e2e8f0", borderTop: "6px solid #3b82f6", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                             <div style={{ background: "#eff6ff", color: "#3b82f6", padding: 10, borderRadius: 10 }}>
@@ -65,7 +92,7 @@ export default function AlgorithmsPage() {
                 </div>
 
                 {/* --- ALNS --- */}
-                <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e2e8f0", borderTop: "5px solid #14b8a6", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
+                <div style={{ background: "white", borderRadius: "18px", padding: "28px", border: "1px solid #e2e8f0", borderTop: "6px solid #14b8a6", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                             <div style={{ background: "#f0fdf4", color: "#14b8a6", padding: 10, borderRadius: 10 }}>
@@ -95,7 +122,7 @@ export default function AlgorithmsPage() {
                 </div>
 
                 {/* --- RL --- */}
-                <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e2e8f0", borderTop: "5px solid #8b5cf6", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
+                <div style={{ background: "white", borderRadius: "18px", padding: "28px", border: "1px solid #e2e8f0", borderTop: "6px solid #8b5cf6", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                             <div style={{ background: "#f5f3ff", color: "#8b5cf6", padding: 10, borderRadius: 10 }}>
@@ -125,6 +152,6 @@ export default function AlgorithmsPage() {
                 </div>
 
             </main>
-        </div>
+        </motion.div>
     );
 }

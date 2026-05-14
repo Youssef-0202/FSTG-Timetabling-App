@@ -244,6 +244,7 @@ class TimetableResult(Base):
     """
     __tablename__ = "timetable_results"
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=True) # Nom personnalisé (ex: "EDT Final S1")
     algo_type = Column(String, index=True) # "alns", "rl", "ga_sa"
     created_at = Column(String)     # Date et heure de génération (ISO)
     score_hard = Column(Integer)    # Nombre de violations Hard (Cible 0)

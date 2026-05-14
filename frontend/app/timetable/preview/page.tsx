@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "framer-motion";
 import React, { useEffect, useState, useCallback } from "react";
 import {
     Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2, FileSpreadsheet, AlertTriangle
@@ -19,6 +20,9 @@ const DAYS_ORDER = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
 
 export default function TimetablePage() {
     const router = useRouter();
+    const [isExporting, setIsExporting] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [isValidating, setIsValidating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -35,6 +39,36 @@ export default function TimetablePage() {
     const [tdGroups, setTdGroups] = useState<any[]>([]);
     const [resultMode, setResultMode] = useState<"ga_sa" | "rl" | "alns">("alns");
     const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+    const [online, setOnline] = useState(true);
+
+    const handleConfirmValidation = async () => {
+        setIsValidating(true);
+        try {
+            const res = await commitPreview(resultMode);
+            if (res.message) {
+                router.push(`/timetable/interactive?algo=${resultMode}`);
+            }
+            setShowConfirmModal(false);
+        } catch (e: any) {
+            alert("Erreur de validation : " + (e.message || e));
+        } finally {
+            setIsValidating(false);
+        }
+    };
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/");
+                setOnline(res.ok);
+            } catch {
+                setOnline(false);
+            }
+        };
+        checkStatus();
+        const interval = setInterval(checkStatus, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         if (viewMode === "section" && selectedId) {
@@ -150,108 +184,145 @@ export default function TimetablePage() {
     }, [rooms]);
 
     return (
-        <div className="page-container">
-            <div className="hero-section" style={{ background: "linear-gradient(90deg, #1e3a8a, #0f172a)" }}>
-                <h1>IA Preview : Emploi du Temps</h1>
-                <p>Aperçu en direct du résultat de l'Algorithme Hybride GA+SA (Non enregistré en base de données).</p>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="page-container"
+        >
+            <div className="sub-header" style={{ padding: "30px 20px 40px" }}>
+                <motion.h1
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    style={{ fontSize: "1.8rem" }}
+                >
+                    IA Preview : Emploi du Temps
+                </motion.h1>
+                <p>
+                    Résultat de l&apos;Optimisation : <span style={{ color: 'var(--gold)', fontWeight: 800 }}>{resultMode.toUpperCase()}</span>
+                </p>
             </div>
 
-            <div className="content-wrapper">
-                <div className="top-bar">
-                    <div className="mode-toggle">
-                        <button className={viewMode === "section" ? "active" : ""} onClick={() => { setViewMode("section"); if (sections.length > 0) setSelectedId(String(sections[0].id)); }}><Users size={16} /> Par Section</button>
-                        <button className={viewMode === "teacher" ? "active" : ""} onClick={() => { setViewMode("teacher"); if (activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id)); }}><UserIcon size={16} /> Par Prof</button>
-                        <button className={viewMode === "master" ? "active" : ""} onClick={() => setViewMode("master")}><Calendar size={16} /> Vue Globale</button>
-                    </div>
+            <div className="content-wrapper" style={{ margin: "-50px auto 0", position: "relative", zIndex: 10 }}>
+                <div className="top-bar" style={{
+                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', background: 'white',
+                    border: 'none', padding: '12px 20px', borderRadius: '16px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px'
+                }}>
+                    {/* GAUCHE : Mode & Audit */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="mode-toggle" style={{ background: '#f1f5f9', padding: '4px', borderRadius: '10px', display: 'flex', gap: '2px', height: '42px', alignItems: 'center' }}>
+                            {[
+                                { id: 'section', icon: <Users size={14} />, label: 'Section' },
+                                { id: 'teacher', icon: <UserIcon size={14} />, label: 'Prof' },
+                                { id: 'master', icon: <Calendar size={14} />, label: 'Global' }
+                            ].map(m => (
+                                <button
+                                    key={m.id}
+                                    className={viewMode === m.id ? "active" : ""}
+                                    onClick={() => {
+                                        setViewMode(m.id as any);
+                                        if (m.id === "section" && sections.length > 0) setSelectedId(String(sections[0].id));
+                                        if (m.id === "teacher" && activeTeachers.length > 0) setSelectedId(String(activeTeachers[0].id));
+                                    }}
+                                    style={{
+                                        border: 'none', padding: '0 12px', borderRadius: '8px', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '0.82rem',
+                                        height: '34px', transition: 'all 0.2s',
+                                        background: viewMode === m.id ? 'white' : 'transparent',
+                                        color: viewMode === m.id ? '#1e3a8a' : '#64748b',
+                                        boxShadow: viewMode === m.id ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
+                                    }}
+                                >
+                                    {m.icon} {m.label}
+                                </button>
+                            ))}
+                        </div>
 
-                    {viewMode === "section" && (
-                        <div
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
-                                background: showFiliereAudit ? '#fee2e2' : '#f1f5f9',
-                                borderRadius: '8px', border: `1px solid ${showFiliereAudit ? '#fca5a5' : '#e2e8f0'}`,
-                                cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer',
-                                opacity: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 0.5 : 1,
-                                transition: 'all 0.2s'
-                            }}
-                            onClick={() => {
-                                if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
-                                    setShowFiliereAudit(!showFiliereAudit);
-                                }
-                            }}
-                        >
-                            <input
-                                type="checkbox"
-                                checked={showFiliereAudit && !sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
-                                onChange={(e) => {
+                        {viewMode === "section" && (
+                            <div
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px',
+                                    background: showFiliereAudit ? '#fef2f2' : '#f8fafc',
+                                    borderRadius: '10px', border: `1.5px solid ${showFiliereAudit ? '#fee2e2' : '#e2e8f0'}`,
+                                    cursor: 'pointer', height: '42px', transition: 'all 0.2s'
+                                }}
+                                onClick={() => {
                                     if (!sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")) {
-                                        setShowFiliereAudit(e.target.checked);
+                                        setShowFiliereAudit(!showFiliereAudit);
                                     }
                                 }}
-                                disabled={sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
-                                style={{ accentColor: '#ef4444', cursor: sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4") ? 'not-allowed' : 'pointer' }}
-                            />
-                            <label style={{ fontSize: '0.75rem', fontWeight: 800, color: showFiliereAudit ? '#b91c1c' : '#64748b', cursor: 'inherit', userSelect: 'none' }}>
-                                Audit : Chevauchement Filières
-                            </label>
-                        </div>
-                    )}
-                    <div className="result-mode-selector" style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '10px', border: '1px solid #e2e8f0', gap: '4px' }}>
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={showFiliereAudit && !sections.find(s => String(s.id) === String(selectedId))?.name.endsWith("S4")}
+                                    onChange={() => { }}
+                                    style={{ accentColor: '#ef4444', width: '14px', height: '14px' }}
+                                />
+                                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: showFiliereAudit ? '#ef4444' : '#64748b' }}>Audit Filières</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* MILIEU : Algo Selector */}
+                    <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '10px', gap: '2px', height: '42px', alignItems: 'center' }}>
                         {["alns", "rl", "ga_sa"].map(mode => (
                             <button
                                 key={mode}
-                                className={resultMode === mode ? "active-mode" : ""}
                                 onClick={() => setResultMode(mode as any)}
                                 style={{
-                                    border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer',
-                                    fontSize: '0.75rem', fontWeight: 800,
+                                    border: 'none', padding: '0 14px', borderRadius: '8px', cursor: 'pointer',
+                                    fontSize: '0.82rem', fontWeight: 800, height: '34px',
                                     background: resultMode === mode ? (mode === 'alns' ? '#7c3aed' : '#d97706') : 'transparent',
                                     color: resultMode === mode ? 'white' : '#64748b',
                                     transition: 'all 0.2s'
                                 }}
                             >
-                                {mode.toUpperCase()} Agent
+                                {mode.toUpperCase()}
                             </button>
                         ))}
                     </div>
 
-                    {viewMode !== "master" && (
-                        <select className="id-selector" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
-                            {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : activeTeachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                        </select>
-                    )}
+                    {/* DROITE : Sélection & Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {viewMode !== "master" && (
+                            <select
+                                value={selectedId}
+                                onChange={(e) => setSelectedId(e.target.value)}
+                                style={{
+                                    height: '42px', padding: '0 12px', borderRadius: '10px',
+                                    border: '1.5px solid #e2e8f0', background: '#f8fafc',
+                                    fontSize: '0.82rem', fontWeight: 700, color: '#1e293b',
+                                    outline: 'none', cursor: 'pointer', minWidth: '130px'
+                                }}
+                            >
+                                {viewMode === "section" ? sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>) : activeTeachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                            </select>
+                        )}
 
-                    <button
-                        onClick={() => window.open(`/api/export-excel?mode=${resultMode}`, "_blank")}
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
-                            background: 'white', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '12px',
-                            fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontSize: '0.85rem'
-                        }}
-                    >
-                        <FileSpreadsheet size={18} color="#10b981" /> Exporter Excel
-                    </button>
-                    <button
-                        onClick={async () => {
-                            if (confirm("Voulez-vous valider ce planning et passer à l'édition manuelle ?")) {
-                                try {
-                                    const res = await commitPreview(resultMode);
-                                    if (res.message) {
-                                        router.push(`/timetable/interactive?algo=${resultMode}`);
-                                    }
-                                } catch (err) {
-                                    alert("Erreur lors de la validation : " + err);
-                                }
-                            }
-                        }}
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px',
-                            background: '#10b981', color: 'white', border: 'none', borderRadius: '12px',
-                            fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3)'
-                        }}
-                    >
-                        <CheckCircle size={18} /> Valider & Éditer
-                    </button>
+                        <button
+                            onClick={() => window.open(`/api/export-excel?mode=${resultMode}`, "_blank")}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '8px', padding: '0 16px',
+                                background: 'white', color: '#475569', border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                                fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', height: '42px', fontSize: '0.82rem'
+                            }}
+                        >
+                            <FileSpreadsheet size={16} color="#10b981" /> Excel
+                        </button>
+
+                        <button
+                            onClick={() => setShowConfirmModal(true)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '8px', padding: '0 16px',
+                                background: '#10b981', color: 'white', border: 'none', borderRadius: '10px',
+                                fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', height: '42px',
+                                fontSize: '0.82rem', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
+                            }}
+                        >
+                            <CheckCircle size={16} /> Valider
+                        </button>
+                    </div>
                 </div>
 
                 <div className="timetable-main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -542,7 +613,70 @@ export default function TimetablePage() {
                 </div>
             </div>
 
+            {/* MODALE DE CONFIRMATION PREMIUM */}
+            {showConfirmModal && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 1000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(10px)',
+                }}>
+                    <div className="confirm-card" style={{
+                        background: 'white', padding: '32px', borderRadius: '24px',
+                        width: '100%', maxWidth: '400px', textAlign: 'center',
+                        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    }}>
+                        <div style={{
+                            width: '64px', height: '64px', background: '#ecfdf5',
+                            borderRadius: '50%', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', margin: '0 auto 20px',
+                            color: '#10b981', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)'
+                        }}>
+                            <CheckCircle size={32} />
+                        </div>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>
+                            Confirmer la Validation
+                        </h3>
+                        <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6, marginBottom: '28px' }}>
+                            Souhaitez-vous valider ce planning <strong>{resultMode.toUpperCase()}</strong> ?
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                onClick={() => setShowConfirmModal(false)}
+                                style={{
+                                    flex: 1, padding: '12px', borderRadius: '12px',
+                                    border: '1.5px solid #e2e8f0', background: 'white',
+                                    color: '#64748b', fontWeight: 700, cursor: 'pointer',
+                                    transition: 'all 0.2s', fontSize: '0.85rem'
+                                }}
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleConfirmValidation}
+                                disabled={isValidating}
+                                style={{
+                                    flex: 2, padding: '12px', borderRadius: '12px',
+                                    border: 'none', background: '#10b981',
+                                    color: 'white', fontWeight: 700, cursor: 'pointer',
+                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                    fontSize: '0.85rem'
+                                }}
+                            >
+                                {isValidating ? "Validation en cours..." : "Confirmer"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <style jsx>{`
+                @keyframes popIn {
+                    from { transform: scale(0.9); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
                 .page-container { background: #f8fafc; min-height: 100vh; font-family: 'Inter', sans-serif; }
                 .hero-section { color: white; padding: 40px 20px; text-align: center; }
                 .content-wrapper { max-width: 1600px; margin: 0 auto; padding: 20px; }
@@ -563,6 +697,6 @@ export default function TimetablePage() {
                 .c-name { font-weight: 800; color: #1e3a8a; margin-bottom: 4px; }
                 .c-info-row { font-size: 0.65rem; color: #64748b; display: flex; flex-direction: column; gap: 2px; }
             `}</style>
-        </div>
+        </motion.div>
     );
 }

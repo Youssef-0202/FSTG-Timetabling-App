@@ -1,4 +1,4 @@
-const API_BASE = "http://192.168.56.1:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -239,6 +239,29 @@ export const commitPreview = (mode: string = "alns") =>
 export const resetAssignments = (mode?: string) =>
   apiFetch<{ message: string }>(mode ? `/assignments/reset?mode=${mode}` : "/assignments/reset", { method: "POST" });
 
+export interface TimetableResult {
+  id: number;
+  name: string;
+  algo_type: string;
+  created_at: string;
+  score_hard: number;
+  score_soft: number;
+  is_validated: boolean;
+}
+
+export const getTimetableResult = (id: number) => apiFetch<TimetableResult>(`/timetable-results/${id}`);
+export const getTimetableResults = () => apiFetch<TimetableResult[]>("/timetable-results");
+export const deleteTimetableResult = (id: number) => apiFetch<null>(`/timetable-results/${id}`, { method: "DELETE" });
+export const saveManualSession = (name?: string, edit_id?: number | null, score_hard: number = 0, score_soft: number = 0, algo_type: string = "manual") => {
+  const params = new URLSearchParams();
+  if (name) params.append("name", name);
+  if (edit_id) params.append("edit_id", String(edit_id));
+  params.append("score_hard", String(score_hard));
+  params.append("score_soft", String(score_soft));
+  params.append("algo_type", algo_type);
+  const queryString = params.toString();
+  return apiFetch<{ message: string }>(`/save-manual-session${queryString ? `?${queryString}` : ""}`, { method: "POST" });
+};
 // ─── Auditing ───
 export interface AuditResult {
   section: string;

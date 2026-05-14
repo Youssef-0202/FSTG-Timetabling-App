@@ -5,13 +5,13 @@ import time
 from datetime import datetime
 
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Imports locaux
-from data_manager import DataManager
-from models import Schedule
-from constraints import calculate_fitness_full
-from engine_rl import HybridEngine
+from commun.data_manager import DataManager
+from commun.models import Schedule
+from constraints_optimized import calculate_fitness_full
+from engine_optimized import HybridEngine
 from agent import QLearningAgent
 from reporting import print_generation_status, generate_final_report, initialize_log_file, HistoryLogger
 
@@ -120,9 +120,9 @@ def run_rl_optimization():
     best_final = engine.population[0]
     
     # 1. Mise à jour SQL (Archive) via l API ou methode interne
-    if hasattr(best_final, 'sync_to_db'):
-        print("[DB] Synchronisation de la solution RL dans la base de données...")
-        best_final.sync_to_db()
+    # if hasattr(best_final, 'sync_to_db'):
+    #     print("[DB] Synchronisation de la solution RL dans la base de données...")
+    #     best_final.sync_to_db()
 
     # 2. Exportation et Archivage en Base de Données
     try:

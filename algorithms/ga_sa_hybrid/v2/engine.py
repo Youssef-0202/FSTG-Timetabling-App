@@ -14,9 +14,11 @@ import math
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from commun.models import Schedule, Assignment
-from commun.constraints import calculate_fitness_full
+# Chargement des contraintes communes
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'commun')))
+
+from models import Schedule, Assignment
+from constraints_optimized import calculate_fitness_full
 
 
 class HybridEngine:
@@ -370,7 +372,7 @@ class HybridEngine:
         return Schedule(self.dm, new_assignments)
 
     def mutate(self, schedule):
-        """Mutation Ponderee : Focalise l exploration sur les zones de conflit."""
+        """Mutation Simple (Aléatoire) """
         if not schedule.assignments:
             return
             
@@ -379,8 +381,17 @@ class HybridEngine:
         if not unlocked:
             return
             
+        # --- NOUVELLE LOGIQUE : MUTATION SIMPLE ---
+        # On choisit un index au hasard sans pondération
+        idx, _ = random.choice(unlocked)
+        
+        # Mutation effective : Changement aléatoire de la salle ET du créneau
+        schedule.assignments[idx].room     = random.choice(self.dm.rooms)
+        schedule.assignments[idx].timeslot = random.choice(self.dm.timeslots)
+
+        """
+        # --- ANCIENNE LOGIQUE (Mutation Pondérée par Heatmap) ---
         # 1. Analyse des conflits actuels pour définir les priorités de mutation
-        # On appelle une version ultra-rapide du calcul de pénalités (Hard seulement)
         penalties = self._compute_rough_penalties(schedule)
         
         # 2. Création de la liste des poids : (Poids élevé = Haute probabilité de mutation)
@@ -390,9 +401,10 @@ class HybridEngine:
         indices_list = [i for i, _ in unlocked]
         idx = random.choices(indices_list, weights=weights, k=1)[0]
         
-        # 4. Mutation effective : Changement aléatoire de la salle ET du créneau
+        # 4. Mutation effective
         schedule.assignments[idx].room     = random.choice(self.dm.rooms)
         schedule.assignments[idx].timeslot = random.choice(self.dm.timeslots)
+        """
 
     def _compute_rough_penalties(self, schedule):
         """
