@@ -140,8 +140,8 @@ def run_alns_optimization():
         result_payload = {
             "algo_type": "alns",
             "created_at": datetime.now().isoformat(),
-            "score_hard": int(best_final.h_violations),
-            "score_soft": float(best_final.s_score),
+            "score_hard": 0,
+            "score_soft": 0,
             "data": best_final.to_dict(),
             "is_validated": False
         }
@@ -163,6 +163,17 @@ def run_alns_optimization():
             
     except Exception as e:
         print(f"[WARN] Erreur lors de l'archivage/export : {e}")
+
+    # --- NOUVEAUX : BACKUP JSON DANS LE DOSSIER LOGS ---
+    try:
+        backup_dir = os.path.join(os.path.dirname(__file__), "logs")
+        os.makedirs(backup_dir, exist_ok=True)
+        backup_path = os.path.join(backup_dir, f"backup_alns_v1_{int(time.time())}.json")
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
+        print(f"[BACKUP] Copie de sauvegarde créée dans : {os.path.basename(backup_path)}")
+    except Exception as e:
+        print(f"[WARN] Erreur lors de la création du backup local : {e}")
 
 
 if __name__ == "__main__":

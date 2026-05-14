@@ -183,8 +183,8 @@ def run_optimization():
         result_payload = {
             "algo_type": "ga_sa",
             "created_at": datetime.now().isoformat(),
-            "score_hard": int(h_final),
-            "score_soft": float(s_final),
+            "score_hard": 0,
+            "score_soft": 0,
             "data": best_final.to_dict(),
             "is_validated": False
         }
@@ -206,6 +206,17 @@ def run_optimization():
             
     except Exception as e:
         print(f"[ERREUR] Archivage/Export échoué : {e}")
+
+    # --- NOUVEAUX : BACKUP JSON DANS LE DOSSIER LOGS ---
+    try:
+        backup_dir = os.path.join(os.path.dirname(__file__), "logs")
+        os.makedirs(backup_dir, exist_ok=True)
+        backup_path = os.path.join(backup_dir, f"backup_ga_sa_v2_{int(time.time())}.json")
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            json.dump(best_final.to_dict(), f, indent=4, ensure_ascii=False)
+        print(f"[BACKUP] Copie de sauvegarde créée dans : {os.path.basename(backup_path)}")
+    except Exception as e:
+        print(f"[WARN] Erreur lors de la création du backup local : {e}")
 
 if __name__ == "__main__":
     run_optimization()

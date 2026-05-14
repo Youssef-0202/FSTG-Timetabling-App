@@ -180,5 +180,40 @@ def export_schedule_to_json(schedule):
     if VERBOSE:
         print(f"\n[EXPORT] Solution sauvegardee dans : {os.path.basename(file_path)}")
 
+    # --- ARCHIVAGE EN BASE DE DONNÉES (POUR L'INTERFACE) ---
+    try:
+        import requests
+        # Calcul des violations pour le payload (H=conflits, S=qualité)
+        score_total, h_final, s_final, _ = calculate_fitness_full(schedule, CONSTRAINTS_MASK)
+        
+        result_payload = {
+            "algo_type": "ga_sa_v1",
+            "created_at": datetime.now().isoformat(),
+            "score_hard": 0,
+            "score_soft": 0,
+            "data": output,
+            "is_validated": False
+        }
+        
+        # Envoi au backend
+        API_URL = "http://localhost:8000/timetable-results"
+        response = requests.post(API_URL, json=result_payload)
+        
+        if response.status_code == 201:
+            print(f"[DB-ARCHIVE] Résultat GA-SA v1 sauvegardé avec succès en base de données.")
+        else:
+            print(f"[WARN] Échec de l'archivage en DB ({response.status_code}): {response.text}")
+
+        # --- BACKUP JSON LOCAL ---
+        backup_dir = os.path.join(os.path.dirname(__file__), "logs")
+        os.makedirs(backup_dir, exist_ok=True)
+        backup_path = os.path.join(backup_dir, f"backup_ga_sa_v1_{int(time.time())}.json")
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            json.dump(output, f, indent=4, ensure_ascii=False)
+        print(f"[BACKUP] Copie de sauvegarde créée dans : {os.path.basename(backup_path)}")
+
+    except Exception as e:
+        print(f"[WARN] Erreur lors de l'archivage/backup GA-SA v1 : {e}")
+
 if __name__ == "__main__":
     run_optimization()
