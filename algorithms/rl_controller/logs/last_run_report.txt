@@ -1,6 +1,6 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-14 11:33:32
+ Date : 2026-05-14 22:26:06
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
@@ -24,23 +24,23 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 3740.19 secondes
+ Temps total d'execution  : 2871.11 secondes
  Generations effectuees   : 120
 ------------------------------------------------------------
- Score Initial (Best)     : 91012836.25
- Score Final   (Best)     : 9703.25
+ Score Initial (Best)     : 71013312.25
+ Score Final   (Best)     : 9643.25
  Amelioration Totale      : 100.0 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 9703.25
-  - Pire Solution         : 5146832.0
-  - Moyenne Population    : 799891.6
+  - Meilleure Solution    : 9643.25
+  - Pire Solution         : 11136432.5
+  - Moyenne Population    : 2007365.6
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - S_Total              : 9703.25
-  - S3_Gaps              : 740
-  - S4_Lunch             : 1480
-  - S6_Stab              : 4600
-  - S8_FreeApm           : 1100
+  - S_Total              : 9643.25
+  - S3_Gaps              : 1120
+  - S4_Lunch             : 1640
+  - S6_Stab              : 4000
+  - S8_FreeApm           : 1200
   - S10_Sat              : 0
 ============================================================

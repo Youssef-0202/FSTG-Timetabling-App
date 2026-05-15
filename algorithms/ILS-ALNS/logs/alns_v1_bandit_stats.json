@@ -1,34 +1,34 @@
 {
     "RandomShift": {
-        "count": 1243254,
-        "avg_reward": 1.3659
+        "count": 1243471,
+        "avg_reward": 1.3875
     },
     "SwapSlots": {
-        "count": 26,
-        "avg_reward": 0.2165
+        "count": 47,
+        "avg_reward": 0.3927
     },
     "StabilizeRoom": {
-        "count": 39,
-        "avg_reward": 0.3376
+        "count": 24,
+        "avg_reward": 0.1954
     },
     "CompactProf": {
-        "count": 167,
-        "avg_reward": 0.618
+        "count": 35,
+        "avg_reward": 0.315
     },
     "CompactSection": {
-        "count": 96,
-        "avg_reward": 0.5356
+        "count": 114,
+        "avg_reward": 0.5386
     },
     "LunchFix": {
-        "count": 84,
-        "avg_reward": 0.5143
+        "count": 58,
+        "avg_reward": 0.4414
     },
     "SwapRoomOnly": {
-        "count": 22,
-        "avg_reward": 0.1442
+        "count": 15,
+        "avg_reward": 0.0
     },
     "KempeChain": {
-        "count": 21,
-        "avg_reward": 0.1244
+        "count": 19,
+        "avg_reward": 0.0975
     }
 }

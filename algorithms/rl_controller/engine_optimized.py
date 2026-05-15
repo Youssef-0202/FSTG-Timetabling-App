@@ -54,9 +54,8 @@ import os
 from collections import defaultdict
 
 # Chargement des contraintes communes (identique à engine_rl.py)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
-
-from models import Schedule, Assignment
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from commun.models import Schedule, Assignment
 from constraints_optimized import calculate_fitness_full
 from agent import QLearningAgent
 
