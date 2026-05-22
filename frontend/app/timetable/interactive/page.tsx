@@ -10,7 +10,7 @@ import {
     TouchSensor
 } from "@dnd-kit/core";
 import { useDroppable, useDraggable } from "@dnd-kit/core";
-import { Clock, MapPin, ArrowLeft, CheckCircle, RotateCcw, AlertTriangle, FileText, XCircle, AlertCircle } from "lucide-react";
+import { Clock, MapPin, ArrowLeft, CheckCircle, RotateCcw, AlertTriangle, FileText, XCircle, AlertCircle, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -41,7 +41,7 @@ function CourseCard({
     isDragging = false, isOverlay = false,
     dragListeners, dragRef, dragAttributes, transform,
     conflicts = { hard: [], warnings: [] }, isGhost = false, sectionName = null,
-    showAudit = false,
+    showAudit = false, isLocked = false
 }: any) {
     const isGr6 = showAudit && (groupLabel?.toLowerCase().includes("gr 6") || groupLabel?.toLowerCase().includes("gr6"));
     const { border, bg, nameColor } = typeStyle(type);
@@ -57,7 +57,7 @@ function CourseCard({
         borderLeft: isGhost ? "5px solid #ef4444" : `5px solid ${finalBorder}`,
         border: hardErr ? "2px solid #ef4444" : warnErr ? "2px solid #f59e0b" : isGhost ? '2px solid #ef4444' : (isGr6 ? "1px solid #fdba74" : undefined),
         background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : finalBg,
-        cursor: isDragging ? "grabbing" : isGhost ? 'default' : "grab",
+        cursor: isDragging ? "grabbing" : (isGhost || isLocked) ? 'default' : "grab",
         opacity: isDragging && !isOverlay ? 0 : isGhost ? 0.72 : 1,
         position: "relative" as const,
         transition: transform ? 'none' : 'all 0.2s',
@@ -67,11 +67,19 @@ function CourseCard({
     return (
         <div ref={dragRef} style={boxStyle} {...dragListeners} {...dragAttributes} title={isGhost ? `COURS DE LA SECTION : ${sectionName}` : conflictMsg}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                <div style={{ fontWeight: 800, color: nameColor, lineHeight: 1.2, fontSize: "0.75rem", flex: 1 }}>{modName || "—"}</div>
+                <div style={{ fontWeight: 800, color: nameColor, lineHeight: 1.2, fontSize: "0.75rem", flex: 1 }}>
+                    {modName || "—"}
+                </div>
                 {hardErr && <div style={{ background: "#ef4444", color: "white", borderRadius: "50%", padding: "2px", marginRight: 4 }}><AlertTriangle size={12} strokeWidth={3} /></div>}
                 {!hardErr && warnErr && <div style={{ background: "#f59e0b", color: "white", borderRadius: "50%", padding: "2px", marginRight: 4 }}><AlertTriangle size={12} strokeWidth={3} /></div>}
                 {groupLabel && <div style={{ background: '#1e293b', padding: '2px 5px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 900, color: 'white', marginLeft: "4px" }}>{groupLabel}</div>}
             </div>
+
+            {isLocked && (
+                <div style={{ position: 'absolute', bottom: '6px', right: '6px', opacity: 0.8 }}>
+                    <Lock size={12} color="#ef4444" strokeWidth={3} />
+                </div>
+            )}
             <div style={{ fontSize: "0.65rem", fontWeight: 600, display: "flex", flexDirection: "column", gap: 3 }}>
                 <div style={{ color: "#475569", textTransform: "uppercase", fontSize: "0.6rem" }}>{teacherName ? `Pr. ${teacherName}` : "—"}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, color: "#64748b" }}><MapPin size={10} color="#94a3b8" /> {roomName || "—"}</div>
@@ -84,14 +92,18 @@ function DraggableCourse({ assignment, modName, teacherName, roomName, type, gro
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: `course-${assignment.id}`,
         data: { assignment },
-        disabled: isGhost
+        disabled: isGhost || assignment.is_locked
     });
     return (
-        <div onContextMenu={(e) => !isGhost && onContextMenu(e, assignment)}>
+        <div
+            onClick={() => !isGhost && onContextMenu(null as any, assignment)}
+            onContextMenu={(e) => !isGhost && onContextMenu(e, assignment)}
+        >
             <CourseCard
                 modName={modName} teacherName={teacherName} roomName={roomName} type={type} groupLabel={groupLabel}
                 isDragging={isDragging} dragRef={setNodeRef} dragListeners={listeners} dragAttributes={attributes}
                 transform={transform} conflicts={conflicts} isGhost={isGhost} sectionName={sectionName} showAudit={showAudit}
+                isLocked={assignment.is_locked}
             />
         </div>
     );
@@ -141,7 +153,7 @@ export default function InteractiveEditor() {
     const [activeAssignment, setActiveAssignment] = useState<Assignment | null>(null);
     const [showFiliereAudit, setShowFiliereAudit] = useState(false);
     const [editingAsgn, setEditingAsgn] = useState<Assignment | null>(null);
-    const [editData, setEditData] = useState<{ roomId: number | null; teacherId: number | null }>({ roomId: null, teacherId: null });
+    const [editData, setEditData] = useState<{ roomId: number | null; teacherId: number | null; isLocked: boolean }>({ roomId: null, teacherId: null, isLocked: false });
     const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
     const [availableTeachers, setAvailableTeachers] = useState<Teacher[]>([]);
     const [saving, setSaving] = useState(false);
@@ -200,7 +212,7 @@ export default function InteractiveEditor() {
 
     const openEdit = async (asgn: Assignment) => {
         setEditingAsgn(asgn);
-        setEditData({ roomId: asgn.room_id, teacherId: asgn.teacher_id });
+        setEditData({ roomId: asgn.room_id, teacherId: asgn.teacher_id, isLocked: asgn.is_locked });
         if (asgn.slot_id) {
             try {
                 const res = await getAvailableResources(asgn.slot_id, asgn.id);
@@ -214,10 +226,24 @@ export default function InteractiveEditor() {
         if (!editingAsgn) return;
         setSaving(true);
         try {
-            await updateAssignment(editingAsgn.id, { ...editingAsgn, room_id: editData.roomId, teacher_id: editData.teacherId ?? editingAsgn.teacher_id });
+            // Création d'un objet propre pour l'API (AssignmentCreate)
+            const payload = {
+                module_part_id: editingAsgn.module_part_id,
+                teacher_id: editData.teacherId ?? editingAsgn.teacher_id,
+                room_id: editData.roomId,
+                slot_id: editingAsgn.slot_id,
+                section_id: editingAsgn.section_id,
+                is_locked: editData.isLocked,
+                tdgroup_ids: editingAsgn.td_groups?.map(g => typeof g === 'object' ? g.id : g) || []
+            };
+
+            await updateAssignment(editingAsgn.id, payload as any);
             setEditingAsgn(null);
-            loadData(true);
-        } catch (e) { alert(e); } finally { setSaving(false); }
+            await loadData(true); // Recharger les données pour rafraîchir l'UI
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de la mise à jour");
+        } finally { setSaving(false); }
     };
 
     useEffect(() => { loadData(); }, [loadData]);
@@ -392,12 +418,7 @@ export default function InteractiveEditor() {
     return (
         <div style={{ background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
             {/* 1. SUB-HEADER COMPACT */}
-            <div className="sub-header" style={{
-                background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
-                padding: "30px 20px 60px",
-                textAlign: 'center',
-                color: 'white'
-            }}>
+            <div className="sub-header" style={{ padding: "80px 20px 70px" }}>
                 <h1 style={{ margin: 0, fontSize: "1.8rem", fontWeight: 900, letterSpacing: '-0.025em' }}>
                     Édition Manuelle
                 </h1>
@@ -591,7 +612,10 @@ export default function InteractiveEditor() {
                                                         <DraggableCourse
                                                             key={c.id} assignment={c} {...resolveCard(c)}
                                                             conflicts={getConflicts(c, c.slot_id)}
-                                                            onContextMenu={(e: React.MouseEvent, a: Assignment) => { e.preventDefault(); openEdit(a); }}
+                                                            onContextMenu={(e: React.MouseEvent, asgn: Assignment) => {
+                                                                if (e) e.preventDefault();
+                                                                openEdit(asgn);
+                                                            }}
                                                         />
                                                     ))}
                                                 </DroppableCell>
@@ -654,6 +678,42 @@ export default function InteractiveEditor() {
                                 <option value=''>— Même enseignant —</option>
                                 {availableTeachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                             </select>
+                        </div>
+
+                        <div
+                            onClick={() => setEditData(d => ({ ...d, isLocked: !d.isLocked }))}
+                            style={{
+                                marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '14px 18px', borderRadius: '16px', background: editData.isLocked ? '#fefce8' : '#f8fafc',
+                                border: editData.isLocked ? '1.5px solid #fde047' : '1.5px solid #e2e8f0',
+                                cursor: 'pointer', transition: 'all 0.2s'
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '10px',
+                                    background: editData.isLocked ? '#facc15' : '#e2e8f0',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    color: editData.isLocked ? 'white' : '#64748b'
+                                }}>
+                                    <Lock size={18} />
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#1e293b' }}>Séance Fixée</div>
+                                    <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>Cocher pour geler ce créneau</div>
+                                </div>
+                            </div>
+                            <div style={{
+                                width: '40px', height: '22px', borderRadius: '20px',
+                                background: editData.isLocked ? '#22c55e' : '#cbd5e1',
+                                position: 'relative', transition: 'all 0.3s'
+                            }}>
+                                <div style={{
+                                    width: '16px', height: '16px', borderRadius: '50%', background: 'white',
+                                    position: 'absolute', top: '3px', left: editData.isLocked ? '21px' : '3px',
+                                    transition: 'all 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                }} />
+                            </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px' }}>

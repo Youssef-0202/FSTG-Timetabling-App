@@ -16,7 +16,7 @@ import {
     getAssignments, Assignment, createAssignment, AssignmentCreate, updateAssignment, deleteAssignment,
     getModuleParts, createModulePart, updateModulePart, deleteModulePart, ModulePart,
     getTimeslots, createTimeslot, updateTimeslot, deleteTimeslot, Timeslot,
-    getFilieres, createFiliere, deleteFiliere, Filiere,
+    getFilieres, createFiliere, updateFiliere, deleteFiliere, Filiere,
     getGroupeFilieres, createGroupeFiliere, deleteGroupeFiliere, updateGroupeFiliere, GroupeFiliere,
     getSections, createSection, deleteSection, Section,
     getTDGroups, createTDGroup, updateTDGroup, deleteTDGroup, TDGroup,
@@ -144,11 +144,15 @@ function DatabaseContent() {
                 await createDepartment({ name: String(d.name || "") });
                 setDepartments(await getDepartments());
             } else if (tab === "filieres") {
-                await createFiliere({
+                const payload = {
                     name: String(d.name || ""),
                     type: String(d.type || "TC"),
-                    dept_id: Number(d.dept_id || 1)
-                });
+                    dept_id: Number(d.dept_id || 1),
+                    chef_id: d.chef_id ? Number(d.chef_id) : null
+                };
+                modal.mode === "add"
+                    ? await createFiliere(payload)
+                    : await updateFiliere(Number(d.id), payload);
                 setFilieres(await getFilieres());
             } else if (tab === "sections") {
                 await createSection({
@@ -305,7 +309,7 @@ function DatabaseContent() {
 
     return (
         <>
-            <div className="sub-header">
+            <div className="sub-header" style={{ padding: "100px 20px 90px" }}>
                 <motion.h1
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -534,19 +538,32 @@ function DatabaseContent() {
 
                     {tab === "filieres" && (
                         <table>
-                            <thead><tr><th>ID</th><th>Nom Filière</th><th>Type</th><th>Département</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Nom Filière</th><th>Type</th><th>Département</th><th>Chef de Filière</th><th>Actions</th></tr></thead>
                             <tbody>
-                                {!loading && filieres.map((f) => (
-                                    <tr key={f.id}>
-                                        <td><code style={{ fontSize: "0.78rem" }}>#{f.id}</code></td>
-                                        <td><b>{f.name}</b></td>
-                                        <td><span className="badge badge-td">{f.type}</span></td>
-                                        <td>{departments.find(d => d.id === f.dept_id)?.name || "N/A"}</td>
-                                        <td><div className="actions-cell">
-                                            <button className="btn btn-outline btn-sm" disabled><Pencil size={13} /></button>
-                                        </div></td>
-                                    </tr>
-                                ))}
+                                {!loading && filieres.map((f) => {
+                                    const chef = teachers.find(t => t.id === f.chef_id);
+                                    return (
+                                        <tr key={f.id}>
+                                            <td><code style={{ fontSize: "0.78rem" }}>#{f.id}</code></td>
+                                            <td><b>{f.name}</b></td>
+                                            <td><span className="badge badge-td">{f.type}</span></td>
+                                            <td>{departments.find(d => d.id === f.dept_id)?.name || "N/A"}</td>
+                                            <td>
+                                                {chef ? (
+                                                    <span style={{ color: "var(--navy)", fontWeight: 700, fontSize: "0.8rem" }}>
+                                                        Pr. {chef.name}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ color: "var(--muted)", fontStyle: "italic", fontSize: "0.8rem" }}>Non assigné</span>
+                                                )}
+                                            </td>
+                                            <td><div className="actions-cell">
+                                                <button className="btn btn-outline btn-sm" onClick={() => openEdit(f as any)}><Pencil size={13} /></button>
+                                                <button className="btn btn-danger btn-sm" onClick={() => del(f.id)}><Trash2 size={13} /></button>
+                                            </div></td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}
@@ -598,15 +615,44 @@ function DatabaseContent() {
                             <tbody>
                                 {!loading && (teachers as Teacher[])
                                     .filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()))
-                                    .map((t) => {
+                                    .map((t, idx) => {
                                         const avail = (t.availabilities as any) || {};
                                         const unSlots = avail.unavailable_slots || [];
                                         const count = Array.isArray(unSlots) ? unSlots.length : 0;
+                                        const profFilieres = filieres.filter(f => f.chef_id === t.id);
+                                        const { initials, color } = avatar(t.name, idx);
+
                                         return (
                                             <tr key={t.id}>
                                                 <td><code style={{ fontSize: "0.78rem" }}>#{t.id}</code></td>
-                                                <td><b>{t.name}</b></td>
-                                                <td style={{ color: "var(--muted)" }}>{t.email}</td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <div style={{
+                                                            width: '32px', height: '32px', borderRadius: '8px', backgroundColor: color,
+                                                            color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            fontSize: '0.75rem', fontWeight: 800, flexShrink: 0
+                                                        }}>
+                                                            {initials}
+                                                        </div>
+                                                        <div>
+                                                            <div style={{ fontWeight: 800, color: 'var(--navy)', textTransform: 'capitalize' }}>
+                                                                {t.name}
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '4px', marginTop: '2px' }}>
+                                                                {profFilieres.map(pf => (
+                                                                    <span key={pf.id} style={{
+                                                                        fontSize: '0.6rem', fontWeight: 900, padding: '1px 6px',
+                                                                        borderRadius: '4px', backgroundColor: '#eef2ff', color: '#4338ca',
+                                                                        border: '1px solid #c7d2fe', textTransform: 'uppercase'
+                                                                    }}>
+                                                                        CHEF {pf.name}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ color: "var(--muted)", fontSize: '0.85rem' }}>{t.email}</td>
                                                 <td>
                                                     {count > 0 ? (
                                                         <span className="badge" style={{ backgroundColor: "#fef2f2", color: "#ef4444", border: "1px solid #fee2e2", fontSize: "0.75rem" }}>
@@ -858,6 +904,19 @@ function DatabaseContent() {
                                         <select value={String(modal.data.dept_id || "")} onChange={(e) => setField("dept_id", e.target.value)}>
                                             <option value="">Sélectionner</option>
                                             {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="form-group full">
+                                        <label style={{ color: 'var(--navy)', fontWeight: 800 }}>Chef de Filière (Responsable)</label>
+                                        <select
+                                            value={String(modal.data.chef_id || "")}
+                                            onChange={(e) => setField("chef_id", e.target.value)}
+                                            style={{ border: '2px solid var(--navy)', backgroundColor: '#f0f4ff' }}
+                                        >
+                                            <option value="">-- Aucun (Non assigné) --</option>
+                                            {teachers.sort((a, b) => a.name.localeCompare(b.name)).map(t => (
+                                                <option key={t.id} value={t.id}>Pr. {t.name} ({t.email})</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </>

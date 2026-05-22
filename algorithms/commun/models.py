@@ -59,6 +59,7 @@ class Assignment:
             "room_id": self.room.id,
             "slot_id": self.timeslot.id,
             "section_id": self.module_part.section_id,
+            "is_locked": self.module_part.is_locked,
             "td_groups": [{"id": gid} for gid in self.module_part.td_group_ids]
         }
 

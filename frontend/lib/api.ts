@@ -39,6 +39,7 @@ export interface Filiere {
   name: string;
   type: string; // "TC", "LST", "MST", "CI"
   dept_id: number;
+  chef_id?: number | null;
 }
 
 export interface GroupeFiliere {
@@ -128,6 +129,8 @@ export const deleteDepartment = (id: number) =>
 export const getFilieres = () => apiFetch<Filiere[]>("/filieres");
 export const createFiliere = (data: Omit<Filiere, "id">) =>
   apiFetch<Filiere>("/filieres", { method: "POST", body: JSON.stringify(data) });
+export const updateFiliere = (id: number, data: Partial<Filiere>) =>
+  apiFetch<Filiere>(`/filieres/${id}`, { method: "PUT", body: JSON.stringify(data) });
 export const deleteFiliere = (id: number) =>
   apiFetch<null>(`/filieres/${id}`, { method: "DELETE" });
 

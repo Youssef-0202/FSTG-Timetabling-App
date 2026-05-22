@@ -6,9 +6,13 @@ import sys
 
 def get_log_path():
     """Détermine le chemin absolu du fichier de log (Force V2 Logs)."""
-    # Chemin absolu vers .../algorithms/ga_sa_hybrid/v2/logs
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
+    # Determination dynamique du dossier logs (Turbo-friendly)
+    log_dir = os.path.join(os.getcwd(), "logs")
+    
+    if not os.path.exists(log_dir):
+        # Fallback pour eviter les erreurs si lance hors dossier algo
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
     
     if not os.path.exists(log_dir):
         try:
@@ -117,8 +121,9 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
 class HistoryLogger:
     """Enregistre l'historique complet (H1, H2, S1, S2...) dans un fichier CSV."""
     def __init__(self, filename="evolution_history.csv"):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
+        log_dir = os.path.join(os.getcwd(), "logs")
+        if not os.path.exists(log_dir):
+            log_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ga_sa_hybrid", "v2", "logs"))
         
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)

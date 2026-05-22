@@ -19,9 +19,16 @@ class FiliereBase(BaseModel):
     name: str
     type: str       # "TC", "LST", "MST", "CI"
     dept_id: int
+    chef_id: Optional[int] = None
 
 class FiliereCreate(FiliereBase):
     pass
+
+class FiliereUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    dept_id: Optional[int] = None
+    chef_id: Optional[int] = None
 
 class Filiere(FiliereBase):
     id: int

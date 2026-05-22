@@ -1,0 +1,46 @@
+============================================================
+ RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
+ Date : 2026-05-22 15:21:25
+============================================================
+
+1. PARAMETRES DE L'ALGORITHME :
+ - Population Size      : 20
+ - Max Generations      : 120
+ - Mutation Rate        : 0.3
+ - SA Iterations        : 1200
+ - SA Temp Initial      : 50.0
+
+2. STATISTIQUES DE LA BASE DE DONNEES :
+ - Nombre d'Enseignants : 77
+ - Nombre de Salles     : 29
+ - Nombre de Sections   : 10
+ - Seances a placer     : 243
+ - Creneaux disponibles : 30
+
+============================================================
+ SUIVI DES GENERATIONS :
+============================================================
+
+============================================================
+ ANALYSE FINALE DES PERFORMANCES 
+============================================================
+ Temps total d'execution  : 897.63 secondes
+ Generations effectuees   : 120
+------------------------------------------------------------
+ Score Initial (Best)     : 58188471.5
+ Score Final   (Best)     : 8966.25
+ Amelioration Totale      : 100.0 %
+------------------------------------------------------------
+ STATISTIQUES DE LA DERNIERE POPULATION :
+  - Meilleure Solution    : 8966.25
+  - Pire Solution         : 2021299.5
+  - Moyenne Population    : 506056.5
+------------------------------------------------------------
+ DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
+  - S_Total              : 8966.25
+  - S3_Gaps              : 980
+  - S4_Lunch             : 1560
+  - S6_Stab              : 3700
+  - S8_FreeApm           : 1100
+  - S10_Sat              : 0
+============================================================

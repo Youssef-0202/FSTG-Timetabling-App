@@ -1,0 +1,103 @@
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME RL-CONTROLLER (V1.0)
+-------------------------------------------------------
+
+1. ARCHITECTURE GLOBALE
+-----------------------
+L'algorithme RL-Controller est un système mémétique hybride (GA + SA) où la phase de recherche locale est pilotée par un agent d'Apprentissage par Renforcement (Reinforcement Learning).
+
+Les innovations majeures :
+- Contrôle par Q-Learning : L'agent apprend quelle heuristique est la plus efficace selon l'état actuel de la solution.
+- Recherche Locale Bi-Phasée : Phase 'Hard' pour la faisabilité, suivie d'une phase 'Soft' pilotée par le RL pour la qualité.
+- Croisement Modulaire : Préserve la cohérence des modules (CM/TD/TP) lors de l'évolution génétique.
+- Mutation Pondérée : Identifie et cible prioritairement les zones de conflit (Resource Heatmap).
+
+2. PSEUDO-CODE :
+----------------
+
+Procedure MAIN_RL_SOLVER()
+--------------------------
+1 :  DM = Charger_Données()
+2 :  Agent = QLearningAgent(Actions=[0, 1, 2, 3])
+3 :  Population = INITIALISER_POPULATION(80% Greedy, 20% Random)
+4 :  
+5 :  Tant que Gen < MAX_GEN :
+6 :      EVOLVE(Population, Agent) // Cycle de reproduction + Apprentissage
+7 :      
+8 :      Si stagnation détectée :
+9 :          INJECTER_DIVERSITE(Population)
+10:      
+11:      Enregistrer_Etat_Agent(Agent.Knowledge)
+12:      Gen = Gen + 1
+13:  Fin Tant que
+
+Procedure EVOLVE(Population, Agent)
+-----------------------------------
+1 :  Trier(Population)
+2 :  Nouvelle_Pop = []
+3 :  
+4 :  // 1. ÉLITES : Polissage Local intensif
+5 :  Pour chaque Elite dans Population[0..ELITISM] :
+6 :      Elite = SA_RL_SEARCH(Elite, Agent)
+7 :      Nouvelle_Pop.Ajouter(Elite)
+8 :  
+9 :  // 2. OFFSPRING : GA + RL
+10:  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+11:      P1, P2 = Sélection_Tournoi(Population)
+12:      Enfant = CROISEMENT_MODULAIRE(P1, P2)
+13:      
+14:      Si Random() < Mutation_Rate :
+15:          MUTATION_PONDÉRÉE(Enfant)
+16:      
+17:      // Polissage dirigé par l'agent RL
+18:      Enfant = SA_RL_SEARCH(Enfant, Agent)
+19:      
+20:      Nouvelle_Pop.Ajouter(Enfant)
+21:  Fin Tant que
+22:  Population = Nouvelle_Pop
+
+Procedure SA_RL_SEARCH(Individu, Agent)
+---------------------------------------
+1 :  Phase = 'Hard' si Individu.H > 0 sinon 'Soft'
+2 :  T = Max(T0, Fitness * 0.05)
+3 :  Etat_RL = Extraire_Etat(Individu) // [H, Gaps, Stab, Progress]
+4 :  
+5 :  Pour i = 1 à SA_ITERATIONS :
+6 :      Si Phase == 'Hard' :
+7 :          Mouvement = Mouvement_Générique_Conflit(Individu)
+8 :      Sinon :
+9 :          Action = Agent.CHOOSE_ACTION(Etat_RL) // Epsilon-Greedy
+10:         Mouvement = Appliquer_Heuristique_RL(Individu, Action)
+11:     
+12:     Delta = Calculer_Delta(Individu, Mouvement)
+13:     
+14:     Si Metropolis_Accept(Delta, T) :
+15:         Si Phase == 'Soft' : 
+16:             Reward = (Old_Fit - New_Fit) / 10.0
+17:             Agent.LEARN(Etat_RL, Action, Reward, Nouveau_Etat)
+18:         Etat_RL = Nouveau_Etat
+19:     Sinon :
+20:         UNDO(Individu, Mouvement)
+21:     
+22:     Refroidissement(T)
+23:  Fin Pour
+24:  Retourner Meilleur_Solution_Locale
+
+3. AGENT RL (Q-LEARNING)
+------------------------
+- Espace d'État (State) : (H_bin, Gaps_bin, Stab_bin, Progress_bin)
+- Espace d'Action (Actions) :
+    0. Stabilisation Salles (S6)
+    1. Compactage Professeur
+    2. Compactage Étudiant (S3)
+    3. Exploration Aléatoire
+- Update (Bellman) :
+    Q(s, a) = Q(s, a) + LR * [Reward + Gamma * Max(Q(s', a')) - Q(s, a)]
+
+4. OPÉRATEURS GÉNÉTIQUES
+------------------------
+- Crossover Modulaire : Échange de blocs de gènes correspondant à un module complet (préserve les liens CM-TD).
+- Mutation Pondérée : Utilise une 'Roulette Wheel' basée sur les violations hard. Une séance en conflit a 1000x plus de chances d'être mutée qu'une séance valide.
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT RL-CONTROLLER V1.0
+--------------------------------------------------------------------------------

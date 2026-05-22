@@ -46,7 +46,7 @@ export default function HomePage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="sub-header">
+      <div className="sub-header" style={{ padding: "130px 20px 90px" }}>
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

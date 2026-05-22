@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useState, useCallback } from "react";
 import {
-    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2, FileSpreadsheet, AlertTriangle
+    Calendar, Users, Download, Clock, MapPin, User as UserIcon, CheckCircle, Edit2, FileSpreadsheet, AlertTriangle, Lock
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -37,7 +37,7 @@ export default function TimetablePage() {
     const [auditGhostType, setAuditGhostType] = useState<"CM" | "ALL">("CM");
 
     const [tdGroups, setTdGroups] = useState<any[]>([]);
-    const [resultMode, setResultMode] = useState<"ga_sa" | "rl" | "alns">("alns");
+    const [resultMode, setResultMode] = useState<"ga_sa" | "rl" | "alns" | "fused">("fused");
     const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
     const [online, setOnline] = useState(true);
 
@@ -189,12 +189,12 @@ export default function TimetablePage() {
             animate={{ opacity: 1 }}
             className="page-container"
         >
-            <div className="sub-header" style={{ padding: "30px 20px 40px" }}>
+            <div className="sub-header" style={{ padding: "80px 20px 90px" }}>
                 <motion.h1
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1 }}
-                    style={{ fontSize: "1.8rem" }}
+                    style={{ fontSize: "2.8rem", fontWeight: 900 }}
                 >
                     IA Preview : Emploi du Temps
                 </motion.h1>
@@ -204,11 +204,24 @@ export default function TimetablePage() {
             </div>
 
             <div className="content-wrapper" style={{ margin: "-50px auto 0", position: "relative", zIndex: 10 }}>
-                <div className="top-bar" style={{
-                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', background: 'white',
-                    border: 'none', padding: '12px 20px', borderRadius: '16px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px'
-                }}>
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="top-bar"
+                    style={{
+                        boxShadow: 'var(--shadow-lg)',
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid var(--border)',
+                        padding: '16px 24px',
+                        borderRadius: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '12px'
+                    }}
+                >
                     {/* GAUCHE : Mode & Audit */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div className="mode-toggle" style={{ background: '#f1f5f9', padding: '4px', borderRadius: '10px', display: 'flex', gap: '2px', height: '42px', alignItems: 'center' }}>
@@ -266,21 +279,36 @@ export default function TimetablePage() {
 
                     {/* MILIEU : Algo Selector */}
                     <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '10px', gap: '2px', height: '42px', alignItems: 'center' }}>
-                        {["alns", "rl", "ga_sa"].map(mode => (
-                            <button
-                                key={mode}
-                                onClick={() => setResultMode(mode as any)}
-                                style={{
-                                    border: 'none', padding: '0 14px', borderRadius: '8px', cursor: 'pointer',
-                                    fontSize: '0.82rem', fontWeight: 800, height: '34px',
-                                    background: resultMode === mode ? (mode === 'alns' ? '#7c3aed' : '#d97706') : 'transparent',
-                                    color: resultMode === mode ? 'white' : '#64748b',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {mode.toUpperCase()}
-                            </button>
-                        ))}
+                        {(["fused", "alns", "rl", "ga_sa"] as const).map(mode => {
+                            const colors: Record<string, string> = {
+                                fused: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                alns: '#7c3aed',
+                                rl: '#0891b2',
+                                ga_sa: '#d97706'
+                            };
+                            const labels: Record<string, string> = {
+                                fused: 'RL-ALNS',
+                                alns: 'ALNS',
+                                rl: 'RL',
+                                ga_sa: 'GA-SA'
+                            };
+                            return (
+                                <button
+                                    key={mode}
+                                    onClick={() => setResultMode(mode)}
+                                    style={{
+                                        border: 'none', padding: '0 14px', borderRadius: '8px', cursor: 'pointer',
+                                        fontSize: '0.82rem', fontWeight: 800, height: '34px',
+                                        background: resultMode === mode ? colors[mode] : 'transparent',
+                                        color: resultMode === mode ? 'white' : '#64748b',
+                                        transition: 'all 0.2s',
+                                        boxShadow: resultMode === mode && mode === 'fused' ? '0 2px 8px rgba(99,102,241,0.4)' : 'none'
+                                    }}
+                                >
+                                    {labels[mode]}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     {/* DROITE : Sélection & Actions */}
@@ -323,7 +351,7 @@ export default function TimetablePage() {
                             <CheckCircle size={16} /> Valider
                         </button>
                     </div>
-                </div>
+                </motion.div>
 
                 <div className="timetable-main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     {auditResult && viewMode === "section" && (
@@ -478,19 +506,30 @@ export default function TimetablePage() {
                                                                     const bgColor = isGhost ? '#fff1f2' : undefined;
 
                                                                     return (
-                                                                        <div key={c.id} className={`course-box ${mp?.type.toLowerCase()}`} style={{
-                                                                            margin: 0, padding: '10px', borderRadius: '8px',
-                                                                            borderLeft: `5px solid ${isGhost ? '#ef4444' : (mp?.type.toLowerCase() === 'cm' ? '#3b82f6' : '#22c55e')}`,
-                                                                            background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : bgColor,
-                                                                            pointerEvents: isGhost ? 'none' : 'auto',
-                                                                            position: 'relative',
-                                                                            boxShadow: isGhost ? '0 4px 6px -1px rgba(239, 68, 68, 0.1)' : undefined
-                                                                        }}>
+                                                                        <motion.div
+                                                                            key={c.id}
+                                                                            whileHover={{ scale: 1.03, y: -4, boxShadow: '0 12px 20px rgba(0,0,0,0.1)' }}
+                                                                            className={`course-box ${mp?.type.toLowerCase()}`}
+                                                                            style={{
+                                                                                margin: 0, padding: '12px', borderRadius: '12px',
+                                                                                borderLeft: `6px solid ${isGhost ? '#ef4444' : (mp?.type.toLowerCase() === 'cm' ? '#3b82f6' : '#22c55e')}`,
+                                                                                background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : bgColor,
+                                                                                pointerEvents: isGhost ? 'none' : 'auto',
+                                                                                position: 'relative',
+                                                                                cursor: 'pointer',
+                                                                                transition: 'border-color 0.3s'
+                                                                            }}
+                                                                        >
+                                                                            {c.is_locked && (
+                                                                                <div style={{ position: 'absolute', bottom: '8px', right: '8px', opacity: 0.8 }}>
+                                                                                    <Lock size={12} color="#ef4444" strokeWidth={3} />
+                                                                                </div>
+                                                                            )}
                                                                             {isGhost && (
                                                                                 <div style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', fontSize: '0.6rem', padding: '3px 6px', borderRadius: '4px', fontWeight: 900, boxShadow: '0 2px 4px rgba(0,0,0,0.2)', zIndex: 20 }}>{ghostSectionName}</div>
                                                                             )}
                                                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                                                                                <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '0.75rem', lineHeight: 1.2, flex: 1 }}>
+                                                                                <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '0.8rem', lineHeight: 1.2, flex: 1, fontFamily: 'Outfit, sans-serif' }}>
                                                                                     {mod?.name}
                                                                                 </div>
                                                                                 {groupLabel && (
@@ -500,14 +539,14 @@ export default function TimetablePage() {
                                                                                 )}
                                                                             </div>
                                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.65rem', fontWeight: 600 }}>
-                                                                                <div style={{ color: '#475569', textTransform: 'uppercase', fontSize: '0.6rem' }}>
+                                                                                <div style={{ color: '#475569', textTransform: 'uppercase', fontSize: '0.65rem' }}>
                                                                                     {teacher ? `Pr. ${teacher.name}` : '—'}
                                                                                 </div>
                                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b' }}>
                                                                                     <MapPin size={10} color="#94a3b8" /> {room?.name || '—'}
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
+                                                                        </motion.div>
                                                                     );
                                                                 })}
                                                             </div>
@@ -594,9 +633,16 @@ export default function TimetablePage() {
                                                                         <div style={{ color: '#475569', fontSize: '0.6rem', textTransform: 'uppercase', marginBottom: '2px' }}>
                                                                             {teacher ? `Pr. ${teacher.name}` : '—'}
                                                                         </div>
-                                                                        <div style={{ fontWeight: 700, color: '#64748b', fontSize: '0.6rem' }}>
-                                                                            {sec ? sec.name : a.td_groups && a.td_groups.length > 0 ? a.td_groups.map(g => g.name).join('+') : '—'}
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                                                                            <span style={{ fontWeight: 700, color: '#64748b' }}>
+                                                                                {sec ? sec.name : a.td_groups && a.td_groups.length > 0 ? a.td_groups.map(g => g.name).join('+') : '—'}
+                                                                            </span>
                                                                         </div>
+                                                                        {a.is_locked && (
+                                                                            <div style={{ position: 'absolute', bottom: '4px', right: '4px', opacity: 0.7 }}>
+                                                                                <Lock size={10} color="#ef4444" strokeWidth={3} />
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </td>
                                                             );
@@ -614,63 +660,65 @@ export default function TimetablePage() {
             </div>
 
             {/* MODALE DE CONFIRMATION PREMIUM */}
-            {showConfirmModal && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 1000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(10px)',
-                }}>
-                    <div className="confirm-card" style={{
-                        background: 'white', padding: '32px', borderRadius: '24px',
-                        width: '100%', maxWidth: '400px', textAlign: 'center',
-                        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            {
+                showConfirmModal && (
+                    <div style={{
+                        position: 'fixed', inset: 0, zIndex: 1000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(10px)',
                     }}>
-                        <div style={{
-                            width: '64px', height: '64px', background: '#ecfdf5',
-                            borderRadius: '50%', display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', margin: '0 auto 20px',
-                            color: '#10b981', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)'
+                        <div className="confirm-card" style={{
+                            background: 'white', padding: '32px', borderRadius: '24px',
+                            width: '100%', maxWidth: '400px', textAlign: 'center',
+                            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
                         }}>
-                            <CheckCircle size={32} />
-                        </div>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>
-                            Confirmer la Validation
-                        </h3>
-                        <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6, marginBottom: '28px' }}>
-                            Souhaitez-vous valider ce planning <strong>{resultMode.toUpperCase()}</strong> ?
-                        </p>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                            <button
-                                onClick={() => setShowConfirmModal(false)}
-                                style={{
-                                    flex: 1, padding: '12px', borderRadius: '12px',
-                                    border: '1.5px solid #e2e8f0', background: 'white',
-                                    color: '#64748b', fontWeight: 700, cursor: 'pointer',
-                                    transition: 'all 0.2s', fontSize: '0.85rem'
-                                }}
-                            >
-                                Annuler
-                            </button>
-                            <button
-                                onClick={handleConfirmValidation}
-                                disabled={isValidating}
-                                style={{
-                                    flex: 2, padding: '12px', borderRadius: '12px',
-                                    border: 'none', background: '#10b981',
-                                    color: 'white', fontWeight: 700, cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                    fontSize: '0.85rem'
-                                }}
-                            >
-                                {isValidating ? "Validation en cours..." : "Confirmer"}
-                            </button>
+                            <div style={{
+                                width: '64px', height: '64px', background: '#ecfdf5',
+                                borderRadius: '50%', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', margin: '0 auto 20px',
+                                color: '#10b981', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)'
+                            }}>
+                                <CheckCircle size={32} />
+                            </div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>
+                                Confirmer la Validation
+                            </h3>
+                            <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6, marginBottom: '28px' }}>
+                                Souhaitez-vous valider ce planning <strong>{resultMode.toUpperCase()}</strong> ?
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    onClick={() => setShowConfirmModal(false)}
+                                    style={{
+                                        flex: 1, padding: '12px', borderRadius: '12px',
+                                        border: '1.5px solid #e2e8f0', background: 'white',
+                                        color: '#64748b', fontWeight: 700, cursor: 'pointer',
+                                        transition: 'all 0.2s', fontSize: '0.85rem'
+                                    }}
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={handleConfirmValidation}
+                                    disabled={isValidating}
+                                    style={{
+                                        flex: 2, padding: '12px', borderRadius: '12px',
+                                        border: 'none', background: '#10b981',
+                                        color: 'white', fontWeight: 700, cursor: 'pointer',
+                                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    {isValidating ? "Validation en cours..." : "Confirmer"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <style jsx>{`
                 @keyframes popIn {
@@ -697,6 +745,6 @@ export default function TimetablePage() {
                 .c-name { font-weight: 800; color: #1e3a8a; margin-bottom: 4px; }
                 .c-info-row { font-size: 0.65rem; color: #64748b; display: flex; flex-direction: column; gap: 2px; }
             `}</style>
-        </motion.div>
+        </motion.div >
     );
 }

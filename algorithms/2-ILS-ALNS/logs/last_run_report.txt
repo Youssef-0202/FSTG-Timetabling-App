@@ -1,0 +1,24 @@
+============================================================
+ RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
+ Date : 2026-05-15 13:00:56
+============================================================
+
+1. PARAMETRES DE L'ALGORITHME :
+ - Algorithme          : ILS-ALNS-v1
+ - Population Size      : 40
+ - Max Generations      : 200
+ - Mutation Rate        : N/A
+ - SA Iterations        : 1500
+ - SA Temp Initial      : 50.0
+ - SA Cooling           : 0.98
+
+2. STATISTIQUES DE LA BASE DE DONNEES :
+ - Nombre d'Enseignants : 74
+ - Nombre de Salles     : 29
+ - Nombre de Sections   : 10
+ - Seances a placer     : 245
+ - Creneaux disponibles : 30
+
+============================================================
+ SUIVI DES GENERATIONS :
+============================================================

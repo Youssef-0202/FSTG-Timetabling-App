@@ -13,6 +13,7 @@ const links = [
     { href: "/database", label: "Données", Icon: Database },
     { href: "/algorithms", label: "Solveurs", Icon: Cpu },
     { href: "/timetable/preview", label: "Planning", Icon: CalendarDays },
+    { href: "/maquettes", label: "Maquettes", Icon: ShieldCheck },
     { href: "/reports", label: "Rapports", Icon: BarChart2 },
 ];
 

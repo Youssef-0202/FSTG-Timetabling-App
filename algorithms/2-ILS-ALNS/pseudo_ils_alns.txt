@@ -1,0 +1,93 @@
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME ILS-ALNS (V1.1)
+--------------------------------------------------
+
+1. ARCHITECTURE GLOBALE : "KICK-AND-POLISH"
+-------------------------------------------
+L'algorithme ILS-ALNS remplace le cycle génétique classique (Crossover/Mutation) par un paradigme de Recherche Locale Itérée (ILS) couplé à une Recherche Locale Adaptative (ALNS).
+
+Différences clés avec la Baseline (GA) :
+- Suppression du Crossover : Évite la création d'individus "monstres" incohérents.
+- Perturbation (Kick) : Un parent unique est "secoué" pour explorer de nouvelles zones.
+- Intensification Systématique : Chaque nouvel individu subit 1200 itérations de polissage.
+
+2. PSEUDO-CODE DÉTAILLÉ
+-----------------------
+
+Procedure EVOLVE(Population)
+----------------------------
+1 :  Trier(Population, par fitness croissante)
+2 :  Nouvelle_Pop = []
+3 :  
+4 :  // --- PHASE A : INTENSIFICATION DES ÉLITES ---
+5 :  Pour i = 0 à (ELITISM - 1) :
+6 :      Elite = Copy(Population[i])
+7 :      Elite = SA_ALNS(Elite, Mode="Pur Polissage") // Aucun choc préalable
+8 :      Nouvelle_Pop.Ajouter(Elite)
+9 :  
+10:  // --- PHASE B : DIVERSIFICATION ILS (NON-ÉLITES) ---
+11:  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+12:      Parent = Sélection_Tournoi(Population, k=4)
+13:      
+14:      // 1. LE KICK (Perturbation)
+15:      Force = Max(0.04, 0.12 - Gen * 0.001)
+16:      Enfant = ILS_PERTURBATION(Parent, Force) 
+17:      
+18:      // 2. LE POLISSAGE (SA-ALNS)
+19:      Enfant = SA_ALNS(Enfant, Iters=1200)
+20:      
+21:      Nouvelle_Pop.Ajouter(Enfant)
+22:  Fin Tant que
+
+Procedure SA_ALNS(Individu, Iters)
+----------------------------------
+1 :  T = Max(T0, Fitness * 0.04)
+2 :  Meilleur_Etat_Local = Sauvegarder_Etat_Initial(Individu)
+3 :  
+4 :  Pour it = 1 à Iters :
+5 :      // --- SÉCURITÉ ANTI-STAGNATION (REHEATING) ---
+6 :      Si stagnation > (Iters / 6) :
+7 :          T = T_Original * (0.5 ^ count) // Choc thermique pour sortir du trou
+8 :      
+9 :      // --- SÉLECTION (PRÉDIRE via SCORE UCB1) ---
+10:     Op_ID = BANDIT.SELECT_ARM() 
+11:     
+12:     // --- ACTION (MOUVEMENT) ---
+13:     (Indices_Touchés, Anciens_Etats) = APPLIQUER_OPÉRATEUR(Individu, Op_ID)
+14:     
+15:     Δ = Fitness_Après - Fitness_Avant
+16:     
+17:     // --- ACCEPTATION (METROPOLIS) ---
+18:     Si Δ < 0 OU (T > 0 et Random() < exp(-Δ / T)) :
+19:         // SUCCÈS : On garde le mouvement
+20:         // --- ÉVALUATION (APPRENDRE via RÉCOMPENSE) ---
+21:         Récompense = Max(0, -Δ / Best_Ever_Fit) * 150
+22:         BANDIT.UPDATE(Op_ID, Récompense)
+23:     Sinon :
+24:         // ÉCHEC : ROLLBACK O(1)
+25:         RESTAURER_ETAT(Individu, Indices_Touchés, Anciens_Etats)
+26:         Si stag > 50 : BANDIT.UPDATE(Op_ID, 0) // Signal de faible performance
+27:     Fin Si
+28:     
+29:     T = T * Cooling_Rate
+30:  Fin Pour
+31:  Restaurer(Individu, Meilleur_Etat_Local) // On finit toujours sur le meilleur trouvé
+32:  Retourner Individu
+
+3. BIBLIOTHÈQUE D'OPÉRATEURS (neighborhoods)
+-------------------------------------------
+1. RandomShift     : Déplacement aléatoire (Exploration pure)
+2. SwapSlots       : Échange de créneaux intra-section
+3. StabilizeRoom   : Alignement sur une salle unique par module
+4. CompactProf     : Réduction des trous dans l'emploi du temps enseignant
+5. CompactSection  : Réduction des trous pour les étudiants
+6. LunchFix        : Libération forcée du créneau de 12h30
+7. SwapRoomOnly    : Mutation de salle sans changement de temps
+8. KempeChain      : Échange structurel complexe avec résolution de conflits
+
+4. FORMULE MATHÉMATIQUE DU BANDIT (UCB1)
+----------------------------------------
+Score_i = (Total_Rewards_i / Usage_i) + 1.1 * sqrt( log(Total_Steps) / Usage_i )
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT ENRICHI ILS-ALNS V1.1
+--------------------------------------------------------------------------------

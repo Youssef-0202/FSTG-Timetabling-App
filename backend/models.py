@@ -55,8 +55,10 @@ class Filiere(Base):
     name = Column(String, index=True)         # ex: "GI", "GP", "MSD"
     type = Column(String)                     # "TC", "LST", "MST", "CI"
     dept_id = Column(Integer, ForeignKey("departments.id"))
+    chef_id = Column(Integer, ForeignKey("teachers.id"), nullable=True)
 
     department = relationship("Department", back_populates="filieres")
+    chef = relationship("Teacher", back_populates="filieres_dirigees")
     groupes = relationship("GroupeFiliere", back_populates="filiere")
 
 
@@ -179,6 +181,7 @@ class Teacher(Base):
     availabilities = Column(JSON)   # {"Lundi": ["08:30-10:25", "14:30-16:25"], ...}
 
     assignments = relationship("Assignment", back_populates="teacher")
+    filieres_dirigees = relationship("Filiere", back_populates="chef")
 
 
 class Room(Base):

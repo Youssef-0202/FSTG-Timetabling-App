@@ -1,0 +1,119 @@
+import random
+
+class Room:
+    def __init__(self, id, name, capacity, type):
+        self.id = id
+        self.name = name
+        self.capacity = capacity
+        self.type = type
+
+class Teacher:
+    def __init__(self, id, name, email="", unavailable_slots=None):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.unavailable_slots = set(unavailable_slots or [])
+
+
+class Timeslot:
+    def __init__(self, id, day, start_time, end_time):
+        self.id = id
+        self.day = day
+        self.start_time = start_time
+        self.end_time = end_time
+
+class Section:
+    def __init__(self, id, name, student_count, parent_id=None):
+        self.id = id
+        self.name = name
+        self.student_count = student_count
+        self.parent_id = parent_id
+
+class ModulePart:
+    def __init__(self, id, module_id, teacher_id, section_id, type="TD", required_room_type="SALLE_TD", group_size=30, td_group_ids=None, is_locked=False, fixed_room_id=None, fixed_slot_id=None):
+        self.id = id
+        self.module_id = module_id
+        self.teacher_id = teacher_id
+        self.section_id = section_id  # Parent section or target section for CM
+        self.type = type
+        self.required_room_type = required_room_type
+        self.group_size = group_size
+        self.td_group_ids = td_group_ids or []  # Real individual group IDs
+        # Verrouillage pour les Affectations de Type 1 (Fixées par l'admin)
+        self.is_locked = is_locked
+        self.fixed_room_id = fixed_room_id
+        self.fixed_slot_id = fixed_slot_id
+
+
+class Assignment:
+    def __init__(self,module_part,room,timeslot) :
+        self.module_part = module_part  # The session 
+        self.room = room                # The chosen room
+        self.timeslot= timeslot          # The chosen slot
+
+    def to_dict(self):
+        return {
+            "id": self.module_part.id,
+            "module_part_id": self.module_part.module_id,
+            "teacher_id": self.module_part.teacher_id,
+            "room_id": self.room.id,
+            "slot_id": self.timeslot.id,
+            "section_id": self.module_part.section_id,
+            "td_groups": [{"id": gid} for gid in self.module_part.td_group_ids]
+        }
+
+class Schedule : # un emploi du temps complet proposé par l'algo 
+    def __init__(self, data_manager, assignments=None):
+        self.data_manager = data_manager
+        self.assignments = assignments or []
+        self.fitness = None
+        self.h_violations = 0
+        self.soft_score = 0
+        
+    def to_dict(self):
+        return [a.to_dict() for a in self.assignments]
+        
+    def copy(self):
+        new_assignments = []
+        for a in self.assignments:
+            new_as = Assignment(a.module_part, a.room, a.timeslot)
+            new_assignments.append(new_as)
+            
+        new_sched = Schedule(self.data_manager, new_assignments)
+        new_sched.fitness = self.fitness
+        new_sched.h_violations = self.h_violations
+        new_sched.soft_score = self.soft_score
+        return new_sched
+
+    def sync_to_db(self):
+        """Envoie le planning complet à l'API pour mise à jour de la base de données."""
+        import requests
+        API_URL = "http://localhost:8000"
+        
+        print(f"--- Synchronisation de {len(self.assignments)} seances avec la base de donnees SQL...")
+        
+        # Préparation du payload au format AssignmentCreate (backend/schemas.py)
+        payload = []
+        for a in self.assignments:
+            payload.append({
+                "module_part_id": a.module_part.module_id, # ID du module_part réel en base
+                "teacher_id": a.module_part.teacher_id,
+                "room_id": a.room.id,
+                "slot_id": a.timeslot.id,
+                "section_id": a.module_part.section_id,
+                "tdgroup_ids": a.module_part.td_group_ids,
+                "is_locked": False
+            })
+            
+        try:
+            resp = requests.post(f"{API_URL}/save-assignments", json=payload, timeout=30)
+            if resp.status_code in [200, 201]:
+                print(f"OK : La base de donnees SQL a ete mise a jour.")
+            else:
+                print(f"Error lors de la synchro : {resp.status_code} - {resp.text}")
+        except Exception as e:
+            print(f"Error de connexion a l API pour la synchronisation : {e}")
+
+    def __str__(self):
+        return f"Schedule: {len(self.assignments)} assignments, H: {self.h_violations}"
+

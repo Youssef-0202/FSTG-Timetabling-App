@@ -1,0 +1,60 @@
+ALGORITHME : RL-ALNS avec Curriculum Learning (Proposition Gagnante)
+================================================================
+
+ENTRÉES : 
+  - DM : Gestionnaire de données (salles, profs, séances)
+  - Agent : Q-Learning Agent (initially empty)
+  - Phases : [S1: 30% des sections, S2: 60% des sections, S3: 100%]
+
+SORTIE :
+  - Emploi du temps optimal (Schedule)
+  - Base de connaissances (Q-Table) entraînée
+
+----------------------------------------------------------------
+PARTIE 1 : PHASE DE CURRICULUM (WARM-UP)
+----------------------------------------------------------------
+
+POUR CHAQUE phase P de [1..3] :
+    1. Sélectionner les sous-données correspondantes (DM_sub)
+    2. Créer une population initiale pour DM_sub
+    3. POUR gen de 1 à 12 :
+        a. Évoluer la population (HybridEngine.evolve)
+        b. L'Agent apprend les récompenses basées sur les micro-actions
+        c. SI gain de fitness : stocker l'expérience dans la Q-Table
+    4. Fin de phase : L'Agent préserve sa mémoire (Transfer Learning)
+
+----------------------------------------------------------------
+PARTIE 2 : OPTIMISATION GLOBALE (FUSIONNÉE)
+----------------------------------------------------------------
+
+Initialiser Engine_Global avec l'Agent pré-entraîné
+
+POUR gen de 1 à MAX_GEN :
+    POUR CHAQUE individu dans Population :
+        
+        A. SÉLECTION DE LA STRATÉGIE (RL) :
+           - Observer l'état S (H_violations, Gaps, Stability, Progress)
+           - Action A = Agent.choose_action(S) (8 Micro ou 4 Macro)
+           
+        B. EXÉCUTION (ALNS) :
+           - Appliquer l'opérateur A (ex: SwapRoom, Stabilize, KempeChain)
+           - Calculer nouveau Fitness (Mode Turbo : Évaluation Delta)
+           
+        C. RECUIT SIMULÉ (Exploration) :
+           - Delta = NewFitness - OldFitness
+           - SI Delta < 0 OU (acceptation probabiliste) :
+               - Garder le mouvement
+               - Récompense R = -Delta (Bonus si H=0)
+           - SINON : 
+               - Annuler mouvement
+               - Récompense R = 0
+               
+        D. APPRENTISSAGE :
+           - Agent.learn(S, A, R, S_next)
+
+    E. ÉVOLUTION (GA) :
+       - Garder l'élite
+       - Sélection par tournoi
+       - Mutation légère pour la diversité
+
+RETOURNER le Meilleur Individu

@@ -1,0 +1,260 @@
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME HYBRIDE GA+SA (V2.1)
+
+
+1. ARCHITECTURE GLOBALE (Évolution V1 -> V2.1)
+---------------------------------------------
+La V2.1 conserve la structure "Mémétique" de la V1 (SA à l'intérieur du cycle 
+génétique), mais remplace la recherche locale "aveugle" par une recherche 
+**"Guidée par la Connaissance du Domaine"** et une évaluation haute performance.
+
+Les 3 piliers du saut qualitatif :
+- Mouvements Guidés : Ciblent chirurgicalement les séances en conflit (Phase Hard)
+  ou les opportunités de regroupement pédagogique (Phase Soft).
+- Delta-Scoring : Ne recalcule que la variation de score (Gain de vitesse x10).
+- In-place Mutation with Undo : Zéro allocation mémoire durant le Recuit 
+  Simulé (évite les copies d'objets coûteuses).
+
+
+
+
+2. PSEUDO-CODE :
+-----------------------
+
+Procedure MAIN_SOLVER()
+-----------------------
+1 :  DM = Charger_Données_API()
+2 :  Calculer_Graphe_Filières() // Pré-calcul statique (Related Sections)
+3 :  Population = Initialiser_Greedy(30, 0.8) // 80% Glouton, 20% Aléatoire
+4 :  
+5 :  Initialiser_Compteur_Stagnation(C = 0)
+6 :  Tant que Gen < MAX_GEN et H > 0 (ou Stabilité non atteinte) :
+7 :      EVOLVE(Population)
+8 :      Nouveau_Best = Population[0]
+9 :      
+10:      // Détection de stagnation (Anti-Plateau)
+11:      Si Nouveau_Best.Score >= Ancien_Best.Score :
+12:          C = C + 1
+13:      Sinon :
+14:          C = 0
+15:      
+16:      Si C >= 5 et H > 0 :
+17:          INJECTER_DIVERSITE(Population) // Relancer la recherche
+18:          C = 0
+19:      
+20:      Afficher_Progrès(Gen, Nouveau_Best)
+21:      Gen = Gen + 1
+22:  Fin Tant que
+23:  Archiver_Résultats_Base_Données(Meilleur)
+24:  Exporter_Json(Meilleur)
+
+Procedure INJECTER_DIVERSITE(Population)
+----------------------------------------
+1 :  Conserver_Elites(Population) // On garde les meilleurs (Élitisme)
+2 :  Pour i = (ELITISM + 1) à (POP_SIZE / 3) :
+3 :      Nouveau = CONSTRUIRE_INDIVIDU_GREEDY()
+4 :      Remplacer_Pire_Individu(Population, Nouveau)
+5 :  Fin Pour
+6 :  Mélanger_Population_Restante()
+
+Procedure INITIALISER_POPULATION()
+----------------------------------
+1 :  Pour k = 1 à (POP_SIZE * 0.8) :
+2 :      Individu = CONSTRUIRE_INDIVIDU_GREEDY() // 80% de solutions intelligentes
+3 :      Ajouter Individu à Population
+4 :  Fin Pour
+5 :  Pour k = 1 à (POP_SIZE * 0.2) :
+6 :      Ajouter Individu_Aléatoire() à Population // 20% pour la diversité
+7 :  Fin Pour
+
+Procedure CONSTRUIRE_INDIVIDU_GREEDY()
+--------------------------------------
+1 :  Initialiser_Registres_Vides(Prof_Used, Salle_Used, Groupe_Used)
+2 :  Seances = Mélanger_Aléatoirement(Liste_Toutes_Les_Séances)
+3 :
+4 :  Pour chaque S dans Seances :
+5 :      Si S est verrouillée :
+6 :          Placer S à sa position fixe
+7 :      Sinon :
+8 :          Options = Échantillonner_15_Créneaux_Aléatoires()
+9 :          Meilleur_Score = INFINI
+10:
+11:          Pour chaque (Créneau, Salle) dans Options :
+12:              Coût_Local = 0
+13:              // Vérification instantanée via les registres du passé
+14:              Si Prof_Used[S.Prof, Créneau] : Coût_Local += 1000
+15:              Si Salle_Used[Salle, Créneau] : Coût_Local += 1000
+16:              Si Groupe_Used[S.Groupe, Créneau] : Coût_Local += 1000
+17:              // Vérification contraintes spéciales (H10, H12, H13)
+18:              ... 
+19:              Si Coût_Local < Meilleur_Score :
+20:                  Meilleur_Score = Coût_Local
+21:                  Choix_Final = (Créneau, Salle)
+22:              Si Coût_Local == 0 : Break // Solution parfaite trouvée
+23:          Fin Pour
+24:      
+25:      // Mise à jour des registres pour les prochaines séances de CE MEME individu
+26:      Mise_à_jour_Registres(Choix_Final, Prof_Used, Salle_Used, Groupe_Used)
+27:      Enregistrer_Affectation(S, Choix_Final)
+28:  Fin Pour
+29:  Retourner Individu_Complet
+
+Procedure EVOLVE(Population)
+---------------------------------
+1 :  Trier(Population, par fitness lexicographique) 
+2 :  Nouvelle_Pop = Population[0..ELITISM] // Conservation des génies
+3 :  
+4 :  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+5 :      // 1. Sélection
+6 :      P1, P2 = Sélection_Tournoi(Population, k=3)
+7 :      
+8 :      // 2. Croisement Modulaire (Crossover)
+9 :      Enfant = Crossover_Par_Module(P1, P2)
+10:     
+11:     // 3. Mutation Guidée (Inversion des Conflits)
+12:     Si Random() < MUTATION_RATE :
+13:         Cibling = Extraire_Conflits_Hard(Enfant)
+14:         Appliquer_Mutation(Enfant, Cibling)
+15:     Fin Si
+16:     
+17:     // 4. POLISSAGE MÉMÉTIQUE (Recuit Simulé Local)
+18:     Enfant = RECUIT_SIMULÉ_LOCAL(Enfant, Iters=1200, Cooling=0.965)
+19:     
+20:     Nouvelle_Pop.Ajouter(Enfant)
+21: Fin Tant que
+22: Retourner Nouvelle_Pop
+    
+Procedure CROISEMENT_MODULAIRE(P1, P2)
+--------------------------------------
+1 :  Initialiser Enfant_Vide()
+2 :  Modules = Lister_Modules_Uniques(P1) 
+3 :
+4 :  Pour chaque Module M dans Modules :
+5 :      // Tirage au sort du parent donneur pour LE BLOC COMPLET
+6 :      Si Aléatoire(0, 1) < 0.5 :
+7 :          Parent_Source = P1
+8 :      Sinon :
+9 :          Parent_Source = P2
+10:
+11:      // On transmet toutes les séances (CM, TD, TP) de ce module d'un seul bloc
+12:      Pour chaque Séance s appartenant à M :
+13:          Enfant[s] = Parent_Source[s] (Salle, Créneau)
+14:      Fin Pour
+15:  Fin Pour
+16:  Retourner Enfant
+    
+Procedure MUTATION_PONDÉRÉE(Individu)
+-------------------------------------
+1 :  // 1. Identification des zones à problèmes
+2 :  Poids_Conflits = ESTIMER_CHALEUR_CONFLITS(Individu)
+3 :
+4 :  // 2. Sélection biaisée (plus un gène a de conflits, plus il risque de muter)
+5 :  Séance_Cible = Tirage_Au_Sort_Pondéré(Individu.Séances, Poids_Conflits)
+6 :
+7 :  // 3. Modification aléatoire (Exploration)
+8 :  Séance_Cible.Salle = Nouvelle_Salle_Aléatoire()
+9 :  Séance_Cible.Créneau = Nouveau_Créneau_Aléatoire()
+
+Procedure ESTIMER_CHALEUR_CONFLITS(Individu)
+--------------------------------------------
+1 :  Initialiser Poids[] avec une valeur de base (0.1) pour tous
+2 :  
+3 :  // Scan rapide O(N) des ressources physiques
+4 :  Pour chaque s dans Individu.Séances :
+5 :      Si Professeur(s) est occupé ailleurs au même moment :
+6 :          Poids[s] += 1000
+7 :      Si Salle(s) est occupée ailleurs au même moment :
+8 :          Poids[s] += 1000
+9 :      Si Groupe(s) a un autre cours au même moment :
+10:          Poids[s] += 1000
+11:  Fin Pour
+12:  
+13:  Retourner Poids
+
+Procedure RECUIT_SIMULÉ_LOCAL(Individu, Iters, Alpha)
+-----------------------------------------------------
+1 :  T0 = Individu.Total_Score * 0.05 // Température adaptative
+2 :  Courant_S = Individu.Total_Score
+3 :  Snapshot = Copy_Light(Individu)
+4 :  
+5 :  Pour i = 1 à Iters :
+6 :      // Choix du mouvement stratégique
+7 :      Si Individu.H_Violations > 0 :
+8 :          Move = SHIFT_COLLISION(Individu) // Cible un prof/salle occupé
+9 :      Sinon :
+10:         Move = COMPACT_DAY(Individu)     // Cible un trou S3 ou stabilité S6
+11:     Fin Si
+12:     
+13:     // Application "In-Place" (Performance O(1))
+14:     Backtrack_Status = Appliquer_ET_Sauvegarder_Ancien(Individu, Move)
+15:     Nouveau_S = Calculer_Fitness_Fast(Individu) // Delta-scoring
+16:     
+17:     // Critère de Metropolis
+18:     Delta = Nouveau_S - Courant_S
+19:     Si Delta < 0 OU Random() < exp(-Delta / T) :
+20:         Courant_S = Nouveau_S
+21:         Si Nouveau_S < Snapshot.Fitness : Update_Snapshot(Individu)
+22:     Sinon :
+23:         Restaurer(Individu, Backtrack_Status) // UNDO stratégique
+24:     Fin Si
+25:     
+26:     T = T * Alpha // Refroidissement géométrique
+27: Fin Pour
+28: 
+29: Retourner Snapshot
+
+Procedure SHIFT_COLLISION(Individu, Cache_Conflits)
+--------------------------------------------------
+1 :  Séance = Choisir_Au_Hasard(Cache_Conflits)
+2 :  Option = Choisir_Probabilité()
+3 :
+4 :  Si Option < 0.4 : Déplacer(Séance, Nouvelle_Salle, Nouveau_Créneau)
+5 :  Si Option < 0.7 : Changer_Salle_Uniquement(Séance)
+6 :  Sinon : Echanger_Créneaux(Séance, Autre_Séance_Du_Groupe) // SWAP
+7 :  
+8 :  Retourner Changements
+
+Procedure COMPACT_DAY(Individu)
+-------------------------------
+1 :  Séance = Choisir_Au_Hasard(Population_Mobile)
+2 :  Option = Choisir_Probabilité()
+3 :
+4 :  // Objectif : Réduire les "Trous" (Gaps) s'il n'y a plus de conflits Hard
+5 :  Si Option < 0.3 : Aligner_Salles_Du_Module(Séance.Module)
+6 :  Si Option < 0.6 : Rapprocher_Séance_Du_Prof(Séance) // Réduire S3 Prof
+7 :  Sinon : Rapprocher_Séance_Des_Etudiants(Séance)  // Réduire S3 Etudiant
+8 :
+9 :  Retourner Changements
+
+3. FORMULATION MATHÉMATIQUE DE LA FITNESS
+-----------------------------------------
+Le score d'un individu x est calculé par la fonction multi-objectifs hiérarchisée :
+
+   F(x) = (M * H(x)) + S(x)
+
+Où :
+- M = 1,000,000 (Facteur de pénalité Hard)
+- H(x) = Somme des violations H1 à H12 (Profs, Salles, Groupes, Filières)
+- S(x) = Somme pondérée des pénalités Soft (Trous, Déjeuner, Fatigue, Samedi)
+
+4. COMPLEXITÉ TECHNIQUE
+-----------------------
+- Évaluation : O(N) grâce aux SlotMaps (N = nb séances).
+- Espace recherche : (~300 créneaux * 30 salles)^232 séances ≈ Infini.
+- Convergence H=0 : ~15 générations.
+- Optimisation Soft : ~8x d'amélioration par rapport à la V1.
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT V2.1
+--------------------------------------------------------------------------------
+
+
+Ce qui change réellement entre V1 et V2.1 :
+----> Du "Hasard" vers le "Ciblage" :
+V1 : Le SA faisait des mouvements aléatoires (Random Shift/Swap) sur n'importe quelle séance.
+V2.1 : Le SA est "Conscient des Conflits". S'il y a un problème de prof (H1), il n'essaie de bouger que les séances en conflit. S'y il n'y a plus de conflits, il n'essaie de faire que des mouvements bénéfiques pour les "Trous" (S3) ou la "Stabilité" (S6).
+----> La Vitesse (Delta-Scoring) :
+V1 : Chaque mouvement du SA recalculait toute l'infirmerie des contraintes ($O(N^2)$). Très lent.
+V2.1 : On ne calcule que la différence provoquée par le mouvement (Delta-Scoring). C'est ce qui a permis de passer de 400 à 1200 itérations sans ramer.
+----> La Mémoire (Undo Logic) :
+V1 : On faisait une copie complète de l'individu (Child.copy()) à chaque étape.
+V2.1 : On modifie l'individu directement "en place", et si le score est mauvais, on fait "Undo" (on revient en arrière). Zéro copie mémoire.

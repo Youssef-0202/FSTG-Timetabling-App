@@ -336,6 +336,29 @@ def delete_module_part(part_id: int, db: Session = Depends(get_db)):
 def list_filieres(db: Session = Depends(get_db)):
     return db.query(models.Filiere).all()
 
+@app.post("/filieres", response_model=schemas.Filiere, status_code=201)
+def create_filiere(f: schemas.FiliereCreate, db: Session = Depends(get_db)):
+    db_f = models.Filiere(**f.model_dump())
+    db.add(db_f); db.commit(); db.refresh(db_f)
+    return db_f
+
+@app.put("/filieres/{filiere_id}", response_model=schemas.Filiere)
+def update_filiere(filiere_id: int, data: schemas.FiliereUpdate, db: Session = Depends(get_db)):
+    f = db.query(models.Filiere).filter(models.Filiere.id == filiere_id).first()
+    if not f:
+        raise HTTPException(status_code=404, detail="Filière introuvable")
+    for k, v in data.model_dump(exclude_unset=True).items():
+        setattr(f, k, v)
+    db.commit(); db.refresh(f)
+    return f
+
+@app.delete("/filieres/{filiere_id}", status_code=204)
+def delete_filiere(filiere_id: int, db: Session = Depends(get_db)):
+    f = db.query(models.Filiere).filter(models.Filiere.id == filiere_id).first()
+    if not f:
+        raise HTTPException(status_code=404, detail="Filière introuvable")
+    db.delete(f); db.commit()
+
 
 # DEPARTMENTS  /departments
 
@@ -662,8 +685,8 @@ def save_manual_session(
                 "room_id": a.room_id,
                 "slot_id": a.slot_id,
                 "section_id": a.section_id,
-                "is_locked": True, # On les marque comme verrouillés pour la trace
-                "td_groups": [g.id for g in a.td_groups]
+                "is_locked": a.is_locked,
+                "td_groups": [{"id": g.id} for g in a.td_groups]
             })
             
             # 3. Vérification basique des conflits Hard (Doubles réservations)
@@ -820,7 +843,8 @@ def audit_section(section_id: int, mode: str = "interactive", db: Session = Depe
             is_really_cm = mp_obj.type.upper() == "CM" if mp_obj else False
             
             a_sid = int(a.get('section_id', -1))
-            a_groups = [int(g['id']) for g in a.get('td_groups', [])]
+            # Robustesse : g peut être un dict {"id":...} ou un int directement
+            a_groups = [int(g['id'] if isinstance(g, dict) else g) for g in a.get('td_groups', [])]
             matched_groups = [gid for gid in td_group_ids if gid in a_groups]
             
             if is_really_cm and a_sid == section_id:
@@ -976,7 +1000,7 @@ def reset_assignments(mode: str = None, db: Session = Depends(get_db)):
     Sinon, on prend le dernier résultat validé (tous modes confondus).
     """
     try:
-        query = db.query(models.TimetableResult).filter(models.TimetableResult.is_validated == True)
+        query = db.query(models.TimetableResult).filter(models.TimetableResult.is_validated == False)
         
         if mode:
             mode = mode.lower()  # Normalisation : 'GA_SA' -> 'ga_sa'

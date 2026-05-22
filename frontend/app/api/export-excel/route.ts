@@ -19,11 +19,13 @@ export async function GET(request: Request) {
             outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\backend\\export_result_${dbId}.xlsx`;
             await execAsync(`python "${scriptPath}" ${dbId}`);
         } else {
+            const sectionId = searchParams.get('section_id') || '';
             const safeMode = mode || 'ga_sa';
             scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\export_excel.py";
-            const fileSuffix = ["alns", "rl"].includes(safeMode) ? `_${safeMode.toUpperCase()}` : "";
-            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}.xlsx`;
-            await execAsync(`python "${scriptPath}" ${safeMode}`);
+            const fileSuffix = ["alns", "rl", "fused"].includes(safeMode) ? `_${safeMode.toUpperCase()}` : "";
+            const sectionSuffix = sectionId ? `_${sectionId}` : "";
+            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}${sectionSuffix}.xlsx`;
+            await execAsync(`python "${scriptPath}" ${safeMode} ${sectionId}`.trim());
         }
         
         // Read the generated Excel file

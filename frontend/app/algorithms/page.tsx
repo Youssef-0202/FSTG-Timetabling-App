@@ -43,7 +43,7 @@ export default function AlgorithmsPage() {
             animate={{ opacity: 1 }}
             style={{ background: "#f8fafc", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}
         >
-            <div className="sub-header" style={{ paddingBottom: "110px" }}>
+            <div className="sub-header" style={{ padding: "110px 20px 90px" }}>
                 <motion.h1
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}

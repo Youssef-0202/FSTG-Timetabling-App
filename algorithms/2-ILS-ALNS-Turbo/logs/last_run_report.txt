@@ -1,0 +1,48 @@
+============================================================
+ RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
+ Date : 2026-05-20 19:15:27
+============================================================
+
+1. PARAMETRES DE L'ALGORITHME :
+ - Algorithme          : ILS-ALNS-v1
+ - Population Size      : 20
+ - Max Generations      : 120
+ - Mutation Rate        : N/A
+ - SA Iterations        : 1200
+ - SA Temp Initial      : 50.0
+ - SA Cooling           : 0.99
+
+2. STATISTIQUES DE LA BASE DE DONNEES :
+ - Nombre d'Enseignants : 77
+ - Nombre de Salles     : 29
+ - Nombre de Sections   : 10
+ - Seances a placer     : 243
+ - Creneaux disponibles : 30
+
+============================================================
+ SUIVI DES GENERATIONS :
+============================================================
+
+============================================================
+ ANALYSE FINALE DES PERFORMANCES 
+============================================================
+ Temps total d'execution  : 1942.45 secondes
+ Generations effectuees   : 120
+------------------------------------------------------------
+ Score Initial (Best)     : 62012980.25
+ Score Final   (Best)     : 10531.25
+ Amelioration Totale      : 100.0 %
+------------------------------------------------------------
+ STATISTIQUES DE LA DERNIERE POPULATION :
+  - Meilleure Solution    : 10531.25
+  - Pire Solution         : 41062766.0
+  - Moyenne Population    : 15887133.8
+------------------------------------------------------------
+ DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
+  - S_Total              : 10531.25
+  - S3_Gaps              : 1200
+  - S4_Lunch             : 1560
+  - S6_Stab              : 4500
+  - S8_FreeApm           : 1500
+  - S10_Sat              : 0
+============================================================

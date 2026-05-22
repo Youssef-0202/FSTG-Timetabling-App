@@ -1,0 +1,47 @@
+DOCUMENTATION SCIENTIFIQUE : MOTEUR FUSIONNÉ RL-ALNS (V3.0)
+------------------------------------------------------------
+
+1. PHILOSOPHIE : "LE STRATÈGE ET LA FOURMI"
+-------------------------------------------
+Ce moteur combine deux paradigmes d'IA pour résoudre l'emploi du temps :
+- RL (Chef d'Orchestre) : Gère les réorganisations MACRO (compactage, équilibre).
+- ALNS (Chirurgien) : Gère les optimisations MICRO (micro-déplacements, Kempe chains).
+
+L'innovation réside dans le fait que l'Agent RL apprend à choisir entre la Stratégie 
+et la Précision en fonction de l'état actuel de la solution.
+
+2. ESPACE DES ACTIONS (12 Actions)
+----------------------------------
+L'Agent Q-Learning pilote désormais 12 "leviers" :
+
+[MICRO-ACTIONS 0-7 : ALNS Mode]
+0 : Random Shift (Exploration pure)
+1 : Swap Slots (Échange intra-section)
+2 : Stabilize Room (Cohérence salle/module)
+3 : Compact Day Prof (Micro-regroupement enseignant)
+4 : Compact Day Section (Micro-regroupement étudiants)
+5 : Lunch Fix (Gestion de la pause déjeuner)
+6 : Swap Room Only (Mutation de salle uniquement)
+7 : Kempe Chain (Échange de blocs de créneaux)
+
+[MACRO-ACTIONS 8-11 : RL Strategy Mode]
+8 : Strategic Room Leveling (Réallocation massive des salles)
+9 : Professional Compactation (Réorganisation complète du planning prof)
+10: Sectional Streamlining (Réorganisation globale du planning section)
+11: Strategic Random Kick (Perturbation intelligente pour sortir d'un plateau)
+
+3. VECTEUR D'ÉTAT S(t)
+----------------------
+L'agent prend ses décisions en observant :
+S = [Hard_Violations, Gaps_Score, Stability_Score, Progress_Time]
+
+4. RÉCOMPENSE R(t)
+------------------
+La récompense est calculée par le gain de Fitness tri-niveaux. 
+Le RL reçoit un bonus plus important s'il arrive à réduire les scores Soft (confort) 
+sans recréer de conflits Hard (faisabilité).
+
+------------------------------------------------------------
+RÉSULTAT ATTENDU : Une convergence plus rapide vers le H=0 et une 
+capacité supérieure à descendre sous les records de fitness précédents.
+------------------------------------------------------------
