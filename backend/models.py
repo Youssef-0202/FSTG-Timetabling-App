@@ -166,6 +166,21 @@ class TDGroup(Base):
 
     section = relationship("Section", back_populates="td_groups")
     assignments = relationship("Assignment", secondary=assignment_tdgroups, back_populates="td_groups")
+    tp_sanctuarizations = relationship("TPSanctuarization", back_populates="group")
+
+
+class TPSanctuarization(Base):
+    """
+    Règles de sanctuarisation des TPs : bloque des demi-journées pour un groupe.
+    Utilisé par le moteur pour filtrer les créneaux disponibles.
+    """
+    __tablename__ = "tp_sanctuarizations"
+    id = Column(Integer, primary_key=True, index=True)
+    group_id = Column(Integer, ForeignKey("td_groups.id"))
+    day = Column(String)            # "LUNDI", "MARDI", etc.
+    is_morning = Column(Boolean)    # True = Matin (8h30-12h30), False = Après-midi (14h30-18h30)
+    
+    group = relationship("TDGroup", back_populates="tp_sanctuarizations")
 
 
 # =============================================================================
@@ -227,6 +242,10 @@ class Assignment(Base):
     slot_id = Column(Integer, ForeignKey("timeslots.id"))
     section_id = Column(Integer, ForeignKey("sections.id"), nullable=True)  # Pour les CM
     is_locked = Column(Boolean, default=False)
+    
+    # --- Champs additionnels pour le Mode TP Manuel ---
+    tp_subgroup = Column(String, nullable=True)  # ex: "A", "B", "A & B"
+    alternance = Column(String, nullable=True)   # ex: "par alternance", "Quinzaine 1"
 
     module_part = relationship("ModulePart", back_populates="assignments")
     teacher = relationship("Teacher", back_populates="assignments")
@@ -254,3 +273,4 @@ class TimetableResult(Base):
     score_soft = Column(Float)      # Score de qualité Soft
     data = Column(JSON)             # La liste complète des affectations (JSON)
     is_validated = Column(Boolean, default=False) # True si l'admin a validé cet EDT
+    is_master_reference = Column(Boolean, default=False)  # L'EDT officiel pour les TP

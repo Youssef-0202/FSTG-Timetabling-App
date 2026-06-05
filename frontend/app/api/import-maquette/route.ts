@@ -7,6 +7,7 @@ import fs from 'fs';
 const execPromise = util.promisify(exec);
 
 export async function POST(req: Request) {
+    let tempFilePath = "";
     try {
         const formData = await req.formData();
         const file = formData.get('file') as File;
@@ -15,47 +16,68 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, errors: ["Aucun fichier reçu"] }, { status: 400 });
         }
 
+        const { searchParams } = new URL(req.url);
+        const isPreview = searchParams.get('preview') === 'true';
+        const filiereId = searchParams.get('filiere_id') || '';
+
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const backendDir = path.join(process.cwd(), '..', 'backend');
+        // CHEMIN ABSOLU pour éviter les erreurs de CWD
+        const backendDir = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\backend";
         const uploadDir = path.join(backendDir, 'temp_uploads');
         
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
         
-        const tempFilePath = path.join(uploadDir, `${Date.now()}_${file.name}`);
+        // Nom de fichier SANS espaces ni caractères spéciaux pour docker cp
+        const safeFilename = `maquette_${Date.now()}.xlsx`;
+        tempFilePath = path.join(uploadDir, safeFilename);
         fs.writeFileSync(tempFilePath, buffer);
 
-        const command = `python maquette_parser.py "${tempFilePath}"`;
+        const filiereArg = filiereId ? `--filiere_id ${filiereId}` : '';
+        const containerFilePath = `/app/temp_uploads/${path.basename(tempFilePath)}`;
         
-        // On passe explicitly localhost en env var car Node s'exécute sur le Host
-        const env = { 
-            ...process.env, 
-            DATABASE_URL: "postgresql://user_pfe:password_pfe@127.0.0.1:5432/fstm_timetable" 
-        };
+        // ÉTAPE 1: Copier le fichier Excel depuis Windows vers le container Docker
+        await execPromise(`docker cp "${tempFilePath}" fstm_timetable_backend:${containerFilePath}`);
         
-        const { stdout, stderr } = await execPromise(command, { cwd: backendDir, env });
+        // ÉTAPE 2: Lancer le script Python DANS le container avec le fichier copié
+        const command = isPreview 
+            ? `docker exec fstm_timetable_backend python maquette_parser.py --preview ${filiereArg} "${containerFilePath}"` 
+            : `docker exec fstm_timetable_backend python maquette_parser.py ${filiereArg} "${containerFilePath}"`;
         
-        // Nettoyage asynchrone sécurisé du tmp file
-        try { fs.unlinkSync(tempFilePath); } catch (e) {}
-
-        let jsonResponse: any = {};
+        const env = { ...process.env };
+        
         try {
+            const { stdout, stderr } = await execPromise(command, { cwd: backendDir, env });
+            
+            // Nettoyage: supprimer le fichier sur Windows ET dans le container
+            if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+            await execPromise(`docker exec fstm_timetable_backend rm -f "${containerFilePath}"`).catch(() => {});
+
             const rawOutput = stdout.trim();
-            // On cherche le JSON pour éviter les print parasites des libs python occasionnelles
             const jsonStartInx = rawOutput.indexOf('{');
-            const pureJsonString = jsonStartInx !== -1 ? rawOutput.substring(jsonStartInx) : rawOutput;
-            jsonResponse = JSON.parse(pureJsonString);
-        } catch (e) {
-            console.error("Failed to parse python output", stdout, stderr);
-            return NextResponse.json({ success: false, errors: ["Erreur lors du parsing JSON du backend", stderr] });
+            if (jsonStartInx === -1) {
+                return NextResponse.json({ success: false, errors: ["Réponse backend invalide (pas de JSON)", rawOutput, stderr] });
+            }
+            
+            const pureJsonString = rawOutput.substring(jsonStartInx);
+            const jsonResponse = JSON.parse(pureJsonString);
+            return NextResponse.json(jsonResponse);
+
+        } catch (execErr: any) {
+            if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+            console.error("Python Execution Error:", execErr);
+            return NextResponse.json({ 
+                success: false, 
+                errors: ["Le script Python a échoué", execErr.message, execErr.stderr] 
+            });
         }
-        
-        return NextResponse.json(jsonResponse);
 
     } catch (error: any) {
+        if (tempFilePath && fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+        console.error("API Route Error:", error);
         return NextResponse.json({ success: false, errors: [error.message] }, { status: 500 });
     }
 }

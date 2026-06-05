@@ -1,0 +1,104 @@
+DOCUMENTATION SCIENTIFIQUE : ALGORITHME HYBRIDE GA+SA (V3.0 - Optimisé)
+
+
+1. ARCHITECTURE GLOBALE (Évolution V2.1 -> V3.0)
+---------------------------------------------
+La V3.0 introduit des optimisations majeures pour le temps d'exécution (vitesse accrue de 50%) 
+tout en garantissant la qualité via une recherche locale finale intense.
+
+Les piliers de la V3.0 :
+- Élitisme Strict (30%) : Conservation massive des meilleurs gènes (15 individuals population).
+- Competitive Children : Un enfant n'est accepté que s'il surpasse son meilleur parent.
+- Hybridation Bi-Phase : GA rapide pour l'exploration globale + SA final pour le polissage local.
+- Paramètres Réduits : Population cible de 15 individus pour une convergence ultra-rapide.
+
+
+2. PSEUDO-CODE :
+-----------------------
+
+Procedure MAIN_SOLVER()
+-----------------------
+1 :  DM = Charger_Données_API()
+2 :  Population = Initialiser_Greedy(15, 0.8) 
+3 :  
+4 :  // --- PHASE 1 : EXPLORATION GLOBALE (GA) ---
+5 :  Tant que Gen < 60 et Stabilité non atteinte :
+6 :      EVOLVE(Population) // Avec Elitisme 30% et Compétition Parent-Enfant
+7 :      Gen = Gen + 1
+8 :  Fin Tant que
+9 :
+10:  // --- PHASE 2 : RAFFINEMENT LOCAL (SA FINAL) ---
+11:  Meilleur = Population[0]
+12:  Meilleur = RECUIT_SIMULÉ_LOCAL(Meilleur, Iters=5000, Cooling=0.98)
+13:
+14:  Archiver_Résultats_Base_Données(Meilleur)
+15:  Exporter_Json(Meilleur)
+
+
+Procedure EVOLVE(Population)
+---------------------------------
+1 :  Trier(Population) // Par fitness (croissant)
+2 :  
+3 :  // 1. ÉLITISME 30% (Comme demandé par le prof)
+4 :  N_Elite = Taille(Population) * 0.3
+5 :  Nouvelle_Pop = Population[0...N_Elite] 
+6 :  
+7 :  // 2. REPRODUCTION AVEC COMPÉTITION
+8 :  Tant que Taille(Nouvelle_Pop) < POP_SIZE :
+9 :      P1, P2 = Sélection_Tournoi(Population)
+10:      Enfant = CROISEMENT_MODULAIRE(P1, P2)
+11:      
+12:      Si Random() < MUTATION_RATE :
+13:          Appliquer_Mutation(Enfant)
+14:      Fin Si
+15:
+16:      // --- LOGIQUE TURBO : COMPÉTITION ENFANT-PARENTS ---
+17:      Meilleur_Parent = (P1.Score < P2.Score) ? P1 : P2
+18:      
+19:      Si Enfant.Score < Meilleur_Parent.Score :
+20:          // L'enfant est prometteur : on dépense du temps pour le polir
+21:          Survivant = RECUIT_SIMULÉ_LOCAL(Enfant, Iters=200)
+22:      Sinon :
+23:          // Échec de l'enfant : on garde le parent (Économie de SA et Gain de temps)
+24:          Survivant = Copy(Meilleur_Parent)
+25:      
+26:      Nouvelle_Pop.Ajouter(Survivant)
+28:  Fin Tant que
+29:  Retourner Nouvelle_Pop
+
+
+Procedure RECUIT_SIMULÉ_LOCAL(Individu, Iters, Alpha)
+-----------------------------------------------------
+1 :  T = Température_Initiale(Individu)
+2 :  
+3 :  Pour i = 1 à Iters :
+4 :      // 1. Générer voisin par mouvement ciblé (Hard ou Soft)
+5 :      Voisin = Appliquer_Mouvement_Stratégique(Individu)
+6 :      
+7 :      // 2. Évaluation Delta (Vitesse O(1))
+8 :      Si Voisin.Score < Individu.Score OU Random() < exp(-Delta / T) :
+9 :          Individu = Voisin // Accepté
+10:     Sinon :
+11:          Restaurer_État_Précédent(Individu) // Rejeté
+12:     
+13:     T = T * Alpha // Refroidissement
+14:  Fin Pour
+15:  Retourner Individu.Meilleur_Etat_Trouvé()
+
+
+3. FORMULATION MATHÉMATIQUE (FITNESS)
+-----------------------------------------
+Le score F(x) = (1,000,000 * H(x)) + S(x)
+- H(x) : Violations de contraintes dures (Profs, Salles, Groupes).
+- S(x) : Violations de contraintes souples (Trous, Déjeuner, Samedi).
+
+
+4. COMPLEXITÉ & PERFORMANCE
+-----------------------
+- Vitesse : ~5-8 minutes (contre 15 min en V2.1)
+- Efficacité : La compétition inter-générationnelle garantit que la qualité ne régresse JAMAIS.
+- Raffinement : Le SA final de 5000 itérations élimine les derniers défauts que le GA n'a pas pu traiter.
+
+--------------------------------------------------------------------------------
+FIN DU DOCUMENT V3.0
+--------------------------------------------------------------------------------

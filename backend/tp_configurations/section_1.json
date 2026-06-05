@@ -1,0 +1,383 @@
+{
+    "merge_alternance": true,
+    "assignments": [
+        {
+            "id": "temp-1780678703627-0.28790173403194963",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 15,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.628475736577312",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.7919949938357422",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.31568458911053554",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.7862220691980535",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.18725040111483304",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.47374706592749183",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.2031538611221918",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678703627-0.7872912814749976",
+            "module_part_id": 89,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.38681147223501333",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.6730816582255149",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.31918193700581743",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 15,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.14201957035354074",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.9366314248759176",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.9924288752299972",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.5955076785508876",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.23477621271961646",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678864886-0.8243201155569851",
+            "module_part_id": 88,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.5636072200068297",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.20873374082241147",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 15,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.44394216150854315",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                1,
+                2
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 7,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.504794576658677",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.14376555812808878",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 17,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.7096815211726538",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                3,
+                4
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.1120966022313884",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "A",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.41831207095280976",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "B",
+            "alternance": "par alternance",
+            "slot_id": 5,
+            "teacher_id": 231,
+            "room_id": null
+        },
+        {
+            "id": "temp-1780678995055-0.6058876894335673",
+            "module_part_id": 83,
+            "section_id": 1,
+            "td_groups": [
+                5,
+                6
+            ],
+            "tp_subgroup": "C",
+            "alternance": "par alternance",
+            "slot_id": 1,
+            "teacher_id": 231,
+            "room_id": null
+        }
+    ]
+}

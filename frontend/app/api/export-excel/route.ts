@@ -21,10 +21,10 @@ export async function GET(request: Request) {
         } else {
             const sectionId = searchParams.get('section_id') || '';
             const safeMode = mode || 'ga_sa';
-            scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\export_excel.py";
+            scriptPath = "c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\1-ga_sa_hybrid\\v2\\export_excel.py";
             const fileSuffix = ["alns", "rl", "fused"].includes(safeMode) ? `_${safeMode.toUpperCase()}` : "";
-            const sectionSuffix = sectionId ? `_${sectionId}` : "";
-            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}${sectionSuffix}.xlsx`;
+            const sectionIdVal = sectionId ? `_${sectionId}` : "";
+            outputPath = `c:\\Users\\HP\\OneDrive\\Bureau\\pfe\\_Project_PFE\\algorithms\\1-ga_sa_hybrid\\v2\\logs\\FSTG_EXCEL_PREMIUM${fileSuffix}${sectionIdVal}.xlsx`;
             await execAsync(`python "${scriptPath}" ${safeMode} ${sectionId}`.trim());
         }
         

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import {
     Calendar, Clock, CheckCircle, AlertCircle, FileText,
     ArrowLeft, Layout, FileSpreadsheet, Trash2, ShieldAlert,
-    BarChart3, Download, Search, Filter
+    BarChart3, Download, Search, Filter, Star, Check
 } from "lucide-react";
 import { getTimetableResults, deleteTimetableResult, TimetableResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,15 +32,38 @@ export default function ReportsPage() {
         loadData();
     }, [loadData]);
 
+    const handleSetMaster = async (id: number) => {
+        try {
+            const API_BASE = "http://127.0.0.1:8000";
+            const response = await fetch(`${API_BASE}/timetable-results/${id}/set-master`, { method: 'POST' });
+            if (response.ok) {
+                notify("Ce planning est désormais la référence officielle pour les TP.", "success");
+                loadData();
+            } else {
+                notify("Erreur lors de la définition du Master.", "error");
+            }
+        } catch (e) {
+            notify("Erreur de connexion serveur.", "error");
+        }
+    };
+
     const handleDelete = async () => {
         if (!deletingId) return;
         try {
             await deleteTimetableResult(deletingId);
             setDeletingId(null);
+            notify("Version supprimée avec succès.", "success");
             loadData();
         } catch (e) {
-            alert("Erreur lors de la suppression");
+            notify("Erreur lors de la suppression.", "error");
         }
+    };
+
+    const [showNotify, setShowNotify] = useState(false);
+    const [notifyMsg, setNotifyMsg] = useState("");
+    const [notifyType, setNotifyType] = useState<"success" | "error">("success");
+    const notify = (msg: string, type: "success" | "error") => {
+        setNotifyMsg(msg); setNotifyType(type); setShowNotify(true);
     };
 
     const filtered = results.filter(r =>
@@ -108,13 +131,21 @@ export default function ReportsPage() {
                                 {/* Card Header */}
                                 <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                                        <div style={{ padding: '6px 12px', borderRadius: '8px', background: '#eff6ff', color: '#1e40af', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                            Source: {res.algo_type.toUpperCase()}
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <div style={{ padding: '6px 12px', borderRadius: '8px', background: res.is_master_reference ? '#fef3c7' : '#eff6ff', color: res.is_master_reference ? '#92400e' : '#1e40af', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px', border: res.is_master_reference ? '1px solid #f59e0b' : 'none' }}>
+                                                {res.is_master_reference && <Star size={12} fill="#f59e0b" />}
+                                                {res.is_master_reference ? 'MASTER REFERENCE' : `Source: ${res.algo_type.toUpperCase()}`}
+                                            </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            {!res.is_master_reference && (
+                                                <button onClick={(e) => { e.stopPropagation(); handleSetMaster(res.id); }} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex' }}>
+                                                    <Star size={18} />
+                                                </button>
+                                            )}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981' }}>
                                                 <CheckCircle size={16} />
-                                                <span style={{ fontSize: '0.75rem', fontWeight: 800 }}>Vérifié</span>
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 800 }}>Validé</span>
                                             </div>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); setDeletingId(res.id); }}
@@ -147,12 +178,14 @@ export default function ReportsPage() {
                                 <div style={{ padding: '24px', background: '#fafafa' }}>
                                     <div style={{ textAlign: 'center', padding: '16px', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                                         <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                            Qualité Globale
+                                            Indice de Satisfaction
                                         </span>
                                         <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                                            {Math.round(res.score_soft)}
-                                            {res.algo_type === 'manual' && <span style={{ fontSize: '1.1rem', color: '#64748b' }}>%</span>}
+                                            {Math.max(0, 100 - Math.round(res.score_soft / 4))}%
                                         </div>
+                                        <p style={{ fontSize: '0.6rem', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
+                                            Score Meta : {Math.round(res.score_soft)} (Pénalités)
+                                        </p>
                                         <div style={{ marginTop: '8px', fontSize: '0.7rem', fontWeight: 700, color: res.score_hard === 0 ? '#10b981' : '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                                             {res.score_hard === 0 ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
                                             {res.score_hard === 0 ? "Aucun conflit majeur" : `${res.score_hard} Conflits`}
@@ -245,6 +278,23 @@ export default function ReportsPage() {
                                     Supprimer
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* --- NOTIFICATION PREMIUM --- */}
+            <AnimatePresence>
+                {showNotify && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11,31,75,0.25)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+                        <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
+                            style={{ background: 'white', width: '90%', maxWidth: '380px', borderRadius: '32px', boxShadow: '0 30px 60px rgba(11,31,75,0.15)', padding: '50px 40px', textAlign: 'center' }}>
+                            <div style={{ width: 70, height: 70, borderRadius: '50%', background: notifyType === 'success' ? '#ecfdf5' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                                {notifyType === 'success' ? <Check size={35} color="#10b981" /> : <AlertCircle size={35} color="#ef4444" />}
+                            </div>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#0b1f4b', margin: '0 0 10px' }}>{notifyType === 'success' ? 'Succès' : 'Attention'}</h3>
+                            <p style={{ fontSize: '0.9rem', color: '#64748b', margin: '0 0 30px', lineHeight: 1.5 }}>{notifyMsg}</p>
+                            <button onClick={() => setShowNotify(false)} style={{ width: '100%', padding: '16px', borderRadius: '15px', border: 'none', background: '#0b1f4b', color: 'white', fontWeight: 800, cursor: 'pointer' }}>Continuer</button>
                         </motion.div>
                     </div>
                 )}

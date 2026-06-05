@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
     LayoutDashboard, Database, Cpu, CalendarDays,
-    BarChart2, ShieldCheck, Bell
+    BarChart2, ShieldCheck, Bell, TrendingUp, Info
 } from "lucide-react";
 
 const links = [
@@ -14,7 +14,9 @@ const links = [
     { href: "/algorithms", label: "Solveurs", Icon: Cpu },
     { href: "/timetable/preview", label: "Planning", Icon: CalendarDays },
     { href: "/maquettes", label: "Maquettes", Icon: ShieldCheck },
+    { href: "/statistics", label: "Stats", Icon: TrendingUp },
     { href: "/reports", label: "Rapports", Icon: BarChart2 },
+    { href: "/info", label: "Guide", Icon: Info },
 ];
 
 export default function Navbar() {

@@ -53,7 +53,7 @@ class GroupeFiliere(GroupeFiliereBase):
 # ─── TEACHER ────────────────────────────────────────────────
 class TeacherBase(BaseModel):
     name: str
-    email: str
+    email: Optional[str] = None
     availabilities: Optional[Any] = {}
 
 class TeacherCreate(TeacherBase):
@@ -176,6 +176,24 @@ class TDGroup(TDGroupBase):
     class Config:
         from_attributes = True
 
+# ─── TP SANCTUARIZATION ─────────────────────────────────────
+class TPSanctuarizationBase(BaseModel):
+    group_id: int
+    day: str
+    is_morning: bool
+
+class TPSanctuarizationCreate(TPSanctuarizationBase):
+    pass
+
+class TPSanctuarization(TPSanctuarizationBase):
+    id: int
+    class Config:
+        from_attributes = True
+
+class TPBulkUpdate(BaseModel):
+    section_id: int
+    rules: List[TPSanctuarizationCreate]
+
 # ─── TIMESLOT ───────────────────────────────────────────────
 class TimeslotBase(BaseModel):
     day: str
@@ -195,15 +213,19 @@ class Timeslot(TimeslotBase):
     class Config:
         from_attributes = True
 
+
+
 # ─── ASSIGNMENT ─────────────────────────────────────────────
 class AssignmentCreate(BaseModel):
     module_part_id: int
-    teacher_id: int
+    teacher_id: Optional[int] = None
     room_id: Optional[int] = None
     slot_id: Optional[int] = None
     section_id: Optional[int] = None
     tdgroup_ids: List[int] = []
     is_locked: bool = False
+    tp_subgroup: Optional[str] = None
+    alternance: Optional[str] = None
 
     class Config:
         extra = "allow"
@@ -216,6 +238,8 @@ class AssignmentUpdate(BaseModel):
     section_id: Optional[int] = None
     tdgroup_ids: Optional[List[int]] = None
     is_locked: Optional[bool] = None
+    tp_subgroup: Optional[str] = None
+    alternance: Optional[str] = None
 
     class Config:
         extra = "allow"
@@ -223,11 +247,13 @@ class AssignmentUpdate(BaseModel):
 class Assignment(BaseModel):
     id: int
     module_part_id: int
-    teacher_id: int
+    teacher_id: Optional[int] = None
     room_id: Optional[int] = None
     slot_id: Optional[int] = None
     section_id: Optional[int] = None
     is_locked: bool
+    tp_subgroup: Optional[str] = None
+    alternance: Optional[str] = None
     # Pour l'affichage
     td_groups: List[TDGroup] = []
     
@@ -241,6 +267,7 @@ class DashboardStats(BaseModel):
     total_sections: int
     total_modules: int
     total_assignments: int
+    total_teacher_unavailability: int
     hard_violations: int
 
 # ─── TIMETABLE RESULT ───────────────────────────────────────
@@ -252,6 +279,7 @@ class TimetableResultBase(BaseModel):
     score_soft: Optional[float] = 0.0
     data: List[Any]
     is_validated: bool = False
+    is_master_reference: bool = False
 
 class TimetableResultCreate(TimetableResultBase):
     pass

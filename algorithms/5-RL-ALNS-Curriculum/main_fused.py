@@ -13,23 +13,24 @@ from engine_fused import HybridEngine
 from agent import QLearningAgent
 from reporting import (print_generation_status, generate_final_report,
                        initialize_log_file, HistoryLogger)
+from constraints_optimized import calculate_fitness_full
 
-# CONFIGURATION ULTRA (Target < 7000, ~12-15 min)
-POP_SIZE      = 20
-MAX_GEN       = 120
-MUTATION_RATE = 0.30
-ELITISM       = 4
-SA_ITERATIONS = 1200
-SA_TEMP       = 50.0
-SA_COOLING    = 0.99
-PATIENCE      = 40
+# CONFIGURATION TURBO (Cible < 10 min)
+POP_SIZE      = 12
+MAX_GEN       = 100
+MUTATION_RATE = 0.25
+ELITISM       = 3
+SA_ITERATIONS = 800
+SA_TEMP       = 40.0
+SA_COOLING    = 0.98
+PATIENCE      = 25
 
 CONSTRAINTS_MASK = {
     "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H12": True,
     "S_GAPS": True, "S_LUNCH": True, "S_BALANCE": True,
     "S_STABILITY": True, "S_SHORT_DAY": True, "S_FREE_APM": True,
     "S_FATIGUE": True, "S_SATURDAY": True,
-    "S_MIXING": True, "S_CM_DISPERSION": True
+    "S_BLOCK_SYNERGY": True
 }
 
 def curriculum_warmup(dm, agent, mask, n_phases=3):
@@ -63,7 +64,7 @@ def curriculum_warmup(dm, agent, mask, n_phases=3):
         dm.module_parts = sub_mps
         sub_engine.create_initial_population()
         
-        for _ in range(12): # 12 itérations de pré-apprentissage par phase
+        for _ in range(8): # 8 itérations de pré-apprentissage par phase
             sub_engine.evolve()
             
         print(f"  -> Base de connaissances agent : {len(agent.q_table)} etats memorises.")
@@ -157,8 +158,7 @@ def run_fused_optimization():
     print("[RL] Base de connaissances (Q-Table) sauvegardee.")
 
     best_final = engine.population[0]
-    best_score = best_final.fitness
-    best_hard  = best_final.h_violations
+    best_score, best_hard, best_soft, _ = calculate_fitness_full(best_final, CONSTRAINTS_MASK)
 
     # --- 2. PUSH AUTOMATIQUE VERS LA BASE DE DONNEES (via API REST) ---
     try:

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getPreviewSchedule, getTeachers, getRooms, getModules, getModuleParts, getTimeslots, getSections, getTDGroups, auditSection } from "@/lib/api";
-import { ArrowLeft, Loader2, Printer, CheckCircle, AlertTriangle, Download } from 'lucide-react';
+import { getPreviewSchedule, getTeachers, getRooms, getModules, getModuleParts, getTimeslots, getSections, getTDGroups, auditSection, createAssignment, updateAssignment, saveAssignments } from "@/lib/api";
+import { ArrowLeft, ArrowRight, Loader2, Printer, CheckCircle, AlertTriangle, Download, Zap, Plus, Layers, Trash2 } from 'lucide-react';
 import SectionTimetableGrid from "@/components/SectionTimetableGrid";
 
 export default function CohortTimetablePreview() {
@@ -25,6 +25,13 @@ export default function CohortTimetablePreview() {
     // Mode Création TP
     const [tpMode, setTpMode] = useState(false);
     const [selectedTpGroups, setSelectedTpGroups] = useState<number[]>([]);
+
+    // Batch Generator States
+    const [batchModulePartId, setBatchModulePartId] = useState<number | ''>('');
+    const [batchDivision, setBatchDivision] = useState(3); // A, B, C
+    const [batchGroupsPerSession, setBatchGroupsPerSession] = useState(2); // Gr 1 & 2 together
+    const [batchAlternance, setBatchAlternance] = useState('par alternance');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
         const loadAll = async () => {
@@ -56,50 +63,174 @@ export default function CohortTimetablePreview() {
     }, [sectionId]);
 
     const section = sections.find((s: any) => String(s.id) === String(sectionId));
-    const sectionTdGroups = tdGroups.filter((g: any) => String(g.section_id) === String(sectionId));
+    const sectionTdGroups = tdGroups.filter((g: any) => String(g.section_id) === String(sectionId))
+        .sort((a: any, b: any) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
-    // Calcul des créneaux libres pour les groupes sélectionnés
-    const availableTpSlots: Record<string, boolean> = {};
-    if (tpMode && selectedTpGroups.length > 0) {
-        const uniqueHours = Array.from(new Set(timeslots.map((t: any) => t.start_time.substring(0, 5)))).sort() as string[];
-        const DAYS_ORDER = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const [isDirty, setIsDirty] = useState(false);
+    const [selectedAssignmentToPlace, setSelectedAssignmentToPlace] = useState<any>(null);
 
-        uniqueHours.forEach(hour => {
-            DAYS_ORDER.forEach(day => {
-                const tsKey = `${day.toLowerCase()}-${hour}`;
+    // Filtrer les TP non placés (Brouillon)
+    const unplacedTps = assignments.filter(a => !a.slot_id);
 
-                // Recherche des cours assignés à ce slot pour la section ou les groupes
-                const hasConflict = assignments.some(a => {
-                    const ts = timeslots.find((t: any) => t.id === a.slot_id);
-                    if (!ts) return false;
-                    if (ts.day.toLowerCase() !== day.toLowerCase() || !ts.start_time.startsWith(hour)) return false;
+    // Fonction pour vider le brouillon (tout ce qui n'est pas placé)
+    const handleClearDraft = () => {
+        if (unplacedTps.length === 0) return;
+        if (confirm("Voulez-vous vraiment vider tout le panier des séances non placées ?")) {
+            setAssignments(assignments.filter(a => a.slot_id !== null));
+            setIsDirty(true);
+        }
+    };
 
-                    const mp = moduleParts.find((p: any) => p.id === a.module_part_id);
-                    const isCM = mp?.type?.toLowerCase() === 'cm';
+    // Logic Batch Generation - DRAFT MODE
+    const handleBatchGenerate = () => {
+        if (!batchModulePartId) return alert("Sélectionnez un module TP");
 
-                    // Si c'est un CM de toute la section, ça bloque tous les groupes.
-                    if (isCM && String(a.section_id) === String(sectionId)) return true;
+        // Sécurité : On demande si on veut vider le panier existant avant de générer le nouveau
+        const currentDraftCount = assignments.filter(a => !a.slot_id).length;
+        let baseAssignments = assignments;
 
-                    // Si c'est un TD/TP, vérifier s'il concerne l'un des groupes sélectionnés
-                    if (a.td_groups && selectedTpGroups.some(gId => a.td_groups.includes(gId) || a.td_groups.some((tg: any) => typeof tg === 'object' && tg.id === gId))) {
-                        return true;
-                    }
-                    return false;
+        if (currentDraftCount > 0) {
+            // Nettoyage automatique du brouillon précédent pour éviter les doublons
+            baseAssignments = assignments.filter(a => a.slot_id !== null);
+        }
+
+        const divisionLabels = batchDivision === 3 ? ["A", "B", "C"] : ["A", "B"];
+        const newBatch: any[] = [];
+        const timestamp = Date.now();
+
+        for (let i = 0; i < sectionTdGroups.length; i += batchGroupsPerSession) {
+            const groupsInThisSession = sectionTdGroups.slice(i, i + batchGroupsPerSession);
+            const gObjects = groupsInThisSession;
+
+            for (const label of divisionLabels) {
+                const tempId = `temp_${timestamp}_${i}_${label}`;
+                newBatch.push({
+                    id: tempId,
+                    module_part_id: Number(batchModulePartId),
+                    teacher_id: 231,
+                    section_id: Number(sectionId),
+                    td_groups: gObjects,
+                    is_locked: true,
+                    tp_subgroup: label,
+                    alternance: batchAlternance,
+                    slot_id: null,
+                    room_id: null
                 });
+            }
+        }
 
-                availableTpSlots[tsKey] = !hasConflict;
-            });
+        setAssignments([...baseAssignments, ...newBatch]);
+        setIsDirty(true);
+    };
+
+    // Fonction de placement manuel LOCALE
+    const handlePlaceAssignment = (day: string, hour: string) => {
+        if (!selectedAssignmentToPlace) return;
+
+        const ts = timeslots.find((t: any) => t.day.toLowerCase() === day.toLowerCase() && t.start_time.startsWith(hour));
+        if (!ts) return;
+
+        const updated = assignments.map(a => {
+            if (a.id === selectedAssignmentToPlace.id) {
+                return { ...a, slot_id: ts.id };
+            }
+            return a;
         });
-    }
+
+        setAssignments(updated);
+        setSelectedAssignmentToPlace(null);
+        setIsDirty(true);
+    };
+
+    // Sauvegarde Globale en Base de Données
+    const handleGlobalSave = async () => {
+        try {
+            setLoading(true);
+            const payload = assignments.map(a => ({
+                module_part_id: a.module_part_id,
+                teacher_id: a.teacher_id,
+                room_id: a.room_id,
+                slot_id: a.slot_id,
+                section_id: a.section_id,
+                is_locked: a.is_locked,
+                tp_subgroup: a.tp_subgroup,
+                alternance: a.alternance,
+                tdgroup_ids: a.td_groups?.map((g: any) => (typeof g === 'object' ? g.id : g)) || []
+            }));
+
+            await saveAssignments(payload as any);
+            setIsDirty(false);
+            alert("Planning validé et enregistré en base de données avec succès !");
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de l'enregistrement final.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Filtrer les module parts de type TP
+    const tpModuleParts = moduleParts.filter(mp => mp.type.toLowerCase() === 'tp');
+
+    // Fonction pour calculer les créneaux disponibles pour une séance de TP donnée (Highlight intelligent)
+    const calculateAvailableSlots = (tp: any) => {
+        const slots: Record<string, boolean> = {};
+        const groups = tp.td_groups || [];
+        const groupIds = groups.map((g: any) => typeof g === 'object' ? g.id : g);
+
+        timeslots.forEach((ts: any) => {
+            const tsKey = `${ts.day.toLowerCase()}-${ts.start_time.substring(0, 5)}`;
+
+            // Un créneau est libre si aucun des groupes n'a de cours, 
+            // OU si le cours existant est un TP en alternance opposée (A vs B)
+            const isBusy = assignments.some(a => {
+                if (a.slot_id !== ts.id) return false;
+
+                const mp = moduleParts.find(p => p.id === a.module_part_id);
+                const isCM = mp?.type === 'CM';
+
+                // Si c'est un CM de toute la section, c'est bloqué pour tout le monde
+                if (isCM && String(a.section_id) === String(sectionId)) return true;
+
+                // On vérifie si l'un de nos groupes est concerné
+                const hasSameGroup = a.td_groups?.some((g: any) => groupIds.includes(typeof g === 'object' ? g.id : g));
+
+                if (hasSameGroup) {
+                    // SI c'est le même groupe, on vérifie si on est en alternance
+                    // Si la séance déjà placée est "A" et la nouvelle est "B" (ou inversement), on laisse passer
+                    if (a.tp_subgroup && tp.tp_subgroup && a.tp_subgroup !== tp.tp_subgroup) {
+                        return false; // Pas bloqué, c'est l'alternance !
+                    }
+                    return true; // Bloqué car c'est le même groupe sur un cours normal ou sous-groupe identique
+                }
+                return false;
+            });
+
+            if (!isBusy) slots[tsKey] = true;
+        });
+        return slots;
+    };
 
     if (loading) {
         return (
             <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: '#f8fafc' }}>
-                <Loader2 size={40} style={{ animation: "spin 1s linear infinite", color: 'var(--navy)', marginBottom: '20px' }} />
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--navy)' }}>Extraction algorithmique RL-ALNS en cours...</div>
+                <Loader2 size={40} style={{ animation: "spin 1s linear infinite", color: '#1e3a8a', marginBottom: '20px' }} />
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e3a8a' }}>Chargement de l'interface de gestion...</div>
             </div>
         );
     }
+
+    // Fonction pour retirer un TP de la grille (le remettre dans le panier)
+    const handleDeleteAssignment = (assignmentId: any) => {
+        const updated = assignments.map(a => {
+            if (a.id === assignmentId) {
+                return { ...a, slot_id: null }; // Dé-placer
+            }
+            return a;
+        });
+        setAssignments(updated);
+        setIsDirty(true);
+    };
 
     return (
         <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '40px' }}>
@@ -108,31 +239,36 @@ export default function CohortTimetablePreview() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                     <button
                         onClick={() => router.back()}
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px',
-                            padding: '12px 20px', fontSize: '0.9rem', fontWeight: 800, color: 'var(--navy)',
-                            cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                        }}
-                        onMouseOver={e => e.currentTarget.style.background = '#f1f5f9'}
-                        onMouseOut={e => e.currentTarget.style.background = 'white'}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '12px 20px', fontSize: '0.9rem', fontWeight: 800, color: '#1e293b', cursor: 'pointer' }}
                     >
-                        <ArrowLeft size={16} /> Retour à la filière
+                        <ArrowLeft size={16} /> Retour
                     </button>
 
-                    <button
-                        onClick={() => window.open(`/api/export-excel?mode=fused&section_id=${sectionId}`, "_blank")}
-                        style={{
-                            padding: '12px 24px', borderRadius: '10px', border: 'none',
-                            background: '#3b82f6', color: 'white', fontWeight: 700, fontSize: '0.85rem',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                            boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.2)', transition: 'all 0.2s'
-                        }}
-                        onMouseOver={e => e.currentTarget.style.background = '#2563eb'}
-                        onMouseOut={e => e.currentTarget.style.background = '#3b82f6'}
-                    >
-                        <Download size={16} /> Exporter Excel
-                    </button>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                        {isDirty && (
+                            <>
+                                <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', borderRadius: '10px', background: '#fef2f2', color: '#dc2626', border: 'none', fontWeight: 700 }}>
+                                    Annuler
+                                </button>
+                                <button onClick={handleGlobalSave} style={{ padding: '12px 24px', borderRadius: '12px', background: '#10b981', color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}>
+                                    Valider le planning
+                                </button>
+                            </>
+                        )}
+                        <button
+                            onClick={() => window.open(`/api/export-excel?mode=fused&section_id=${sectionId}`, "_blank")}
+                            style={{
+                                padding: '12px 24px', borderRadius: '10px', border: 'none',
+                                background: '#3b82f6', color: 'white', fontWeight: 700, fontSize: '0.85rem',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
+                                boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.2)', transition: 'all 0.2s'
+                            }}
+                            onMouseOver={e => e.currentTarget.style.background = '#2563eb'}
+                            onMouseOut={e => e.currentTarget.style.background = '#3b82f6'}
+                        >
+                            <Download size={16} /> Exporter Excel
+                        </button>
+                    </div>
                 </div>
 
                 {/* Titre & KPI Audit */}
@@ -142,7 +278,7 @@ export default function CohortTimetablePreview() {
                             <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--navy)', margin: '0 0 10px 0' }}>
                                 Cohorte {section?.name || 'Inconnue'}
                             </h1>
-                            <div style={{ display: 'flex', gap: '15px', color: 'var(--muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+                            <div style={{ display: 'flex', gap: '15px', color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>
                                 <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '6px' }}>Source: RL-ALNS Engine</span>
                                 <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '6px 12px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     <CheckCircle size={14} /> Synchronisé
@@ -175,66 +311,51 @@ export default function CohortTimetablePreview() {
                             </div>
                         )}
                     </div>
-
-                    {/* TOOLBAR CREATION TP */}
-                    <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 800, color: 'var(--navy)', fontSize: '0.9rem' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={tpMode}
-                                    onChange={(e) => setTpMode(e.target.checked)}
-                                    style={{ width: '18px', height: '18px', accentColor: '#8b5cf6' }}
-                                />
-                                Activer Mode TP
-                            </label>
-                        </div>
-
-                        {tpMode && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--muted)' }}>Sélectionner Groupes :</span>
-                                {sectionTdGroups.map((g: any) => {
-                                    const isSelected = selectedTpGroups.includes(g.id);
-                                    return (
-                                        <button
-                                            key={g.id}
-                                            onClick={() => {
-                                                if (isSelected) {
-                                                    setSelectedTpGroups(selectedTpGroups.filter(id => id !== g.id));
-                                                } else {
-                                                    setSelectedTpGroups([...selectedTpGroups, g.id]);
-                                                }
-                                            }}
-                                            style={{
-                                                padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 800,
-                                                background: isSelected ? '#1e3a8a' : '#f1f5f9',
-                                                color: isSelected ? 'white' : '#64748b',
-                                                border: 'none', cursor: 'pointer', transition: 'all 0.2s',
-                                                boxShadow: isSelected ? '0 2px 5px rgba(30, 58, 138, 0.3)' : 'none'
-                                            }}
-                                        >
-                                            {g.name}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
                 </div>
 
-                {/* THE GRID */}
+                {/* BOUTON VERS GESTION GLOBALE TP */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                    padding: '30px',
+                    borderRadius: '24px',
+                    marginBottom: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.3)',
+                    color: 'white'
+                }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 900, margin: '0 0 5px 0' }}>Gestion Spécifique des Travaux Pratiques</h2>
+                        <p style={{ margin: 0, opacity: 0.9, fontWeight: 600, fontSize: '0.9rem' }}>
+                            Configurez l'alternance (A/B), les rotations et les créneaux de 4h sur une grille dédiée au Tronc Commun.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => router.push(`/maquettes/${id}/tp-management?section=${sectionId}`)}
+                        style={{
+                            background: 'white', color: '#6366f1', border: 'none',
+                            padding: '15px 30px', borderRadius: '14px', fontWeight: 900,
+                            fontSize: '0.95rem', cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', gap: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                        }}
+                    >
+                        Ouvrir la gestion des TP <ArrowRight size={18} />
+                    </button>
+                </div>
+
+                {/* THE GRID (Cours & TD Classiques) */}
                 <SectionTimetableGrid
                     assignments={assignments}
                     timeslots={timeslots}
-                    moduleParts={moduleParts}
                     modules={modules}
+                    moduleParts={moduleParts}
                     teachers={teachers}
                     rooms={rooms}
                     sections={sections}
                     tdGroups={tdGroups}
                     selectedId={sectionId}
                     showFiliereAudit={true}
-                    availableTpSlots={availableTpSlots}
                 />
             </div>
         </div>

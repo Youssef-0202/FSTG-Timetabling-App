@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "/api/v1";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -95,13 +95,17 @@ export interface Assignment {
   slot_id: number | null;
   section_id: number | null; // Pour les CM
   is_locked: boolean;
+  tp_subgroup?: string | null;
+  alternance?: string | null;
   td_groups: TDGroup[];      // Pour les TD/TP
 }
 
-export type AssignmentCreate = Omit<Assignment, "id" | "room_id" | "slot_id" | "td_groups"> & { 
+export type AssignmentCreate = Omit<Assignment, "id" | "room_id" | "slot_id" | "td_groups" | "tp_subgroup" | "alternance"> & { 
   room_id?: number | null; 
   slot_id?: number | null; 
   tdgroup_ids: number[];
+  tp_subgroup?: string | null;
+  alternance?: string | null;
 };
 
 export interface DashboardStats {
@@ -167,8 +171,14 @@ export const getAvailableResources = (slotId: number, assignmentId?: number) =>
     `/available-resources?slot_id=${slotId}${assignmentId ? `&assignment_id=${assignmentId}` : ""}`
   );
 
-// ─── Sections 
+// ─── Sections  
 export const getSections = () => apiFetch<Section[]>("/sections");
+export const getSectionTPBlocking = (sectionId: number) => apiFetch(`/sections/${sectionId}/tp-blocking`);
+export const getSectionSanctuarizations = (sectionId: number) => apiFetch(`/sections/${sectionId}/sanctuarizations`);
+export const updateSectionSanctuarizations = (sectionId: number, rules: any[]) => apiFetch(`/sections/${sectionId}/sanctuarizations`, {
+    method: 'POST',
+    body: JSON.stringify({ section_id: sectionId, rules })
+});
 export const createSection = (data: Omit<Section, "id" | "groupes"> & { groupe_ids: number[] }) =>
   apiFetch<Section>("/sections", { method: "POST", body: JSON.stringify(data) });
 export const deleteSection = (id: number) =>
@@ -236,6 +246,9 @@ export const updateAssignment = (id: number, data: Partial<AssignmentCreate>) =>
 export const deleteAssignment = (id: number) =>
   apiFetch<void>(`/assignments/${id}`, { method: "DELETE" });
 
+export const saveAssignments = (data: AssignmentCreate[]) =>
+  apiFetch<{ message: string }>("/save-assignments", { method: "POST", body: JSON.stringify(data) });
+
 export const commitPreview = (mode: string = "alns") =>
   apiFetch<{ message: string }>(`/commit-preview?mode=${mode}`, { method: "POST" });
 
@@ -250,10 +263,13 @@ export interface TimetableResult {
   score_hard: number;
   score_soft: number;
   is_validated: boolean;
+  is_master_reference: boolean;
+  data: any[];
 }
 
 export const getTimetableResult = (id: number) => apiFetch<TimetableResult>(`/timetable-results/${id}`);
 export const getTimetableResults = () => apiFetch<TimetableResult[]>("/timetable-results");
+export const getMasterReference = () => apiFetch<TimetableResult>("/timetable-results/master/reference");
 export const deleteTimetableResult = (id: number) => apiFetch<null>(`/timetable-results/${id}`, { method: "DELETE" });
 export const saveManualSession = (name?: string, edit_id?: number | null, score_hard: number = 0, score_soft: number = 0, algo_type: string = "manual") => {
   const params = new URLSearchParams();
@@ -265,6 +281,9 @@ export const saveManualSession = (name?: string, edit_id?: number | null, score_
   const queryString = params.toString();
   return apiFetch<{ message: string }>(`/save-manual-session${queryString ? `?${queryString}` : ""}`, { method: "POST" });
 };
+export const getTPSanctuarizationsCount = () =>
+  apiFetch<{ count_tp: number }>("/tp-sanctuarizations-numbers");
+
 // ─── Auditing ───
 export interface AuditResult {
   section: string;
@@ -281,7 +300,9 @@ export interface AuditResult {
 export const auditSection = (sectionId: number, mode: string) => 
   apiFetch<AuditResult>(`/audit/section/${sectionId}?mode=${mode}`);
 
-// ─── Algorithms ───
+export const getMasterAudit = () => 
+  apiFetch<{compacite: number, pause_dejeuner: number, rythme_fatigue: number, pedagogie_cm: number}>("/audit/master-reference");
+
 export const runAlgorithm = async (algo: "ga_sa" | "alns" | "rl") => {
   const res = await fetch("/api/run-algo", {
     method: "POST",
@@ -294,3 +315,13 @@ export const runAlgorithm = async (algo: "ga_sa" | "alns" | "rl") => {
   }
   return res.json();
 };
+
+// ─── TP Configuration ───
+export const saveTPConfig = (sectionId: number, config: any[], mergeAlternance: boolean = true) => 
+  apiFetch<{ status: string }>(`/save-tp-config/${sectionId}`, { 
+    method: "POST", 
+    body: JSON.stringify({ merge_alternance: mergeAlternance, assignments: config }) 
+  });
+
+export const loadTPConfig = (sectionId: number) => 
+  apiFetch<any[]>(`/load-tp-config/${sectionId}`);

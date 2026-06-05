@@ -20,7 +20,7 @@ import {
     getModules, Module,
     getModuleParts, ModulePart,
     getTimeslots, Timeslot,
-    getSections, Section, getTDGroups,
+    getSections, Section, getTDGroups, getSectionSanctuarizations,
     updateAssignment, getPreviewSchedule,
     auditSection, AuditResult, getAvailableResources, resetAssignments, saveManualSession, getTimetableResult
 } from "@/lib/api";
@@ -159,6 +159,7 @@ export default function InteractiveEditor() {
     const [saving, setSaving] = useState(false);
     const [validationResult, setValidationResult] = useState<{ hard: string[], warnings: string[] } | null>(null);
     const [showValidationModal, setShowValidationModal] = useState(false);
+    const [allSanctuRules, setAllSanctuRules] = useState<any[]>([]);
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor));
 
@@ -172,6 +173,12 @@ export default function InteractiveEditor() {
             setAssignments(a); setTeachers(t); setRooms(r); setModules(m);
             setModuleParts(mp); setTimeslots(ts); setSections(sec); setTdGroups(tdg);
             setSelectedId(curr => curr || (sec.length > 0 ? String(sec[0].id) : ""));
+
+            // Charger TOUTES les sanctuarisations (un peu gourmand mais efficace pour le drag&drop global)
+            const sanctuRequests = sec.map(s => getSectionSanctuarizations(s.id));
+            const allRulesArrays = await Promise.all(sanctuRequests);
+            setAllSanctuRules(allRulesArrays.flat());
+
         } catch (e) { console.error(e); } finally { if (!silent) setLoading(false); }
     }, []);
 
@@ -371,6 +378,29 @@ export default function InteractiveEditor() {
                 return oSec.groupes?.some(g => myFiliereIds.includes(g.filiere_id));
             });
             if (relConflict) result.warnings.push("Conflit de filière (Tronc commun / Année liée).");
+        }
+
+        // H15: TP Sanctuarization (NEW)
+        const isMorningStatus = ts.start_time.startsWith("08:") || ts.start_time.startsWith("10:");
+        const isAfternoonStatus = ts.start_time.startsWith("14:") || ts.start_time.startsWith("16:");
+
+        // Si ce n'est ni un créneau de pur matin ni de pur après-midi (ex: 12:30), on ne bloque pas
+        if (isMorningStatus || isAfternoonStatus) {
+            const myGroupIds = a.td_groups?.map(g => typeof g === 'object' ? g.id : g) || [];
+            const groupsToCheck = mp.type === 'CM'
+                ? tdGroups.filter(g => Number(g.section_id) === Number(a.section_id)).map(g => g.id)
+                : myGroupIds;
+
+            const tpConflict = allSanctuRules.find(r =>
+                groupsToCheck.includes(r.group_id) &&
+                r.day.toUpperCase() === ts.day.toUpperCase() &&
+                r.is_morning === isMorningStatus
+            );
+
+            if (tpConflict) {
+                const gName = tdGroups.find(g => g.id === tpConflict.group_id)?.name || "du groupe";
+                result.hard.push(`Conflit TP : Créneau réservé pour les TP ${gName}.`);
+            }
         }
 
         return result;

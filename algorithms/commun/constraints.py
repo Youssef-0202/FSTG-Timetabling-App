@@ -57,7 +57,7 @@ def calculate_fitness_full(schedule, mask=None):
     group_slots = {} 
     sec_occupancy = {} #  H13/H14 (sec_id, slot_id) -> {'cm': bool, 'gr6': bool}
     
-    h1, h2, h3, h4, h9, h10, h12 = 0, 0, 0, 0, 0, 0, 0
+    h1, h2, h3, h4, h9, h10, h12, h13 = 0, 0, 0, 0, 0, 0, 0, 0
 
     for a in schedule.assignments:
         ts_id = a.timeslot.id
@@ -126,11 +126,15 @@ def calculate_fitness_full(schedule, mask=None):
                 if is_cm: sec_occupancy[sec_key]['cm'] = True
                 if is_gr6: sec_occupancy[sec_key]['gr6'] = True
 
+        # --- AJOUT H13 : Sanctuarisation TP ---
+        if mp.unavailable_slots and ts_id in mp.unavailable_slots:
+            h13 += 1
+
     # Agrégation des Hard Violations selon le masque
     h_violations = (h1 if mask["H1"] else 0) + (h2 if mask["H2"] else 0) + \
                    (h3 if mask["H3"] else 0) + (h4 if mask["H4"] else 0) + \
                    (h9 if mask["H9"] else 0) + (h10 if mask["H10"] else 0) + \
-                   (h12 if mask["H12"] else 0)
+                   (h12 if mask["H12"] else 0) + (h13 if mask.get("H13", True) else 0)
 
     # 3. ── ANALYSE DES CONTRAINTES SOUPLES (SOFT) ──
     # Objectif : Confort et Pédagogie.

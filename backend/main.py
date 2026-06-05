@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Body
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import models, schemas
+from sqlalchemy import text
 from database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,6 +26,32 @@ app.add_middleware(
 
 # ROOT & STATUS
 
+import json, os
+from fastapi import Body
+
+# Dossier pour les configurations TP
+TP_CONFIG_DIR = "tp_configurations"
+if not os.path.exists(TP_CONFIG_DIR):
+    os.makedirs(TP_CONFIG_DIR)
+
+@app.post("/save-tp-config/{section_id}")
+async def save_tp_config(section_id: int, payload: dict = Body(...)):
+    file_path = os.path.join(TP_CONFIG_DIR, f"section_{section_id}.json")
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=4, ensure_ascii=False)
+    return {"status": "success", "path": file_path}
+
+@app.get("/load-tp-config/{section_id}")
+async def load_tp_config(section_id: int):
+    file_path = os.path.join(TP_CONFIG_DIR, f"section_{section_id}.json")
+    if not os.path.exists(file_path):
+        return []
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return []
+
 @app.get("/")
 def read_root():
     return {"message": "FSTM Timetabling API v2.0", "status": "running"}
@@ -34,20 +62,80 @@ def get_status():
 
 @app.get("/stats", response_model=schemas.DashboardStats)
 def get_dashboard_stats(db: Session = Depends(get_db)):
-    return schemas.DashboardStats(
-        total_teachers=db.query(models.Teacher).count(),
-        total_rooms=db.query(models.Room).count(),
-        total_sections=db.query(models.Section).count(),
-        total_modules=db.query(models.Module).count(),
-        total_assignments=db.query(models.Assignment).count(),
-        hard_violations=0  
-    )
+    total_teachers = db.query(models.Teacher).count()
+    total_rooms = db.query(models.Room).count()
+    total_sections = db.query(models.Section).count()
+    total_modules = db.query(models.Module).count()
+    total_assignments = db.query(models.Assignment).count()
+    
+    # Calcul des indisponibilités profs
+    total_unavail = 0
+    teachers = db.query(models.Teacher).all()
+    for t in teachers:
+        if t.availabilities and "unavailable_slots" in t.availabilities:
+            total_unavail += len(t.availabilities["unavailable_slots"])
+
+    return {
+        "total_teachers": total_teachers,
+        "total_rooms": total_rooms,
+        "total_sections": total_sections,
+        "total_modules": total_modules,
+        "total_assignments": total_assignments,
+        "total_teacher_unavailability": total_unavail,
+        "hard_violations": 0
+    }
+
+@app.get("/audit/master-reference")
+def get_master_audit(db: Session = Depends(get_db)):
+    """
+    Calcule la moyenne globale des 4 indicateurs pédagogiques pour l'emploi du temps Master.
+    Retourne un JSON avec les moyennes de Compacité, Pause Midi, Rythme et Pédagogie.
+    """
+    master = db.query(models.TimetableResult).filter(models.TimetableResult.is_master_reference == True).first()
+    if not master:
+        return {
+            "compacite": 0,
+            "pause_dejeuner": 0,
+            "rythme_fatigue": 0,
+            "pedagogie_cm": 0,
+            "status": "No Master Reference"
+        }
+    
+    sections = db.query(models.Section).all()
+    if not sections:
+        return {"compacite": 0, "pause_dejeuner": 0, "rythme_fatigue": 0, "pedagogie_cm": 0}
+
+    total_metrics = {"compacite": 0.0, "pause_dejeuner": 0.0, "rythme_fatigue": 0.0, "pedagogie_cm": 0.0}
+    count = 0
+
+    for sec in sections:
+        try:
+            # On réutilise la logique interne de audit_section
+            audit = audit_section(sec.id, mode=master.algo_type, db=db)
+            if audit and "details" in audit:
+                total_metrics["compacite"] += audit["details"].get("compacite", 0)
+                total_metrics["pause_dejeuner"] += audit["details"].get("pause_dejeuner", 0)
+                total_metrics["rythme_fatigue"] += audit["details"].get("rythme_fatigue", 0)
+                total_metrics["pedagogie_cm"] += audit["details"].get("pedagogie_cm", 0)
+                count += 1
+        except:
+            continue
+
+    if count == 0:
+        return {"compacite": 0, "pause_dejeuner": 0, "rythme_fatigue": 0, "pedagogie_cm": 0}
+
+    return {
+        "compacite": round(total_metrics["compacite"] / count, 1),
+        "pause_dejeuner": round(total_metrics["pause_dejeuner"] / count, 1),
+        "rythme_fatigue": round(total_metrics["rythme_fatigue"] / count, 1),
+        "pedagogie_cm": round(total_metrics["pedagogie_cm"] / count, 1)
+    }
 
 
 # TEACHERS  /teachers
 
 @app.get("/teachers", response_model=List[schemas.Teacher])
-def list_teachers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_teachers(skip: int = 0, limit: int = 500, db: Session = Depends(get_db)):
     return db.query(models.Teacher).offset(skip).limit(limit).all()
 
 @app.get("/teachers/{teacher_id}", response_model=schemas.Teacher)
@@ -202,6 +290,135 @@ def update_section(section_id: int, data: schemas.SectionCreate, db: Session = D
     return s
 
 
+@app.get("/sections/{section_id}/tp-blocking")
+def get_section_tp_blocking(section_id: int, db: Session = Depends(get_db)):
+    """
+    Renvoie les IDs des créneaux bloqués pour chaque groupe de la section.
+    Priorité aux règles en DB, sinon fallback sur la logique par défaut (Section 1).
+    """
+    section = db.query(models.Section).filter(models.Section.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Section non trouvée")
+    
+    timeslots = db.query(models.Timeslot).all()
+    groups = db.query(models.TDGroup).filter(models.TDGroup.section_id == section_id).all()
+    group_ids = [g.id for g in groups]
+
+    # Tentative de récupération des règles en DB
+    rules = db.query(models.TPSanctuarization).filter(models.TPSanctuarization.group_id.in_(group_ids)).all()
+    
+    result = {}
+    
+    if not rules:
+        # LOGIQUE PAR DÉFAUT (Section 1 uniquement)
+        for g in groups:
+            import re
+            m = re.search(r'Gr\s*(\d+)', g.name)
+            if not m:
+                result[g.id] = []
+                continue
+            g_num = int(m.group(1))
+            blocked_ids = []
+            for s in timeslots:
+                h = s.start_time.hour
+                is_morning = (h < 13)
+                conflict = False
+                if section_id == 1:
+                    if g_num in [1, 2] and (s.day.upper() in ["MARDI", "JEUDI"] and not is_morning): conflict = True
+                    elif g_num in [3, 4] and (s.day.upper() in ["MERCREDI", "VENDREDI"] and is_morning): conflict = True
+                    elif g_num in [5, 6] and (s.day.upper() in ["LUNDI", "MERCREDI"] and is_morning): conflict = True
+                if conflict: blocked_ids.append(s.id)
+            result[g.id] = blocked_ids
+    else:
+        # LOGIQUE DYNAMIQUE (Depuis DB)
+        for g in groups:
+            g_rules = [r for r in rules if r.group_id == g.id]
+            blocked_ids = []
+            for r in g_rules:
+                for s in timeslots:
+                    h = s.start_time.hour
+                    is_morning = (h < 13)
+                    if s.day.upper() == r.day.upper() and is_morning == r.is_morning:
+                        blocked_ids.append(s.id)
+            result[g.id] = blocked_ids
+
+    return result
+
+@app.get("/sections/{section_id}/sanctuarizations", response_model=List[schemas.TPSanctuarization])
+def list_section_sanctuarizations(section_id: int, db: Session = Depends(get_db)):
+    """Renvoie les règles brutes pour l'interface de config."""
+    groups = db.query(models.TDGroup).filter(models.TDGroup.section_id == section_id).all()
+    group_ids = [g.id for g in groups]
+    return db.query(models.TPSanctuarization).filter(models.TPSanctuarization.group_id.in_(group_ids)).all()
+
+@app.post("/sections/{section_id}/sanctuarizations")
+def update_section_sanctuarizations(section_id: int, data: schemas.TPBulkUpdate, db: Session = Depends(get_db)):
+    """Mise à jour en masse des règles de sanctuarisation."""
+    groups = db.query(models.TDGroup).filter(models.TDGroup.section_id == section_id).all()
+    group_ids = [g.id for g in groups]
+    
+    # 1. Nettoyage
+    db.query(models.TPSanctuarization).filter(models.TPSanctuarization.group_id.in_(group_ids)).delete(synchronize_session=False)
+    
+    # 2. Insertion
+    for r in data.rules:
+        new_rule = models.TPSanctuarization(
+            group_id=r.group_id,
+            day=r.day.upper(),
+            is_morning=r.is_morning
+        )
+        db.add(new_rule)
+    
+    db.commit()
+    return {"message": "Configuration mise à jour avec succès"}
+
+@app.get("/sections/{section_id}/tp-blocking")
+def get_section_tp_blocking(section_id: int, db: Session = Depends(get_db)):
+    """
+    Retourne un dict {group_id: [timeslot_ids]} représentant
+    les créneaux bloqués par la sanctuarisation TP pour chaque groupe.
+    Utilisé par le frontend pour colorier la grille de gestion des TP.
+    """
+    # 1. Récupérer les groupes de la section
+    groups = db.query(models.TDGroup).filter(models.TDGroup.section_id == section_id).all()
+    group_ids = [g.id for g in groups]
+
+    # 2. Récupérer les règles de sanctuarisation
+    rules = db.query(models.TPSanctuarization).filter(
+        models.TPSanctuarization.group_id.in_(group_ids)
+    ).all()
+
+    # 3. Récupérer tous les timeslots
+    timeslots = db.query(models.TimeSlot).all()
+
+    # 4. Pour chaque règle, trouver les timeslots correspondants
+    # Matin = 08:30 et 10:35 | Après-midi = 14:30 et 16:35
+    morning_starts = ["08:30", "10:35"]
+    afternoon_starts = ["14:30", "16:35"]
+
+    result: dict = {gid: [] for gid in group_ids}
+
+    for rule in rules:
+        target_starts = morning_starts if rule.is_morning else afternoon_starts
+        rule_day = rule.day.upper()
+
+        for ts in timeslots:
+            ts_day = ts.day.upper()
+            ts_start = ts.start_time[:5]  # "HH:MM"
+
+            if ts_day == rule_day and ts_start in target_starts:
+                if rule.group_id in result:
+                    result[rule.group_id].append(ts.id)
+
+    return result
+
+@app.get("/tp-sanctuarizations-numbers")
+def get_tp_blocking_numbers(db: Session = Depends(get_db)):
+    count = db.query(models.TPSanctuarization).count()
+    return {"count_tp": count}
+
+
+
 # TD GROUPS  /td-groups
 
 @app.get("/td-groups", response_model=List[schemas.TDGroup])
@@ -336,6 +553,65 @@ def delete_module_part(part_id: int, db: Session = Depends(get_db)):
 def list_filieres(db: Session = Depends(get_db)):
     return db.query(models.Filiere).all()
 
+@app.get("/filieres/{filiere_id}/stats")
+def get_filiere_stats(filiere_id: int, db: Session = Depends(get_db)):
+    """Retourne les stats dynamiques d'une filière pour les KPI cards"""
+    try:
+        f = db.query(models.Filiere).filter(models.Filiere.id == filiere_id).first()
+        if not f:
+            raise HTTPException(404, "Filière introuvable")
+
+        # Compter les sections de cette filière
+        sections_query = text("""
+            SELECT DISTINCT s.id, s.name
+            FROM sections s
+            JOIN section_groupes sg ON sg.section_id = s.id
+            JOIN groupe_filieres gf ON gf.id = sg.groupe_id
+            WHERE gf.filiere_id = :fid
+        """)
+        sections = db.execute(sections_query, {"fid": filiere_id}).fetchall()
+        section_ids = [s.id for s in sections]
+
+        # Compter les modules distincts enseignés dans cette filière
+        module_count = 0
+        if section_ids:
+            module_query = text("""
+                SELECT COUNT(DISTINCT m.id) as nb
+                FROM modules m
+                JOIN module_parts mp ON mp.module_id = m.id
+                JOIN assignments a ON a.module_part_id = mp.id
+                WHERE a.section_id = ANY(:sids)
+            """)
+            result = db.execute(module_query, {"sids": section_ids}).fetchone()
+            module_count = result.nb if result else 0
+
+        # Compter les groupes TD (effectif = nb_groupes × 30 étudiants environ)
+        td_count = 0
+        if section_ids:
+            td_query = text("""
+                SELECT COUNT(id) as nb FROM td_groups
+                WHERE section_id = ANY(:sids)
+            """)
+            result2 = db.execute(td_query, {"sids": section_ids}).fetchone()
+            td_count = result2.nb if result2 else 0
+
+        effectif_estime = td_count * 30  # ~30 étudiants par groupe TD
+
+        return {
+            "filiere_id": filiere_id,
+            "filiere_name": f.name,
+            "nb_sections": len(sections),
+            "sections": [{"id": s.id, "name": s.name} for s in sections],
+            "nb_modules": module_count,
+            "nb_td_groups": td_count,
+            "effectif_estime": effectif_estime if effectif_estime > 0 else 0,
+        }
+    except Exception as e:
+        print(f"Error in get_filiere_stats: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}")
+
 @app.post("/filieres", response_model=schemas.Filiere, status_code=201)
 def create_filiere(f: schemas.FiliereCreate, db: Session = Depends(get_db)):
     db_f = models.Filiere(**f.model_dump())
@@ -411,7 +687,9 @@ def create_assignment(data: schemas.AssignmentCreate, db: Session = Depends(get_
         room_id=data.room_id,
         slot_id=data.slot_id,
         section_id=data.section_id,
-        is_locked=data.is_locked
+        is_locked=data.is_locked,
+        tp_subgroup=data.tp_subgroup,
+        alternance=data.alternance
     )
     # Ajout des groupes TD si c'est un TD/TP
     for g_id in data.tdgroup_ids:
@@ -444,6 +722,8 @@ def update_assignment(assignment_id: int, data: schemas.AssignmentUpdate, db: Se
     if "is_locked" in update_data: db_a.is_locked = update_data["is_locked"]
     if "room_id" in update_data: db_a.room_id = update_data["room_id"]
     if "slot_id" in update_data: db_a.slot_id = update_data["slot_id"]
+    if "tp_subgroup" in update_data: db_a.tp_subgroup = update_data["tp_subgroup"]
+    if "alternance" in update_data: db_a.alternance = update_data["alternance"]
 
     # Mise à jour des groupes TD si spécifiés
     if "tdgroup_ids" in update_data:
@@ -553,7 +833,9 @@ def save_assignments(assignments: List[schemas.AssignmentCreate], db: Session = 
                 room_id=a.room_id,
                 slot_id=a.slot_id,
                 section_id=a.section_id,
-                is_locked=a.is_locked
+                is_locked=a.is_locked,
+                tp_subgroup=a.tp_subgroup,
+                alternance=a.alternance
             )
             # Ajout des groupes TD si présents
             if a.tdgroup_ids:
@@ -633,6 +915,8 @@ def commit_preview(mode: str = "alns", result_id: Optional[int] = None, db: Sess
             db_a.teacher_id = item.get('teacher_id')
             db_a.is_locked = item.get('is_locked', False)
             db_a.section_id = item.get('section_id')
+            db_a.tp_subgroup = item.get('tp_subgroup')
+            db_a.alternance = item.get('alternance')
 
             # --- RESTAURATION DES GROUPES TD (CRUCIAL POUR LE SCORE) ---
             group_data = item.get('td_groups', [])
@@ -686,6 +970,8 @@ def save_manual_session(
                 "slot_id": a.slot_id,
                 "section_id": a.section_id,
                 "is_locked": a.is_locked,
+                "tp_subgroup": a.tp_subgroup,
+                "alternance": a.alternance,
                 "td_groups": [{"id": g.id} for g in a.td_groups]
             })
             
@@ -732,6 +1018,11 @@ def save_manual_session(
         validated_res.score_soft = score_soft
         validated_res.is_validated = True
         
+        # LOGIQUE AUTO-MASTER : Si aucun master n'existe, on le devient
+        existing_master = db.query(models.TimetableResult).filter(models.TimetableResult.is_master_reference == True).first()
+        if not existing_master:
+            validated_res.is_master_reference = True
+        
         db.commit()
         
         return {"status": "success", "message": "Planning de production mis à jour avec succès."}
@@ -761,9 +1052,48 @@ def list_timetable_results(db: Session = Depends(get_db)):
 @app.post("/timetable-results", response_model=schemas.TimetableResult, status_code=201)
 def create_timetable_result(result: schemas.TimetableResultCreate, db: Session = Depends(get_db)):
     """Sauvegarde un nouveau résultat de génération (appelé par le solveur)."""
+    # Si aucun master, le nouveau le devient
+    existing_master = db.query(models.TimetableResult).filter(models.TimetableResult.is_master_reference == True).first()
+    
     db_res = models.TimetableResult(**result.model_dump())
+    if not existing_master:
+        db_res.is_master_reference = True
+        
     db.add(db_res); db.commit(); db.refresh(db_res)
     return db_res
+
+@app.get("/timetable-results/master/reference")
+def get_master_reference(db: Session = Depends(get_db)):
+    """Récupère l'EDT marqué comme Master, ou le dernier résultat 'fused' par défaut."""
+    # 1. Tentative : Master explicite
+    res = db.query(models.TimetableResult).filter(models.TimetableResult.is_master_reference == True).first()
+    
+    # 2. Fallback : Dernier résultat de type 'fused' (IA)
+    if not res:
+        res = db.query(models.TimetableResult).filter(
+            models.TimetableResult.algo_type == "fused"
+        ).order_by(models.TimetableResult.id.desc()).first()
+        
+    if not res:
+        raise HTTPException(status_code=404, detail="Aucun emploi du temps (Master ou Fused) trouvé en base de données.")
+        
+    return res
+
+@app.post("/timetable-results/{res_id}/set-master")
+def set_master_reference(res_id: int, db: Session = Depends(get_db)):
+    """Définit un emploi du temps comme référence master et désactive les autres."""
+    # 1. On désactive l'ancien master
+    db.query(models.TimetableResult).update({models.TimetableResult.is_master_reference: False})
+    
+    # 2. On active le nouveau
+    res = db.query(models.TimetableResult).filter(models.TimetableResult.id == res_id).first()
+    if not res:
+        db.rollback()
+        raise HTTPException(status_code=404, detail="Résultat introuvable")
+    
+    res.is_master_reference = True
+    db.commit()
+    return {"message": f"'{res.name}' est désormais l'emploi du temps de référence officiel."}
 
 @app.put("/timetable-results/{res_id}/validate", response_model=schemas.TimetableResult)
 def validate_timetable_result(res_id: int, db: Session = Depends(get_db)):
@@ -1055,9 +1385,9 @@ def run_algorithm(algo: str):
     algo = algo.lower()
     
     scripts = {
-        "ga_sa": os.path.join(base_dir, "algorithms", "ga_sa_hybrid", "v2", "main_solver.py"),
-        "alns": os.path.join(base_dir, "algorithms", "ILS-ALNS", "main_alns.py"),
-        "rl": os.path.join(base_dir, "algorithms", "rl_controller", "main_rl.py")
+        "ga_sa": os.path.join(base_dir, "algorithms", "1-ga_sa_hybrid", "v2", "main_solver.py"),
+        "alns": os.path.join(base_dir, "algorithms", "2-ILS-ALNS", "main_alns.py"),
+        "rl": os.path.join(base_dir, "algorithms", "5-RL-ALNS-Curriculum", "main_fused.py")
     }
     
     script_path = scripts.get(algo)
@@ -1077,3 +1407,221 @@ def run_algorithm(algo: str):
             
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur de lancement : {str(e)}")
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from datetime import time as dt_time
+
+@app.get("/export-tp-excel/{section_id}")
+async def export_tp_excel(section_id: int, merge: bool = True, db: Session = Depends(get_db)):
+    try:
+        # 1. Charger les données essentielles
+        section = db.query(models.Section).filter(models.Section.id == section_id).first()
+        if not section: raise HTTPException(404, "Section non trouvée")
+        
+        tp_data = json.load(open(os.path.join(TP_CONFIG_DIR, f"section_{section_id}.json"), "r", encoding="utf-8")) if os.path.exists(os.path.join(TP_CONFIG_DIR, f"section_{section_id}.json")) else []
+        tp_config_raw = tp_data.get('assignments', []) if isinstance(tp_data, dict) else tp_data
+        tp_config = [a for a in tp_config_raw if a.get('slot_id') is not None]
+        module_parts = {p.id: p for p in db.query(models.ModulePart).all()}
+        modules = {m.id: m for m in db.query(models.Module).all()}
+        timeslots = {t.id: t for t in db.query(models.Timeslot).all()}
+        td_groups_dict = {g.id: g for g in db.query(models.TDGroup).all()}
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Planning TP"
+        
+        # Styles Premium
+        thick_border = Border(left=Side(style='thick'), right=Side(style='thick'), top=Side(style='thick'), bottom=Side(style='thick'))
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        
+        # Entête Noir Premium
+        ws.merge_cells("A1:C1")
+        ws["A1"] = f"FSTG Timetabling - EMPLOI DU TEMPS TP - {section.name.upper()}"
+        ws["A1"].font = Font(bold=True, size=16, color="FFFFFF")
+        ws["A1"].fill = PatternFill(start_color="1F2937", end_color="1F2937", fill_type="solid")
+        ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[1].height = 40
+
+        # Heures Colonnes (BLOCS DE 4H)
+        ws.cell(row=2, column=2, value="MATIN (08h30 - 12h30)")
+        ws.cell(row=2, column=3, value="APRES-MIDI (14h30 - 18h30)")
+        
+        header_fill = PatternFill(start_color="FDE68A", end_color="FDE68A", fill_type="solid")
+        for c in [2, 3]:
+            cell = ws.cell(row=2, column=c)
+            cell.fill = header_fill
+            cell.font = Font(bold=True, size=11)
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = thick_border
+        ws.row_dimensions[2].height = 30
+        
+        color_map = {
+            "Biologie Animale et Végétale": "D1FAE5", # Vert
+            "Géodynamique externe": "DBEAFE",       # Bleu
+            "Réactivité Chimique": "F3F4F6",         # Gris
+            "Culture digitale": "F3E8FF",           # Mauve
+            "Mécanique des Fluides": "FEF3C7"        # Orange
+        }
+
+        days = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+        current_row = 3
+
+        for day in days:
+            # Cellule Jour
+            ws.row_dimensions[current_row].height = 100
+            day_cell = ws.cell(row=current_row, column=1, value=day.upper())
+            day_cell.font = Font(bold=True, color="FFFFFF", size=12)
+            day_cell.fill = PatternFill(start_color="374151", end_color="374151", fill_type="solid")
+            day_cell.alignment = Alignment(vertical="center", horizontal="center")
+            day_cell.border = thin_border
+            
+            # Pour chaque bloc de 4h (Matin / AM)
+            for b_idx in [0, 1]:
+                col = b_idx + 2
+                is_morning = (b_idx == 0)
+                
+                # Récupérer TOUS les TP du bloc de 4h
+                cell_content = []
+                # Regrouper par module pour éviter les répétitions si merge=True
+                mod_buckets = {}
+                for asgn in tp_config:
+                    ts = timeslots.get(int(asgn['slot_id']))
+                    if not ts or ts.day.lower() != day.lower(): continue
+                    
+                    h = ts.start_time.hour if isinstance(ts.start_time, dt_time) else int(str(ts.start_time)[:2])
+                    match = (h < 13) if is_morning else (h >= 13)
+                    
+                    if match:
+                        mp = module_parts.get(asgn.get('module_part_id'))
+                        if mp: 
+                            key = mp.module_id if merge else str(asgn.get('id', id(asgn)))
+                            mod_buckets.setdefault(key, []).append(asgn)
+
+                # Construire le texte épuré fidèle à l'UI
+                for key_id, assigns in mod_buckets.items():
+                    mp_id = assigns[0].get('module_part_id')
+                    mp = module_parts.get(mp_id)
+                    m_obj = modules.get(mp.module_id) if mp else None
+                    m_name = m_obj.name if m_obj else "TP"
+                    
+                    # On veut : "Gr X A & Gr Y A / Gr X B & Gr Y B"
+                    assignment_labels = []
+                    for a in assigns:
+                        gids = [gid.get('id') if isinstance(gid, dict) else gid for gid in a.get('td_groups', [])]
+                        sub = a.get('tp_subgroup', "") # A, B, C...
+                        gnames = []
+                        for gid in gids:
+                            g_obj = td_groups_dict.get(gid)
+                            if g_obj:
+                                # Extraire juste le chiffre "1", "2"...
+                                g_num = "".join(filter(str.isdigit, g_obj.name.replace(section.name, "")))
+                                gnames.append(f"Gr {g_num}{sub}")
+                        
+                        assignment_labels.append(" & ".join(gnames))
+                    
+                    alt_text = "(par alternance)" if len(assigns) > 1 else "(par quinzaine)"
+                    alt_text = alt_text if merge else ""
+                    
+                    cell_content.append(f"● {m_name}\n   {' / '.join(assignment_labels)} {alt_text}".strip())
+
+                cell = ws.cell(row=current_row, column=col, value="\n".join(cell_content))
+                cell.alignment = Alignment(wrap_text=True, horizontal="left", vertical="center", indent=1)
+                cell.font = Font(size=10, bold=True)
+                cell.border = thin_border
+                
+                # Couleur de fond discrète si contient des données
+                if cell_content:
+                    cell.fill = PatternFill(start_color="F9FAFB", end_color="F9FAFB", fill_type="solid")
+                else:
+                    cell.fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+
+            current_row += 1
+
+        # Ajustements finaux
+        ws.column_dimensions['A'].width = 15
+        ws.column_dimensions['B'].width = 60
+        ws.column_dimensions['C'].width = 60
+
+        export_path = f"export_tp_{section_id}_clean.xlsx"
+        wb.save(export_path)
+        return FileResponse(export_path, filename=f"Planning_TP_Clean_{section.name}.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, str(e))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/debug/gb-s4")
+def debug_gb_s4(db: Session = Depends(get_db)):
+    """Récupère toutes les affectations pour GB S4 Gr 1."""
+    # 1. Trouver les IDs liés à GB S4
+    sections = db.query(models.Section).filter(models.Section.name.like("%GB S4%")).all()
+    sec_ids = [s.id for s in sections]
+    
+    # 2. Récupérer les assignments CM
+    cm_asgns = db.query(models.Assignment).filter(models.Assignment.section_id.in_(sec_ids)).all()
+    
+    results = []
+    for a in cm_asgns:
+        mp = db.query(models.ModulePart).get(a.module_part_id)
+        mod = db.query(models.Module).get(mp.module_id) if mp else None
+        ts = db.query(models.Timeslot).get(a.slot_id) if a.slot_id else None
+        results.append({
+            "id": a.id, "module": mod.name if mod else "?", "type": mp.type if mp else "?",
+            "day": ts.day if ts else "?", "time": ts.start_time if ts else "?",
+            "info": "CM"
+        })
+@app.get("/debug/duplicate-td-to-gr2")
+def duplicate_td_to_gr2(db: Session = Depends(get_db)):
+    """Duplique les TD du Groupe 1 vers le Groupe 2 pour GB S4."""
+    # 1. Identifier GB S4
+    section = db.query(models.Section).filter(models.Section.name.like("%GB S4%")).first()
+    if not section: return {"error": "Section GB S4 non trouvee"}
+    
+    # 2. Groupe Cible : ID #35 (Gr 2)
+    target_group_id = 35
+    
+    # 3. Récupérer les TD actuels de la section (qui sont implicitement Gr 1 pour l'instant)
+    td_asgns = db.query(models.Assignment).join(models.ModulePart).filter(
+        models.Assignment.section_id == section.id,
+        models.ModulePart.type == "TD"
+    ).all()
+    
+    new_count = 0
+    for a in td_asgns:
+        # Créer une copie
+        new_a = models.Assignment(
+            module_part_id=a.module_part_id,
+            teacher_id=a.teacher_id,
+            room_id=a.room_id,
+            slot_id=a.slot_id,
+            section_id=a.section_id,
+            is_locked=a.is_locked
+        )
+        db.add(new_a)
+        db.flush() # Pour avoir l'ID
+        
+        # Lier au groupe 35 dans la table d'association (si elle existe)
+        # Note: Dans votre modèle, assignments et td_groups sont liés par une table secondary
+        target_group = db.query(models.TDGroup).get(target_group_id)
+        if target_group:
+            new_a.td_groups.append(target_group)
+            new_count += 1
+            
+    db.commit()
+    return {"message": f"Succès : {new_count} séances de TD dupliquées pour le Groupe 2.", "section": section.name}
+
+@app.get("/emergency-migrate")
+def emergency_migrate(db: Session = Depends(get_db)):
+    """Route de secours pour ajouter la colonne manquante si le schéma est vieux."""
+    from sqlalchemy import text
+    try:
+        db.execute(text("ALTER TABLE timetable_results ADD COLUMN is_master_reference BOOLEAN DEFAULT FALSE;"))
+        db.commit()
+        return {"message": "Success: Column is_master_reference added."}
+    except Exception as e:
+        db.rollback()
+        return {"message": f"Notice/Error: {str(e)}"}

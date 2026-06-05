@@ -1,0 +1,22 @@
+============================================================
+ RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
+ Date : 2026-06-05 14:34:07
+============================================================
+
+1. PARAMETRES DE L'ALGORITHME :
+ - Population Size      : 20
+ - Max Generations      : 120
+ - Mutation Rate        : 0.3
+ - SA Iterations        : 800
+ - SA Temp Initial      : 50.0
+
+2. STATISTIQUES DE LA BASE DE DONNEES :
+ - Nombre d'Enseignants : 78
+ - Nombre de Salles     : 29
+ - Nombre de Sections   : 10
+ - Seances a placer     : 247
+ - Creneaux disponibles : 30
+
+============================================================
+ SUIVI DES GENERATIONS :
+============================================================

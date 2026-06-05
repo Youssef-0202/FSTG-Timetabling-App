@@ -17,7 +17,7 @@ file_suffix = f"_{mode}" if mode in ["alns", "rl", "fused"] else ""
 
 CACHE_PATH = os.path.join(BASE_DIR, "data_cache.json")
 TIMETABLE_PATH = os.path.join(BASE_DIR, "backend", f"generated_timetable{file_suffix}.json")
-OUTPUT_PATH = os.path.join(BASE_DIR, "algorithms", "ga_sa_hybrid", "v2", "logs", f"FSTG_EXCEL_PREMIUM{file_suffix.upper()}{'_' + target_section_id if target_section_id else ''}.xlsx")
+OUTPUT_PATH = os.path.join(BASE_DIR, "algorithms", "1-ga_sa_hybrid", "v2", "logs", f"FSTG_EXCEL_PREMIUM{file_suffix.upper()}{'_' + target_section_id if target_section_id else ''}.xlsx")
 
 FSTG_LABELS = ["08h30 - 10h25", "10h35 - 12h30", "12h30 - 14h25", "14h30 - 16h25", "16h35 - 18h30"]
 TIME_MAP = {"08:30:00": 0, "10:35:00": 1, "12:30:00": 2, "14:30:00": 3, "16:35:00": 4}

@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 const DAYS_ORDER = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 export default function SectionTimetableGrid({
-    assignments, timeslots, moduleParts, modules, teachers, rooms, sections, tdGroups, selectedId, showFiliereAudit = false, availableTpSlots = {}
+    assignments, timeslots, moduleParts, modules, teachers, rooms, sections, tdGroups, selectedId,
+    showFiliereAudit = false, availableTpSlots = {}, onSlotClick, onDeleteAssignment
 }: any) {
     if (!assignments || assignments.length === 0) {
         return (
@@ -25,6 +26,7 @@ export default function SectionTimetableGrid({
             if (ts.day.toLowerCase().trim() !== day.toLowerCase().trim()) return false;
             if (!ts.start_time.substring(0, 5).startsWith(startTime.substring(0, 5))) return false;
 
+            // On ne garde QUE ce qui appartient à la section sélectionnée
             const isDirect = String(a.section_id) === String(selectedId);
             const isGroupLocal = a.td_groups?.some((g: any) => {
                 const gid = typeof g === 'object' ? g.id : g;
@@ -32,34 +34,7 @@ export default function SectionTimetableGrid({
                 return fullGroup && String(fullGroup.section_id) === String(selectedId);
             });
 
-            if (isDirect || isGroupLocal) return true;
-
-            // Logique Ghost (pour voir les cours partagés avec une autre sous-section)
-            if (showFiliereAudit) {
-                const selectedS = sections.find((s: any) => String(s.id) === String(selectedId));
-                if (!selectedS || !selectedS.groupes) return false;
-                const localFiliereIds = selectedS.groupes.map((g: any) => g.filiere_id);
-                const currentSemester = selectedS.name.split(" ").pop();
-
-                if (currentSemester === "S4") return false; // Ex: règle métier
-
-                const otherLevelSections = sections.filter((s: any) =>
-                    s.groupes?.some((g: any) => localFiliereIds.includes(g.filiere_id)) &&
-                    s.name.split(" ").pop() !== currentSemester
-                );
-
-                const isBlueInOtherLevel = otherLevelSections.some((rs: any) => {
-                    const isDirectMatch = String(a.section_id) === String(rs.id);
-                    const sharesGroupsWithRs = a.td_groups?.some((g: any) => {
-                        const gid = typeof g === 'object' ? g.id : g;
-                        const foundG = tdGroups.find((tg: any) => String(tg.id) === String(gid));
-                        return foundG && String(foundG.section_id) === String(rs.id);
-                    });
-                    return isDirectMatch || sharesGroupsWithRs;
-                });
-                return isBlueInOtherLevel;
-            }
-            return false;
+            return isDirect || isGroupLocal;
         });
     };
 
@@ -101,8 +76,10 @@ export default function SectionTimetableGrid({
                                             verticalAlign: 'top',
                                             background: isAvailableTp ? '#f5f3ff' : 'transparent',
                                             boxShadow: isAvailableTp ? 'inset 0 0 0 2px #8b5cf6' : 'none',
-                                            transition: 'all 0.3s'
+                                            transition: 'all 0.3s',
+                                            cursor: isAvailableTp ? 'pointer' : 'default'
                                         }}
+                                        onClick={() => isAvailableTp && onSlotClick && onSlotClick(day, time)}
                                     >
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                             {isAvailableTp && courses.length === 0 && (
@@ -132,39 +109,57 @@ export default function SectionTimetableGrid({
                                                         if (!found) return "";
                                                         const parts = found.name.split(" ");
                                                         const grIndex = parts.findIndex((p: string) => p.toLowerCase() === "gr");
-                                                        return grIndex !== -1 ? parts.slice(grIndex).join(" ") : found.name;
-                                                    }).filter((n: string) => n !== "").join('+')
+                                                        const baseName = grIndex !== -1 ? parts.slice(grIndex).join(" ") : found.name;
+                                                        // Ajout du label TP (ex: Gr 1A)
+                                                        return c.tp_subgroup ? `${baseName}${c.tp_subgroup}` : baseName;
+                                                    }).filter((n: string) => n !== "").join(' & ')
                                                     : null;
 
-                                                let isGhost = false;
-                                                let ghostSectionName = cSection?.name || "FILIÈRE";
+                                                const isGhost = false;
+                                                const ghostSectionName = "";
 
-                                                if (showFiliereAudit && !isDirect && !isGroupLocal) {
-                                                    isGhost = true;
-                                                    const selectedS = sections.find((s: any) => String(s.id) === String(selectedId));
-                                                    if (selectedS?.groupes) {
-                                                        const localFiliereIds = selectedS.groupes.map((g: any) => g.filiere_id);
-                                                        const currentSem = selectedS.name.split(" ").pop();
-                                                        const otherLevelSections = sections.filter((s: any) =>
-                                                            s.groupes?.some((g: any) => localFiliereIds.includes(g.filiere_id)) &&
-                                                            s.name.split(" ").pop() !== currentSem
-                                                        );
-                                                        const sharingSections = otherLevelSections.filter((rs: any) => {
-                                                            const isDirectMatch = String(c.section_id) === String(rs.id) && (mp?.type === "CM" || !c.td_groups || c.td_groups.length === 0);
-                                                            if (isDirectMatch) return true;
-                                                            return c.td_groups?.some((g: any) => {
-                                                                const gid = typeof g === 'object' ? g.id : g;
-                                                                const fullG = tdGroups.find((tg: any) => String(tg.id) === String(gid));
-                                                                return fullG && String(fullG.section_id) === String(rs.id);
-                                                            });
-                                                        });
-                                                        if (sharingSections.length > 0) {
-                                                            ghostSectionName = sharingSections.map((s: any) => s.name).join(' + ');
-                                                        }
-                                                    }
+                                                // Logique de Détection de Conflit Intelligente (s'inspire de interactive/page.tsx)
+                                                let hasHardConflict = false;
+                                                const otherAsgns = assignments.filter((o: any) => o.id !== c.id && o.slot_id === c.slot_id);
+
+                                                // H1: Collision Prof (sauf prof par défaut)
+                                                const profColl = otherAsgns.find((o: any) => o.teacher_id === c.teacher_id && c.teacher_id !== 231);
+                                                if (profColl) hasHardConflict = true;
+
+                                                // H2: Collision Salle
+                                                const roomColl = otherAsgns.find((o: any) => o.room_id === c.room_id && c.room_id !== null);
+                                                if (roomColl) hasHardConflict = true;
+
+                                                // H3: Collision Groupe étudiant
+                                                if (c.td_groups && c.td_groups.length > 0) {
+                                                    const grColl = otherAsgns.find((o: any) => {
+                                                        const sameGroup = o.td_groups?.some((g1: any) => c.td_groups.some((g2: any) => (typeof g1 === 'object' ? g1.id : g1) === (typeof g2 === 'object' ? g2.id : g2)));
+                                                        if (!sameGroup) return false;
+                                                        // Si c'est le même groupe, ce n'est un conflit que si les sous-groupes sont identiques (ex: A et A)
+                                                        // Si c'est A et B, ce n'est pas un conflit (alternance)
+                                                        if (o.tp_subgroup && c.tp_subgroup && o.tp_subgroup !== c.tp_subgroup) return false;
+                                                        return true;
+                                                    });
+                                                    if (grColl) hasHardConflict = true;
                                                 }
 
-                                                const bgColor = isGhost ? '#fff1f2' : undefined;
+                                                const isError = hasHardConflict && !c.tp_subgroup;
+                                                const isManualTp = c.tp_subgroup || c.alternance;
+
+                                                let cardBg = isGhost ? '#fff1f2' : '#f8fafc';
+                                                let cardBorder = isGhost ? '#ef4444' : (mp?.type.toLowerCase() === 'cm' ? '#3b82f6' : (mp?.type.toLowerCase() === 'tp' ? '#8b5cf6' : '#22c55e'));
+                                                let cardText = '#1e3a8a';
+
+                                                if (isError) {
+                                                    cardBg = '#fef2f2';
+                                                    cardText = '#991b1b';
+                                                    cardBorder = '#ef4444';
+                                                } else if (!isGhost && !isManualTp) {
+                                                    if (mp?.type.toLowerCase() === 'cm') { cardBg = '#eff6ff'; cardText = '#1d4ed8'; }
+                                                    else if (mp?.type.toLowerCase() === 'td') { cardBg = '#ecfdf5'; cardText = '#047857'; }
+                                                } else if (isManualTp) {
+                                                    cardBg = '#f5f3ff'; cardText = '#6d28d9'; cardBorder = '#8b5cf6';
+                                                }
 
                                                 return (
                                                     <motion.div
@@ -172,14 +167,32 @@ export default function SectionTimetableGrid({
                                                         whileHover={{ scale: 1.03, y: -4, boxShadow: '0 12px 20px rgba(0,0,0,0.1)' }}
                                                         style={{
                                                             margin: 0, padding: '12px', borderRadius: '12px',
-                                                            borderLeft: `6px solid ${isGhost ? '#ef4444' : (mp?.type.toLowerCase() === 'cm' ? '#3b82f6' : '#22c55e')}`,
-                                                            background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : (bgColor || '#f8fafc'),
+                                                            borderLeft: `6px solid ${cardBorder}`,
+                                                            background: isGhost ? 'repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff1f2 10px, #fff1f2 20px)' : cardBg,
                                                             pointerEvents: isGhost ? 'none' : 'auto',
                                                             position: 'relative',
                                                             cursor: 'pointer',
-                                                            transition: 'border-color 0.3s'
+                                                            transition: 'all 0.3s'
                                                         }}
                                                     >
+                                                        {isManualTp && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (onDeleteAssignment) onDeleteAssignment(c.id);
+                                                                }}
+                                                                style={{
+                                                                    position: 'absolute', top: '5px', right: '5px',
+                                                                    background: '#fee2e2', color: '#ef4444', border: 'none',
+                                                                    borderRadius: '6px', width: '22px', height: '22px',
+                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                    cursor: 'pointer', fontSize: '0.7rem', zIndex: 10
+                                                                }}
+                                                                title="Retirer de la grille"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
                                                         {c.is_locked && (
                                                             <div style={{ position: 'absolute', bottom: '8px', right: '8px', opacity: 0.8 }}>
                                                                 <Lock size={12} color="#ef4444" strokeWidth={3} />
@@ -189,11 +202,11 @@ export default function SectionTimetableGrid({
                                                             <div style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', fontSize: '0.6rem', padding: '3px 6px', borderRadius: '4px', fontWeight: 900, boxShadow: '0 2px 4px rgba(0,0,0,0.2)', zIndex: 20 }}>{ghostSectionName}</div>
                                                         )}
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                                                            <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '0.8rem', lineHeight: 1.2, flex: 1, fontFamily: 'Outfit, sans-serif' }}>
+                                                            <div style={{ fontWeight: 800, color: cardText, fontSize: '0.8rem', lineHeight: 1.2, flex: 1, fontFamily: 'Outfit, sans-serif' }}>
                                                                 {mod?.name}
                                                             </div>
                                                             {groupLabel && (
-                                                                <div style={{ background: '#1e293b', padding: '2px 6px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 900, color: 'white', marginLeft: '6px' }}>
+                                                                <div style={{ background: mp?.type.toLowerCase() === 'tp' ? '#7c3aed' : '#1e293b', padding: '2px 6px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: 900, color: 'white', marginLeft: '6px' }}>
                                                                     {groupLabel}
                                                                 </div>
                                                             )}
@@ -202,8 +215,15 @@ export default function SectionTimetableGrid({
                                                             <div style={{ color: '#475569', textTransform: 'uppercase', fontSize: '0.65rem' }}>
                                                                 {teacher ? `Pr. ${teacher.name}` : '—'}
                                                             </div>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b' }}>
-                                                                <MapPin size={10} color="#94a3b8" /> {room?.name || '—'}
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b' }}>
+                                                                    <MapPin size={10} color="#94a3b8" /> {room?.name || '—'}
+                                                                </div>
+                                                                {c.alternance && (
+                                                                    <div style={{ fontStyle: 'italic', color: '#8b5cf6', fontSize: '0.6rem' }}>
+                                                                        {c.alternance}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </motion.div>

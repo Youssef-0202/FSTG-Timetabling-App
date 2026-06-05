@@ -18,17 +18,14 @@ export async function GET(request: NextRequest) {
     const filename = `${prefix}${filiere}.xlsx`;
     const filepath = path.join(backendDir, filename);
 
-    // Vérifier si le fichier existe, sinon le générer
-    if (!fs.existsSync(filepath)) {
-        // Lancer le script Python pour générer les maquettes
-        await new Promise<void>((resolve, reject) => {
-            const scriptPath = path.join(process.cwd(), "..", "backend", "maquette_generator.py");
-            exec(`python "${scriptPath}"`, (error) => {
-                if (error) reject(error);
-                else resolve();
-            });
+    // Lancer systématiquement la génération pour avoir les toutes dernières données
+    await new Promise<void>((resolve, reject) => {
+        const scriptPath = path.join(process.cwd(), "..", "backend", "maquette_generator.py");
+        exec(`python "${scriptPath}" --filiere "${filiere}"`, (error) => {
+            if (error) reject(error);
+            else resolve();
         });
-    }
+    });
 
     // Vérifier si le fichier existe après génération
     if (!fs.existsSync(filepath)) {

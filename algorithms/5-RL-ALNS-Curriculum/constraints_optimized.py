@@ -141,6 +141,7 @@ def calculate_fitness_full(schedule, mask=None):
     # 3. ── ANALYSE DES CONTRAINTES SOUPLES (SOFT) ──
     s_gaps, s_lunch, s_fatigue, s_balance, s_short, s_free_apm, s_saturday = 0, 0, 0, 0, 0, 0, 0
     s_stability = 0
+    s_block_synergy = 0
 
     section_assigns = {}
     mod_rooms = {}
@@ -157,6 +158,14 @@ def calculate_fitness_full(schedule, mask=None):
     if mask.get("S_STABILITY", True):
         for rooms in mod_rooms.values():
             if len(rooms) > 1: s_stability += (len(rooms)-1) * 100
+
+    # Identification du cas particulier GB-GEG S2
+    gb_geg_s2_id = None
+    for sid_check, name in dm.sec_id_to_name.items():
+        n_up = (name or "").upper()
+        if "GB" in n_up and "GEG" in n_up and "S2" in n_up:
+            gb_geg_s2_id = sid_check
+            break
 
     for sid, assigns in section_assigns.items():
         day_map = {}
@@ -175,18 +184,38 @@ def calculate_fitness_full(schedule, mask=None):
             for a in day_acts:
                 ts = a.timeslot
                 start = ts.start_time
+                st_val = start.strftime("%H:%M") if hasattr(start, 'strftime') else str(start)[:5]
+                
                 # Remplacement de "in" par comparaison directe (plus rapide)
-                if mask.get("S_LUNCH", True) and start == "12:30": s_lunch += 40
+                if mask.get("S_LUNCH", True) and st_val == "12:30": 
+                    if sid == gb_geg_s2_id:
+                        s_lunch += 1000000 # Interdiction ABSOLUE lunch pour GB-GEG
+                    else:
+                        s_lunch += 40
+
                 if mask.get("S_FATIGUE", True):
-                    if start == "14:30": s_fatigue += 10
-                    elif start == "16:35": s_fatigue += 20
+                    if st_val == "14:30": s_fatigue += 10
+                    elif st_val == "16:35": s_fatigue += 20
                 
                 if mask.get("S_SATURDAY", True) and ts.day == "SAMEDI":
-                    # Morning = 08:30 ou 10:35
-                    if start not in ["08:30", "10:35"] or a.module_part.type == "CM":
-                        s_saturday += 5000
+                    is_morn = (st_val in ["08:30", "10:35"])
+                    # Exception : GB-GEG S2 Matin = TD Uniquement (Max 4 groupes : 3,4,5,6)
+                    is_permitted_grp = False
+                    if sid == gb_geg_s2_id:
+                        for gid in a.module_part.td_group_ids:
+                            g_name = dm.group_map.get(gid, "")
+                            import re
+                            match = re.search(r'Gr\s*(\d+)', g_name)
+                            if match and int(match.group(1)) > 2:
+                                is_permitted_grp = True; break
+
+                    if sid == gb_geg_s2_id and is_morn and a.module_part.type != "CM" and is_permitted_grp:
+                        pass
+                    else:
+                        # Samedi devient une contrainte "quasi-dure" (Big-M)
+                        s_saturday += 1000000 
                 
-                if mask.get("S_FREE_APM", True) and start in ["14:30", "16:35"]:
+                if mask.get("S_FREE_APM", True) and st_val in ["14:30", "16:35"]:
                     busy_afternoons.add(day)
 
         if mask.get("S_SHORT_DAY", True):
@@ -200,14 +229,37 @@ def calculate_fitness_full(schedule, mask=None):
         if mask.get("S_BALANCE", True) and len(daily_hours) > 1:
             avg = sum(daily_hours) / len(daily_hours)
             for h in daily_hours: s_balance += abs(h - avg) * 5
+            
+        # --- LOGIQUE SYNERGIE DE BLOC GB-GEG S2 ---
+        if sid == gb_geg_s2_id and mask.get("S_BLOCK_SYNERGY", True):
+            groups_in_sec = dm.section_to_groups.get(sid, [])
+            for g_id in groups_in_sec:
+                g_assigns = [a for a in assigns if g_id in a.module_part.td_group_ids]
+                block_counts = {} # (day, bid) -> count
+                for a in g_assigns:
+                    st = a.timeslot.start_time
+                    st_val = st.strftime("%H:%M") if hasattr(st, 'strftime') else str(st)[:5]
+                    bid = 1 if st_val in ["08:30", "10:35"] else (2 if st_val in ["14:30", "16:35"] else None)
+                    if bid:
+                        key = (a.timeslot.day, bid)
+                        block_counts[key] = block_counts.get(key, 0) + 1
+                
+                # Penalite pour chaque demi-journee avec une seule seance (non boucher)
+                isolated = [k for k, v in block_counts.items() if v == 1]
+                total_sess = len(g_assigns)
+                allowed_singles = 1 if total_sess % 2 != 0 else 0
+                penalty_count = max(0, len(isolated) - allowed_singles)
+                if penalty_count > 0:
+                    s_block_synergy += penalty_count * 5000
 
-    soft_score = s_gaps + s_lunch + s_fatigue + s_balance + s_stability + s_short + s_free_apm + s_saturday
+    soft_score = s_gaps + s_lunch + s_fatigue + s_balance + s_stability + s_short + s_free_apm + s_saturday + s_block_synergy
 
     details = {
         'H_Total': h_violations, 'S_Total': soft_score,
         'H1_Prof': h1, 'H2_Salle': h2, 'H3_Grp': h3, 'H4_Cap': h4, 'H9_Indisp': h9,
         'S3_Gaps': s_gaps, 'S4_Lunch': s_lunch, 'S6_Stab': s_stability, 
-        'S8_FreeApm': s_free_apm, 'S10_Sat': s_saturday
+        'S8_FreeApm': s_free_apm, 'S10_Sat': s_saturday, 'S12_Block': s_block_synergy
     }
 
     return (M * h_violations) + soft_score, h_violations, soft_score, details
+

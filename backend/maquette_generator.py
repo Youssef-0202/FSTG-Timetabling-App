@@ -59,7 +59,7 @@ def finalize_excel(filename, title_text):
 
 def generate_maquette_a(f_name):
     # GÉNÉRATION POUR LA FILIÈRE SPÉCIFIÉE
-    print(f"⏳ Génération de la Maquette A pour {f_name}...")
+    print(f"Generaton de la Maquette A pour {f_name}...")
     
     query = text("""
         SELECT DISTINCT
@@ -105,14 +105,15 @@ def generate_maquette_a(f_name):
     
     df = pd.read_sql(query, engine, params={"filiere_name": f_name})
     if df.empty: 
-        print(f"❌ Aucun module trouvé pour {f_name}.")
+        print(f"Erreur: Aucun module trouve pour {f_name}.")
         return
 
     # Préparation du format Excel
     df = df.iloc[:, :5] # ID, SECTION, MODULE, VH, ENSEIGNANT_EXISTANT
     
     # On nettoie la colonne SECTION pour n'afficher que "FILIERE S2" ou "FILIERE S4"
-    df.iloc[:, 1] = df.apply(lambda row: f"{f_name} {'S2' if 'S2' in row[1] else 'S4'}", axis=1)
+    # On garde les noms exacts de la base de données pour assurer la correspondance au retour
+    # df.iloc[:, 1] = df.apply(lambda row: f"{f_name} {'S2' if 'S2' in row[1] else 'S4'}", axis=1)
     
     # Remplacer le prof générique "PROF" et les cases vides par "------- (unknown)"
     def clean_teacher(x):
@@ -129,11 +130,11 @@ def generate_maquette_a(f_name):
     filename = os.path.join(OUTPUT_DIR, f"MAQUETTE_A_AFFECTATION_{f_name}.xlsx")
     df.to_excel(filename, index=False, header=False, startrow=4, engine='openpyxl')
     finalize_excel(filename, f"AFFECTATION DES ENSEIGNANTS - {f_name}")
-    print(f"✅ Maquette {f_name} générée : {filename}")
+    print(f"Succes: Maquette {f_name} generee : {filename}")
 
 def generate_maquette_b(f_name):
     """Génère la fiche répertoire des enseignants pour une filière"""
-    print(f"⏳ Génération de la Maquette B (Profs) pour {f_name}...")
+    print(f"Generation de la Maquette B (Profs) pour {f_name}...")
     
     columns = ["NOM ET PRÉNOM", "EMAIL", "GSM", "STATUT", "DÉPARTEMENT", "VŒUX / NOTES"]
     df = pd.DataFrame(columns=columns)
@@ -176,14 +177,23 @@ def generate_maquette_b(f_name):
     ws.column_dimensions['F'].width = 45 
 
     wb.save(filename)
-    print(f"✅ Maquette B {f_name} générée : {filename}")
+    print(f"Succes: Maquette B {f_name} generee : {filename}")
 
 if __name__ == "__main__":
-    # On récupère toutes les filières en base
-    with engine.connect() as conn:
-        res = conn.execute(text("SELECT name FROM filieres")).fetchall()
-        filiere_names = [row[0] for row in res]
-    
-    for fn in filiere_names:
-        generate_maquette_a(fn)
-        generate_maquette_b(fn)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--filiere', type=str, help="Nom de la filiere")
+    args = parser.parse_args()
+
+    if args.filiere:
+        generate_maquette_a(args.filiere)
+        generate_maquette_b(args.filiere)
+    else:
+        # On récupère toutes les filières en base
+        with engine.connect() as conn:
+            res = conn.execute(text("SELECT name FROM filieres")).fetchall()
+            filiere_names = [row[0] for row in res]
+        
+        for fn in filiere_names:
+            generate_maquette_a(fn)
+            generate_maquette_b(fn)

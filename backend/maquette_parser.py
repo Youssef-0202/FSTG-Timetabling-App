@@ -1,268 +1,286 @@
-import sys
-import os
-import json
-import traceback
 import pandas as pd
+import os
+import sys
+import json
+from sqlalchemy.orm import Session
 from sqlalchemy import text
-from database import engine, SessionLocal
-from models import Teacher, Assignment, TDGroup, Section, ModulePart
+from database import SessionLocal
+from models import Assignment, Module, ModulePart, Teacher, Section, TDGroup
 
-def parse_and_update_maquette(filepath: str):
+def parse_and_update_maquette(filepath: str, preview: bool = False, filiere_id: int = None):
     db = SessionLocal()
+    DEBUG_FILE = os.path.join(os.path.dirname(__file__), "temp_uploads", "debug_log.txt")
+    
+    def log_debug(msg):
+        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
+            f.write(msg + "\n")
+        sys.stderr.write(msg + "\n") # Visible dans les logs Docker exec
+
+    log_debug(f"\n--- DEBUG START (Filiere: {filiere_id}, Preview: {preview}) ---")
+    
     stats = {
-        "success": False,
+        "success": True,
         "rows_processed": 0,
         "rows_ignored": 0,
         "assignments_created": 0,
         "assignments_deleted": 0,
         "teachers_created": [],
+        "details": [],
         "errors": []
     }
-    
+
     try:
-        try:
-            df = pd.read_excel(filepath, engine='openpyxl', header=None, skiprows=4)
-        except Exception as e:
-            stats["errors"].append(f"Impossible de lire le fichier: {str(e)}")
-            return stats
-            
-        if df.empty or df.shape[1] < 5:
-            stats["errors"].append("Le fichier Excel ne respecte pas le template officiel (colonnes manquantes).")
-            return stats
-            
+        # 0. VALIDATION DE LA FILIERE (Titre en ligne 1)
+        # On lit la toute première cellule du fichier
+        df_title = pd.read_excel(filepath, header=None, nrows=1)
+        excel_title = str(df_title.iloc[0, 0]).upper()
+        
+        if filiere_id:
+            from models import Filiere
+            filiere_obj = db.query(Filiere).filter(Filiere.id == filiere_id).first()
+            if filiere_obj:
+                f_name = filiere_obj.name.upper()
+                # Extraction du nom court de la filière depuis le titre (ex: 'GI' depuis '... - GI')
+                excel_filiere = excel_title.split('-')[-1].strip() if '-' in excel_title else excel_title
+                
+                if f_name not in excel_title:
+                    stats["success"] = False
+                    stats["errors"].append(f"Fichier Incorrect : Vous tentez d'importer une maquette '{excel_filiere}' alors que vous êtes sur la filière '{f_name}'.")
+                    db.close()
+                    return stats
+
+        # L'Excel exporté a 3 lignes de titre avant les vraies colonnes
+        # On lit avec header=3 pour atterrir sur la bonne ligne
+        df = pd.read_excel(filepath, header=3)
+        
+        # Vérification de sécurité : si les colonnes attendues ne sont pas là, on essaye header=0
+        expected_cols = {'NOM DU MODULE', 'SECTION', 'ENSEIGNANT'}
+        if not expected_cols.issubset(set(df.columns)):
+            df = pd.read_excel(filepath, header=0)
+        
+        if 'ID' not in df.columns: df.insert(0, 'ID', '')
+        
         teacher_cache = {t.name: t.id for t in db.query(Teacher).all()}
-        found_keys = set()
+        touched_cm = set() # (part_id, section_id)
+        touched_td = set() # (part_id, tdgroup_id)
+        seen_sections = set()
         
-        # Identifier toutes les sections présentes dans le fichier
-        sections_in_file = set(df[1].dropna().astype(str).str.strip().unique())
-        if 'SECTION' in sections_in_file:  # Retirer l'en-tête éventuel si resté
-            sections_in_file.remove('SECTION')
+        # 1. ANALYSE DES LIGNES EXCEL
+        for index, row in df.iterrows():
+            internal_id = str(row.get('ID', '')).strip()
+            full_mod_name = str(row.get('NOM DU MODULE', '')).strip()
+            sec_display_name = str(row.get('SECTION', '')).strip()
+            teacher_names_str = str(row.get('ENSEIGNANT', '')).strip()
             
-        for idx, row in df.iterrows():
+            if not full_mod_name or full_mod_name == 'nan': continue
             stats["rows_processed"] += 1
-            internal_id = str(row[0]).strip()
-            teacher_names_str = str(row[4]).strip()
             
-            if not internal_id or internal_id == "nan":
-                stats["rows_ignored"] += 1
-                continue
-                
-            if internal_id.startswith("NEW_"):
-                from models import Module
-                sec_name = str(row[1]).strip()
-                mod_name_full = str(row[2]).strip()
-                
-                target_section = db.query(Section).filter(Section.name.ilike(f"%{sec_name}%")).first()
-                if not target_section:
-                    stats["rows_ignored"] += 1
-                    stats["errors"].append(f"Ligne {idx+5}: Section '{sec_name}' introuvable.")
-                    continue
-                    
-                m_type = "CM"
-                if "(TD)" in mod_name_full.upper(): m_type = "TD"
-                elif "(TP)" in mod_name_full.upper(): m_type = "TP"
-                
-                clean_mod_name = mod_name_full.replace("(CM)", "").replace("(TD)", "").replace("(TP)", "").replace("()", "").strip()
-                
-                vh_str = str(row[3]).upper().replace("H", "").strip()
-                vh_val = int(vh_str) if vh_str.isdigit() else 24
-                
-                module = db.query(Module).filter(Module.name.ilike(f"%{clean_mod_name}%")).first()
-                if not module:
-                    module = Module(name=clean_mod_name, vh=vh_val)
-                    db.add(module)
-                    db.flush()
-                    
-                mpart = db.query(ModulePart).filter(ModulePart.module_id == module.id, ModulePart.type == m_type).first()
-                if not mpart:
-                    mpart = ModulePart(module_id=module.id, type=m_type)
-                    db.add(mpart)
-                    db.flush()
-                    
-                part_id = mpart.id
-                section_id = target_section.id
-                if m_type == "CM":
-                    tdgroup_id = None
-                else:
-                    target_td = db.query(TDGroup).filter(TDGroup.section_id == section_id).first()
-                    tdgroup_id = target_td.id if target_td else None
-                    
-            else:
-                parts = internal_id.split('_')
-                if len(parts) != 3:
-                    stats["rows_ignored"] += 1
-                    stats["errors"].append(f"Ligne {idx+5}: Format ID incorrect ({internal_id})")
-                    continue
-                    
+            # --- Parsing du Type et Nom ---
+            m_type = "CM"
+            if "(TD)" in full_mod_name: m_type = "TD"
+            elif "(TP)" in full_mod_name: m_type = "TD" # On traite les TP comme des TD
+            
+            pure_mod_name = full_mod_name.replace("(CM)","").replace("(TD)","").replace("(TP)","").split("-")[0].strip()
+            gr_num = None
+            if "Gr" in full_mod_name:
+                try: gr_num = full_mod_name.split("Gr")[-1].strip()
+                except: pass
+
+            log_debug(f"[ROW {index}] Analysing: {full_mod_name} | Type: {m_type} | Section: {sec_display_name} | ID: {internal_id}")
+
+            # --- RESOLUTION DES ID ---
+            part_id, section_id, tdgroup_id = None, None, None
+            
+            # Essai 1: ID Masqué
+            if "_" in internal_id:
                 try:
-                    part_id = int(parts[0])
-                    section_id = int(parts[1])
-                    tdgroup_id = int(parts[2]) if parts[2] else None
+                    p_tmp, s_tmp, t_tmp = internal_id.split('_')
+                    pid_tmp = int(p_tmp)
+                    
+                    # Vérifier le type de cette Part — IGNORER LES TP
+                    p_check = db.query(ModulePart).filter(ModulePart.id == pid_tmp).first()
+                    if p_check and p_check.type == 'TP':
+                        log_debug(f"  -> SKIP (Part {pid_tmp} is TP, not managed)")
+                        continue
+                    
+                    part_id = pid_tmp
+                    section_id = int(s_tmp)
+                    tdgroup_id = int(t_tmp) if t_tmp != 'None' and t_tmp else None
+                    log_debug(f"  -> Match via ID: Part {part_id}, Sec {section_id}, Gr {tdgroup_id}")
                 except:
-                    stats["rows_ignored"] += 1
-                    stats["errors"].append(f"Ligne {idx+5}: ID interne corrompu")
-                    continue
-                
-                mpart = db.query(ModulePart).filter(ModulePart.id == part_id).first()
-                if not mpart:
-                    stats["rows_ignored"] += 1
-                    stats["errors"].append(f"Ligne {idx+5}: Le module part_id={part_id} n'existe plus en base.")
-                    continue
-            
-            # Check existant
-            if tdgroup_id is None:
-                existing_query = text("""
-                    SELECT string_agg(DISTINCT t.name, ', ')
-                    FROM public.assignments a
-                    JOIN public.teachers t ON a.teacher_id = t.id
-                    LEFT JOIN public.assignment_tdgroups atd ON a.id = atd.assignment_id
-                    WHERE a.module_part_id = :part_id
-                      AND (a.section_id = :sec_id OR atd.tdgroup_id IN (SELECT id FROM public.td_groups WHERE section_id = :sec_id))
-                """)
-                res = db.execute(existing_query, {"part_id": part_id, "sec_id": section_id}).fetchone()
-            else:
-                existing_query = text("""
-                    SELECT string_agg(DISTINCT t.name, ', ')
-                    FROM public.assignments a
-                    JOIN public.teachers t ON a.teacher_id = t.id
-                    LEFT JOIN public.assignment_tdgroups atd ON a.id = atd.assignment_id
-                    WHERE a.module_part_id = :part_id AND atd.tdgroup_id = :td_id
-                """)
-                res = db.execute(existing_query, {"part_id": part_id, "td_id": tdgroup_id}).fetchone()
-            
-            current_teacher_str = res[0] if res and res[0] else ""
-            clean_current = ", ".join(sorted([t.strip() for t in current_teacher_str.split(',') if t.strip() and t.strip() != "PROF"]))
-            
-            if teacher_names_str == "------- (unknown)" or teacher_names_str == "nan":
-                new_teachers = []
-            else:
-                new_teachers = [t.strip() for t in teacher_names_str.split(',') if t.strip() and t.strip() != "PROF"]
-                
-            clean_new = ", ".join(sorted(new_teachers))
-            
-            if clean_current == clean_new:
-                stats["rows_ignored"] += 1
-                continue
-                
-            # DELETION / CLEANUP
-            if tdgroup_id is None:
-                old_assignments = db.query(Assignment).filter(
-                    Assignment.module_part_id == part_id,
-                    Assignment.section_id == section_id
-                ).all()
-                mutualized = db.query(Assignment).join(Assignment.td_groups).filter(
-                    Assignment.module_part_id == part_id,
-                    TDGroup.section_id == section_id
-                ).all()
-                for ma in mutualized:
-                    ma.td_groups = [g for g in ma.td_groups if g.section_id != section_id]
-                for oa in old_assignments:
-                    db.delete(oa)
-                    stats["assignments_deleted"] += 1
-            else:
-                old_assignments = db.query(Assignment).filter(
-                    Assignment.module_part_id == part_id
-                ).filter(Assignment.td_groups.any(id=tdgroup_id)).all()
-                for oa in old_assignments:
-                    oa.td_groups = [g for g in oa.td_groups if g.id != tdgroup_id]
-                    if len(oa.td_groups) == 0 and oa.section_id is None:
-                        db.delete(oa)
-                        stats["assignments_deleted"] += 1
-                        
-            db.flush()
-            
-            # CREATION
-            for t_name in new_teachers:
-                t_id = teacher_cache.get(t_name)
-                if not t_id:
-                    new_teacher = Teacher(name=t_name, email=f"{t_name.replace(' ', '.').lower()}@fstg.ma")
-                    db.add(new_teacher)
-                    db.flush()
-                    teacher_cache[t_name] = new_teacher.id
-                    t_id = new_teacher.id
-                    stats["teachers_created"].append(t_name)
-                    
-                existing_assignment = db.query(Assignment).filter(
-                    Assignment.module_part_id == part_id,
-                    Assignment.teacher_id == t_id
-                ).first()
-                
-                if existing_assignment:
-                    if tdgroup_id is not None:
-                        tg = db.query(TDGroup).filter(TDGroup.id == tdgroup_id).first()
-                        if tg and tg not in existing_assignment.td_groups:
-                            existing_assignment.td_groups.append(tg)
+                    log_debug(f"  -> ID corrupt: {internal_id}")
+
+            # Essai 2: Texte (Fuzzy Match) si ID a échoué
+            if not part_id:
+                log_debug(f"  -> Attempting Text Match...")
+                # Trouver la section par nom
+                sec_row = db.execute(text("SELECT id FROM sections WHERE name ILIKE :n LIMIT 1"), {"n": f"%{sec_display_name}%"}).fetchone()
+                if sec_row:
+                    section_id = sec_row[0]
+                    # Trouver le module et la partie
+                    mod_row = db.execute(text("SELECT mp.id FROM module_parts mp JOIN modules m ON mp.module_id = m.id WHERE m.name ILIKE :n AND mp.type = :t LIMIT 1"), {"n": f"%{pure_mod_name}%", "t": m_type}).fetchone()
+                    if mod_row:
+                        part_id = mod_row[0]
+                        # Trouver le groupe
+                        if m_type == "TD" and gr_num:
+                            tg_row = db.execute(text("SELECT id FROM td_groups WHERE section_id = :s AND name ILIKE :n LIMIT 1"), {"s": section_id, "n": f"%Gr%{gr_num}%"}).fetchone()
+                            if tg_row: tdgroup_id = tg_row[0]
+                        log_debug(f"  -> Text Match found: Part {part_id}, Sec {section_id}, Gr {tdgroup_id}")
                     else:
-                        tgs = db.query(TDGroup).filter(TDGroup.section_id == section_id).all()
-                        for tg in tgs:
-                            if tg not in existing_assignment.td_groups:
-                                existing_assignment.td_groups.append(tg)
+                        log_debug(f"  -> Module/Part not found for {pure_mod_name} ({m_type})")
                 else:
-                    new_a = Assignment(
-                        module_part_id=part_id,
-                        teacher_id=t_id,
-                        section_id=section_id if tdgroup_id is None else None,
-                        is_locked=True 
-                    )
-                    if tdgroup_id is not None:
-                        tg = db.query(TDGroup).filter(TDGroup.id == tdgroup_id).first()
-                        if tg:
-                            new_a.td_groups.append(tg)
-                    db.add(new_a)
-                    stats["assignments_created"] += 1
-                    
-            # Enregistrer les clés trouvées pour la suppression des orphelins
-            if tdgroup_id is None:
-                found_keys.add(f"{part_id}_{section_id}_None")
+                    log_debug(f"  -> Section not found for {sec_display_name}")
+
+            if not part_id or not section_id:
+                log_debug(f"  -> !!! CRITICAL: Row IGNORED (No match found) !!!")
+                continue
+
+            # Marquer comme vu
+            seen_sections.add(section_id)
+            if m_type == "CM": touched_cm.add((part_id, section_id))
+            else: touched_td.add((part_id, tdgroup_id))
+
+            # --- VERIFICATION EXISTENCE ---
+            current_exists = False
+            current_prof = "VIDE"
+            assign_id = None
+            if m_type == "CM":
+                res = db.execute(text("SELECT a.id, t.name FROM assignments a LEFT JOIN teachers t ON a.teacher_id = t.id WHERE a.module_part_id = :p AND a.section_id = :s LIMIT 1"), {"p": part_id, "s": section_id}).fetchone()
             else:
-                found_keys.add(f"{part_id}_None_{tdgroup_id}")
+                res = db.execute(text("SELECT a.id, t.name FROM assignments a JOIN assignment_tdgroups atd ON a.id = atd.assignment_id LEFT JOIN teachers t ON a.teacher_id = t.id WHERE a.module_part_id = :p AND atd.tdgroup_id = :t LIMIT 1"), {"p": part_id, "t": tdgroup_id}).fetchone() if tdgroup_id else None
+            
+            if res:
+                current_exists = True
+                assign_id = res[0]
+                current_prof = (res[1] if res[1] else "PROF").strip()
+                log_debug(f"  -> Found in DB: Assignment {assign_id} with Prof '{current_prof}'")
+
+            # Comparaison profs
+            new_profs = [t.strip() for t in teacher_names_str.split(',') if t.strip() and t.strip() not in ["nan", "------- (unknown)", "A DETERMINER"]]
+            clean_new = ", ".join(sorted(new_profs)) if new_profs else "PROF"
+            
+            log_debug(f"  -> Compare: [DB: '{current_prof}'] vs [Excel: '{clean_new}']")
+            if clean_new != current_prof or not current_exists:
+                log_debug(f"  -> !!! CHANGE DETECTED !!!")
+                stats["details"].append({
+                    "module": full_mod_name,
+                    "section": sec_display_name,
+                    "old": current_prof if current_exists else "NON EXISTANT",
+                    "new": clean_new
+                })
                 
-        # DELETION OF ORPHANS (Rows deleted in Excel)
-        if sections_in_file and len(found_keys) > 0:
-            all_sections_db = db.query(Section).filter(Section.name.in_(list(sections_in_file))).all()
-            for s in all_sections_db:
-                # Obtenir tous les assignments CM de cette section
-                cm_assignments = db.query(Assignment).filter(Assignment.section_id == s.id).all()
-                for a in cm_assignments:
-                    key = f"{a.module_part_id}_{s.id}_None"
-                    if key not in found_keys:
+                if not preview:
+                    log_debug(f"  -> APPLYING UPDATE for {full_mod_name}")
+                    # Supprimer l'ancienne affectation si elle existe
+                    if current_exists and res:
+                        old_a = db.query(Assignment).filter(Assignment.id == res[0]).first()
+                        if old_a:
+                            db.delete(old_a)
+                            db.flush()
+                            stats["assignments_deleted"] += 1
+                    
+                    # Créer la ou les nouvelles affectations
+                    profs_list = new_profs if new_profs else ["PROF"]
+                    for prof_name in profs_list:
+                        t_id = teacher_cache.get(prof_name)
+                        if not t_id:
+                            # Créer le prof s'il n'existe pas (concerne les nouveaux noms ou 'PROF' s'il manquait)
+                            new_t = Teacher(name=prof_name, email=f"{prof_name.lower().replace(' ', '.')}@fstg.ma")
+                            db.add(new_t)
+                            db.flush()
+                            t_id = new_t.id
+                            teacher_cache[prof_name] = t_id
+                            stats["teachers_created"].append(prof_name)
+                        
+                        new_a = Assignment(
+                            module_part_id=part_id,
+                            teacher_id=t_id,
+                            section_id=section_id if m_type == "CM" else None,
+                            is_locked=False
+                        )
+                        if m_type != "CM" and tdgroup_id:
+                            tg_obj = db.query(TDGroup).filter(TDGroup.id == tdgroup_id).first()
+                            if tg_obj:
+                                new_a.td_groups.append(tg_obj)
+                        db.add(new_a)
+                        stats["assignments_created"] += 1
+                    
+                    db.commit()
+                    log_debug(f"  -> DB UPDATED: {full_mod_name} => {clean_new}")
+            else:
+                stats["rows_ignored"] += 1
+
+        # 2. ANALYSE DES SUPPRESSIONS (Sync au niveau des sections vues dans l'Excel)
+        if seen_sections:
+            log_debug(f"\n--- Checking for Deletions in {len(seen_sections)} section(s): {seen_sections} ---")
+            sections_list = list(seen_sections)
+
+            # CM orphelins : affectations CM en base qui ne sont PAS dans le fichier Excel
+            db_cms = db.query(Assignment).join(Assignment.module_part).filter(
+                Assignment.section_id.in_(sections_list),
+                ModulePart.type == 'CM'
+            ).all()
+            for a in db_cms:
+                if (a.module_part_id, a.section_id) not in touched_cm:
+                    m_name = a.module_part.module.name
+                    s_obj = db.query(Section).get(a.section_id)
+                    s_name = s_obj.name if s_obj else str(a.section_id)
+                    prof_name = a.teacher.name if a.teacher else "PROF"
+                    log_debug(f"  -> Orphan CM: {m_name} in {s_name}")
+                    stats["details"].append({
+                        "module": f"{m_name} (CM)",
+                        "section": s_name,
+                        "old": prof_name,
+                        "new": "SUPPRIMÉ (LIGNE RETIRÉE)"
+                    })
+                    if not preview:
                         db.delete(a)
                         stats["assignments_deleted"] += 1
-                
-                # Obtenir tous les assignments TD de cette section
-                td_assign_query = db.query(Assignment).join(Assignment.td_groups).filter(TDGroup.section_id == s.id).all()
-                for a in td_assign_query:
-                    # Un assignment peut avoir plusieurs groupes, on purge ceux manquant
-                    groups_to_keep = []
-                    for tg in a.td_groups:
-                        if tg.section_id == s.id:
-                            key = f"{a.module_part_id}_None_{tg.id}"
-                            if key in found_keys:
-                                groups_to_keep.append(tg)
-                            else:
-                                stats["assignments_deleted"] += 1
-                        else:
-                            groups_to_keep.append(tg) # Ne pas toucher aux groupes des autres sections
-                    
-                    a.td_groups = groups_to_keep
-                    if len(a.td_groups) == 0 and a.section_id is None:
-                        db.delete(a)
-        
-        db.commit()
-        stats["success"] = True
-        stats["teachers_created"] = list(set(stats["teachers_created"]))
-        return stats
+
+            # TD orphelins : UNIQUEMENT le type TD (pas TP, qui n'est pas géré par cet import)
+            db_tds = db.query(Assignment).join(Assignment.td_groups).join(Assignment.module_part).filter(
+                TDGroup.section_id.in_(sections_list),
+                ModulePart.type == "TD"
+            ).all()
+            seen_assignment_ids = set()
+            for a in db_tds:
+                if a.id in seen_assignment_ids:
+                    continue
+                seen_assignment_ids.add(a.id)
+                for tg in a.td_groups:
+                    if (a.module_part_id, tg.id) not in touched_td:
+                        m_name = a.module_part.module.name
+                        prof_name = a.teacher.name if a.teacher else "PROF"
+                        log_debug(f"  -> Orphan TD: {m_name} ({a.module_part.type}) - {tg.name}")
+                        stats["details"].append({
+                            "module": f"{m_name} ({a.module_part.type}) - {tg.name}",
+                            "section": tg.section.name if tg.section else "?",
+                            "old": prof_name,
+                            "new": "SUPPRIMÉ (LIGNE RETIRÉE)"
+                        })
+                        if not preview:
+                            db.delete(a)
+                            stats["assignments_deleted"] += 1
+            
+            if not preview:
+                db.commit()
+
     except Exception as e:
-        db.rollback()
+        stats["success"] = False
         stats["errors"].append(str(e))
-        return stats
+        log_debug(f"CRITICAL ERROR: {str(e)}")
     finally:
         db.close()
+    
+    return stats
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(json.dumps({"success": False, "errors": ["Aucun fichier fourni"]}))
-        sys.exit(1)
-        
-    result = parse_and_update_maquette(sys.argv[1])
-    print(json.dumps(result))
+    import sys, json
+    args = sys.argv[1:]
+    preview = "--preview" in args
+    filiere_id = None
+    if "--filiere_id" in args:
+        filiere_id = int(args[args.index("--filiere_id") + 1])
+    filepath = args[-1]
+    res = parse_and_update_maquette(filepath, preview, filiere_id)
+    print(json.dumps(res, indent=4, ensure_ascii=False))

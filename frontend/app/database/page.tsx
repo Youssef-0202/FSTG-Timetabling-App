@@ -832,40 +832,77 @@ function DatabaseContent() {
                                         <input type="email" value={String(modal.data.email || "")} onChange={(e) => setField("email", e.target.value)} placeholder="email@fstg-marrakech.ac.ma" />
                                     </div>
                                     <div className="form-group full">
-                                        <label>Indisponibilités (Cliquez pour bloquer)</label>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginTop: '10px', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
-                                            {timeslots.sort((a, b) => (a.id - b.id)).map(ts => {
-                                                const currentAvail = (modal.data.availabilities as any) || {};
-                                                const unSlots = Array.isArray(currentAvail.unavailable_slots) ? currentAvail.unavailable_slots : [];
-                                                const isBlocked = unSlots.includes(ts.id);
+                                        <label style={{ color: 'var(--navy)', fontWeight: 800 }}>Indisponibilités (Cliquez sur une case pour bloquer)</label>
+                                        <div style={{ marginTop: '12px', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'white' }}>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.7rem' }}>
+                                                <thead>
+                                                    <tr style={{ backgroundColor: '#f8fafc' }}>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid var(--border)', width: '60px' }}>Heure</th>
+                                                        {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map(d => (
+                                                            <th key={d} style={{ padding: '8px', borderBottom: '1px solid var(--border)', borderLeft: '1px solid var(--border)' }}>{d}</th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {["08:30", "10:35", "14:30", "16:35"].map((time, tIdx) => (
+                                                        <tr key={time}>
+                                                            <td style={{ padding: '8px', fontWeight: 800, textAlign: 'center', backgroundColor: '#f1f5f9', borderBottom: tIdx < 3 ? '1px solid #e2e8f0' : 'none' }}>{time}</td>
+                                                            {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"].map(day => {
+                                                                const ts = timeslots.find(t =>
+                                                                    t.day.toLowerCase() === day.toLowerCase() &&
+                                                                    t.start_time.substring(0, 5) === time
+                                                                );
+                                                                if (!ts) return <td key={day} style={{ backgroundColor: '#f8fafc', borderLeft: '1px solid #e2e8f0' }}></td>;
 
-                                                return (
-                                                    <button
-                                                        key={ts.id}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            let newSlots = [...unSlots];
-                                                            if (isBlocked) newSlots = newSlots.filter(id => id !== ts.id);
-                                                            else newSlots.push(ts.id);
-                                                            setField("availabilities", { ...currentAvail, unavailable_slots: newSlots });
-                                                        }}
-                                                        style={{
-                                                            padding: '8px',
-                                                            fontSize: '0.75rem',
-                                                            borderRadius: '6px',
-                                                            border: '1px solid',
-                                                            borderColor: isBlocked ? '#ef4444' : 'var(--border)',
-                                                            backgroundColor: isBlocked ? '#fef2f2' : 'var(--card-bg)',
-                                                            color: isBlocked ? '#ef4444' : 'var(--text-primary)',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.2s',
-                                                            fontWeight: isBlocked ? 600 : 400
-                                                        }}
-                                                    >
-                                                        {ts.day} - {ts.start_time.substring(0, 5)}
-                                                    </button>
-                                                );
-                                            })}
+                                                                const currentAvail = (modal.data.availabilities as any) || {};
+                                                                const unSlots = Array.isArray(currentAvail.unavailable_slots) ? currentAvail.unavailable_slots : [];
+                                                                const isBlocked = unSlots.includes(ts.id);
+
+                                                                return (
+                                                                    <td
+                                                                        key={day}
+                                                                        onClick={() => {
+                                                                            let newSlots = [...unSlots];
+                                                                            if (isBlocked) newSlots = newSlots.filter(id => id !== ts.id);
+                                                                            else newSlots.push(ts.id);
+                                                                            setField("availabilities", { ...currentAvail, unavailable_slots: newSlots });
+                                                                        }}
+                                                                        style={{
+                                                                            height: '40px',
+                                                                            backgroundColor: isBlocked ? '#fff1f2' : 'white',
+                                                                            borderLeft: '1px solid #e2e8f0',
+                                                                            borderBottom: tIdx < 3 ? '1px solid #e2e8f0' : 'none',
+                                                                            cursor: 'pointer',
+                                                                            transition: 'all 0.2s',
+                                                                            textAlign: 'center',
+                                                                            position: 'relative'
+                                                                        }}
+                                                                        title={`${day} ${time}`}
+                                                                    >
+                                                                        {isBlocked ? (
+                                                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+                                                                                <X size={14} strokeWidth={3} />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div style={{ color: '#10b981', opacity: 0.2, fontSize: '0.6rem' }}>libre</div>
+                                                                        )}
+                                                                        {/* Hover effect overlay */}
+                                                                        <div className="cell-hover-overlay" style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(59, 130, 246, 0.05)', opacity: 0 }}></div>
+                                                                    </td>
+                                                                );
+                                                            })}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '15px', marginTop: '10px', fontSize: '0.65rem', justifyContent: 'center' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <div style={{ width: '10px', height: '10px', backgroundColor: 'white', border: '1px solid #e2e8f0' }}></div> Disponible
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <div style={{ width: '10px', height: '10px', backgroundColor: '#fff1f2', border: '1px solid #ef4444' }}></div> Indisponible (Bloqué)
+                                            </div>
                                         </div>
                                     </div>
                                 </>
