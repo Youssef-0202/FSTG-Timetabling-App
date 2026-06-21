@@ -1,0 +1,1366 @@
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+[ROW 0] Analysing: Bases de Données (CM) | Type: CM | Section: GB-GEG S2 | ID: 13_1_
+  -> Match via ID: Part 13, Sec 1, Gr None
+  -> Found in DB: Assignment 13717 with Prof 'ED-DAOUDI Rachid'
+  -> Compare: [DB: 'ED-DAOUDI Rachid'] vs [Excel: 'ED-DAOUDI Rachid']
+[ROW 1] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 14_1_1
+  -> Match via ID: Part 14, Sec 1, Gr 1
+  -> Found in DB: Assignment 13737 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 2] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 14_1_2
+  -> Match via ID: Part 14, Sec 1, Gr 2
+  -> Found in DB: Assignment 13666 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 3] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 14_1_3
+  -> Match via ID: Part 14, Sec 1, Gr 3
+  -> Found in DB: Assignment 13667 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 4] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 14_1_4
+  -> Match via ID: Part 14, Sec 1, Gr 4
+  -> Found in DB: Assignment 13668 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 5] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 14_1_5
+  -> Match via ID: Part 14, Sec 1, Gr 5
+  -> Found in DB: Assignment 13669 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 6] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 14_1_6
+  -> Match via ID: Part 14, Sec 1, Gr 6
+  -> Found in DB: Assignment 13670 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 7] Analysing: Biologie Animale et Végétale (CM) | Type: CM | Section: GB-GEG S2 | ID: 1_1_
+  -> Match via ID: Part 1, Sec 1, Gr None
+  -> Found in DB: Assignment 13671 with Prof 'CHERIFI Ouafa'
+  -> Compare: [DB: 'CHERIFI Ouafa'] vs [Excel: 'CHERIFI Ouafa']
+[ROW 8] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 2_1_1
+  -> Match via ID: Part 2, Sec 1, Gr 1
+  -> Found in DB: Assignment 13672 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 9] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 2_1_2
+  -> Match via ID: Part 2, Sec 1, Gr 2
+  -> Found in DB: Assignment 13673 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 10] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 2_1_3
+  -> Match via ID: Part 2, Sec 1, Gr 3
+  -> Found in DB: Assignment 13674 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 11] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 2_1_4
+  -> Match via ID: Part 2, Sec 1, Gr 4
+  -> Found in DB: Assignment 13675 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 12] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 2_1_5
+  -> Match via ID: Part 2, Sec 1, Gr 5
+  -> Found in DB: Assignment 13676 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 13] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 2_1_6
+  -> Match via ID: Part 2, Sec 1, Gr 6
+  -> Found in DB: Assignment 13677 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 14] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 83_1_1
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 15] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 83_1_2
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 16] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 83_1_3
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 17] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 83_1_4
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 18] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 83_1_5
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 19] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 83_1_6
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 20] Analysing: Culture digitale (CM) | Type: CM | Section: GB-GEG S2 | ID: 11_1_
+  -> Match via ID: Part 11, Sec 1, Gr None
+  -> Found in DB: Assignment 13678 with Prof 'OUAARAB Aziz'
+  -> Compare: [DB: 'OUAARAB Aziz'] vs [Excel: 'OUAARAB Aziz']
+[ROW 21] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 12_1_1
+  -> Match via ID: Part 12, Sec 1, Gr 1
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 22] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 12_1_2
+  -> Match via ID: Part 12, Sec 1, Gr 2
+  -> Found in DB: Assignment 13680 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 23] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 12_1_3
+  -> Match via ID: Part 12, Sec 1, Gr 3
+  -> Found in DB: Assignment 13681 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 24] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 12_1_4
+  -> Match via ID: Part 12, Sec 1, Gr 4
+  -> Found in DB: Assignment 13682 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 25] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 12_1_5
+  -> Match via ID: Part 12, Sec 1, Gr 5
+  -> Found in DB: Assignment 13683 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 26] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 12_1_6
+  -> Match via ID: Part 12, Sec 1, Gr 6
+  -> Found in DB: Assignment 13684 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 27] Analysing: Géodynamique externe (CM) | Type: CM | Section: GB-GEG S2 | ID: 5_1_
+  -> Match via ID: Part 5, Sec 1, Gr None
+  -> Found in DB: Assignment 13685 with Prof 'IGMOULLAN Brahim'
+  -> Compare: [DB: 'IGMOULLAN Brahim'] vs [Excel: 'IGMOULLAN Brahim']
+[ROW 28] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 6_1_1
+  -> Match via ID: Part 6, Sec 1, Gr 1
+  -> Found in DB: Assignment 13686 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 29] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 6_1_2
+  -> Match via ID: Part 6, Sec 1, Gr 2
+  -> Found in DB: Assignment 13687 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 30] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 6_1_3
+  -> Match via ID: Part 6, Sec 1, Gr 3
+  -> Found in DB: Assignment 13688 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 31] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 6_1_4
+  -> Match via ID: Part 6, Sec 1, Gr 4
+  -> Found in DB: Assignment 13689 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 32] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 6_1_5
+  -> Match via ID: Part 6, Sec 1, Gr 5
+  -> Found in DB: Assignment 13690 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 33] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 6_1_6
+  -> Match via ID: Part 6, Sec 1, Gr 6
+  -> Found in DB: Assignment 13691 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 34] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 88_1_1
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 35] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 88_1_2
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 36] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 88_1_3
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 37] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 88_1_4
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 38] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 88_1_5
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 39] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 88_1_6
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 40] Analysing: Langue Etrangère 2 (CM) | Type: CM | Section: GB-GEG S2 | ID: 9_1_
+  -> Match via ID: Part 9, Sec 1, Gr None
+  -> Found in DB: Assignment 13692 with Prof 'SADOUK  Leila'
+  -> Compare: [DB: 'SADOUK  Leila'] vs [Excel: 'SADOUK  Leila']
+[ROW 41] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 10_1_1
+  -> Match via ID: Part 10, Sec 1, Gr 1
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 42] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 10_1_2
+  -> Match via ID: Part 10, Sec 1, Gr 2
+  -> Found in DB: Assignment 13694 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 43] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 10_1_3
+  -> Match via ID: Part 10, Sec 1, Gr 3
+  -> Found in DB: Assignment 13695 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 44] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 10_1_4
+  -> Match via ID: Part 10, Sec 1, Gr 4
+  -> Found in DB: Assignment 13696 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 45] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 10_1_5
+  -> Match via ID: Part 10, Sec 1, Gr 5
+  -> Found in DB: Assignment 13697 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 46] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 10_1_6
+  -> Match via ID: Part 10, Sec 1, Gr 6
+  -> Found in DB: Assignment 13698 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 47] Analysing: Mécanique des Fluides et Transfert Thermique (CM) | Type: CM | Section: GB-GEG S2 | ID: 47_1_
+  -> Match via ID: Part 47, Sec 1, Gr None
+  -> Found in DB: Assignment 13699 with Prof 'CHEHOUANI Hassan'
+  -> Compare: [DB: 'CHEHOUANI Hassan'] vs [Excel: 'CHEHOUANI Hassan']
+[ROW 48] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 48_1_1
+  -> Match via ID: Part 48, Sec 1, Gr 1
+  -> Found in DB: Assignment 13700 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 49] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 48_1_2
+  -> Match via ID: Part 48, Sec 1, Gr 2
+  -> Found in DB: Assignment 13701 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 50] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 48_1_3
+  -> Match via ID: Part 48, Sec 1, Gr 3
+  -> Found in DB: Assignment 13702 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 51] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 48_1_4
+  -> Match via ID: Part 48, Sec 1, Gr 4
+  -> Found in DB: Assignment 13703 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 52] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 48_1_5
+  -> Match via ID: Part 48, Sec 1, Gr 5
+  -> Found in DB: Assignment 13704 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 53] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 48_1_6
+  -> Match via ID: Part 48, Sec 1, Gr 6
+  -> Found in DB: Assignment 13705 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 54] Analysing: Réactivité Chimique (CM) | Type: CM | Section: GB-GEG S2 | ID: 7_1_
+  -> Match via ID: Part 7, Sec 1, Gr None
+  -> Found in DB: Assignment 13706 with Prof 'EL MAKHFOUK Mohammed'
+  -> Compare: [DB: 'EL MAKHFOUK Mohammed'] vs [Excel: 'EL MAKHFOUK Mohammed']
+[ROW 55] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 8_1_1
+  -> Match via ID: Part 8, Sec 1, Gr 1
+  -> Found in DB: Assignment 13707 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 56] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 8_1_2
+  -> Match via ID: Part 8, Sec 1, Gr 2
+  -> Found in DB: Assignment 13708 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 57] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 8_1_3
+  -> Match via ID: Part 8, Sec 1, Gr 3
+  -> Found in DB: Assignment 13709 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 58] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 8_1_4
+  -> Match via ID: Part 8, Sec 1, Gr 4
+  -> Found in DB: Assignment 13710 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 59] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 8_1_5
+  -> Match via ID: Part 8, Sec 1, Gr 5
+  -> Found in DB: Assignment 13711 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 60] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 8_1_6
+  -> Match via ID: Part 8, Sec 1, Gr 6
+  -> Found in DB: Assignment 13712 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 61] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 89_1_1
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 62] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 89_1_2
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 63] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 89_1_3
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 64] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 89_1_4
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 65] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 89_1_5
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 66] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 89_1_6
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 67] Analysing: Analyse de Données (CM) | Type: CM | Section: GB S4 | ID: 39_9_
+  -> Match via ID: Part 39, Sec 9, Gr None
+  -> Found in DB: Assignment 13650 with Prof 'OUAARAB Aziz'
+  -> Compare: [DB: 'OUAARAB Aziz'] vs [Excel: 'OUAARAB Aziz']
+[ROW 68] Analysing: Analyse de Données (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 40_9_29
+  -> Match via ID: Part 40, Sec 9, Gr 29
+  -> Found in DB: Assignment 13657 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 69] Analysing: Analyse de Données (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 40_9_35
+  -> Match via ID: Part 40, Sec 9, Gr 35
+  -> Found in DB: Assignment 13728 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 70] Analysing: Analyse de Données (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 95_9_29
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 71] Analysing: Analyse de Données (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 95_9_35
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 72] Analysing: Biochimie Métabolique et Enzymologie (CM) | Type: CM | Section: GB S4 | ID: 71_9_
+  -> Match via ID: Part 71, Sec 9, Gr None
+  -> Found in DB: Assignment 13651 with Prof 'SEDDIQI Nadia'
+  -> Compare: [DB: 'SEDDIQI Nadia'] vs [Excel: 'SEDDIQI Nadia']
+[ROW 73] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 72_9_29
+  -> Match via ID: Part 72, Sec 9, Gr 29
+  -> Found in DB: Assignment 13658 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 74] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 72_9_35
+  -> Match via ID: Part 72, Sec 9, Gr 35
+  -> Found in DB: Assignment 13729 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 75] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 90_9_29
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 76] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 90_9_35
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 77] Analysing: Biologie Moléculaire et Génétique (CM) | Type: CM | Section: GB S4 | ID: 67_9_
+  -> Match via ID: Part 67, Sec 9, Gr None
+  -> Found in DB: Assignment 13652 with Prof 'TADLAOUI OUAFI AHmed'
+  -> Compare: [DB: 'TADLAOUI OUAFI AHmed'] vs [Excel: 'TADLAOUI OUAFI AHmed']
+[ROW 78] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 68_9_29
+  -> Match via ID: Part 68, Sec 9, Gr 29
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 79] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 68_9_35
+  -> Match via ID: Part 68, Sec 9, Gr 35
+  -> Found in DB: Assignment 13730 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 80] Analysing: Développement Personnel (CM) | Type: CM | Section: GB S4 | ID: 33_9_
+  -> Match via ID: Part 33, Sec 9, Gr None
+  -> Found in DB: Assignment 13653 with Prof 'KOURAD Hanane'
+  -> Compare: [DB: 'KOURAD Hanane'] vs [Excel: 'KOURAD Hanane']
+[ROW 81] Analysing: Développement Personnel (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 34_9_29
+  -> Match via ID: Part 34, Sec 9, Gr 29
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 82] Analysing: Développement Personnel (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 34_9_35
+  -> Match via ID: Part 34, Sec 9, Gr 35
+  -> Found in DB: Assignment 13731 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 83] Analysing: LTC2 Français (CM) | Type: CM | Section: GB S4 | ID: 31_9_
+  -> Match via ID: Part 31, Sec 9, Gr None
+  -> Found in DB: Assignment 13654 with Prof 'El HASNAOUI Nadia'
+  -> Compare: [DB: 'El HASNAOUI Nadia'] vs [Excel: 'El HASNAOUI Nadia']
+[ROW 84] Analysing: LTC2 Français (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 32_9_29
+  -> Match via ID: Part 32, Sec 9, Gr 29
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 85] Analysing: LTC2 Français (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 32_9_35
+  -> Match via ID: Part 32, Sec 9, Gr 35
+  -> Found in DB: Assignment 13732 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 86] Analysing: Méthodes d'analyse (CM) | Type: CM | Section: GB S4 | ID: 69_9_
+  -> Match via ID: Part 69, Sec 9, Gr None
+  -> Found in DB: Assignment 13655 with Prof 'MGHAZLI SAFAE'
+  -> Compare: [DB: 'MGHAZLI SAFAE'] vs [Excel: 'MGHAZLI SAFAE']
+[ROW 87] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 70_9_29
+  -> Match via ID: Part 70, Sec 9, Gr 29
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 88] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 70_9_35
+  -> Match via ID: Part 70, Sec 9, Gr 35
+  -> Found in DB: Assignment 13733 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 89] Analysing: Physiologie Animale et Végétale (CM) | Type: CM | Section: GB S4 | ID: 73_9_
+  -> Match via ID: Part 73, Sec 9, Gr None
+  -> Found in DB: Assignment 13656 with Prof 'ELHACHIMI Mly Youssef'
+  -> Compare: [DB: 'ELHACHIMI Mly Youssef'] vs [Excel: 'ELHACHIMI Mly Youssef']
+[ROW 90] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 74_9_29
+  -> Match via ID: Part 74, Sec 9, Gr 29
+  -> Found in DB: Assignment 13663 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 91] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 74_9_35
+  -> Match via ID: Part 74, Sec 9, Gr 35
+  -> Found in DB: Assignment 13734 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+
+--- Checking for Deletions in 2 section(s): {1, 9} ---
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+[ROW 0] Analysing: Bases de Données (CM) | Type: CM | Section: GB-GEG S2 | ID: 13_1_
+  -> Match via ID: Part 13, Sec 1, Gr None
+  -> Found in DB: Assignment 13717 with Prof 'ED-DAOUDI Rachid'
+  -> Compare: [DB: 'ED-DAOUDI Rachid'] vs [Excel: 'ED-DAOUDI Rachid']
+[ROW 1] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 14_1_1
+  -> Match via ID: Part 14, Sec 1, Gr 1
+  -> Found in DB: Assignment 13737 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 2] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 14_1_2
+  -> Match via ID: Part 14, Sec 1, Gr 2
+  -> Found in DB: Assignment 13666 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 3] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 14_1_3
+  -> Match via ID: Part 14, Sec 1, Gr 3
+  -> Found in DB: Assignment 13667 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 4] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 14_1_4
+  -> Match via ID: Part 14, Sec 1, Gr 4
+  -> Found in DB: Assignment 13668 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 5] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 14_1_5
+  -> Match via ID: Part 14, Sec 1, Gr 5
+  -> Found in DB: Assignment 13669 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 6] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 14_1_6
+  -> Match via ID: Part 14, Sec 1, Gr 6
+  -> Found in DB: Assignment 13670 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 7] Analysing: Biologie Animale et Végétale (CM) | Type: CM | Section: GB-GEG S2 | ID: 1_1_
+  -> Match via ID: Part 1, Sec 1, Gr None
+  -> Found in DB: Assignment 13671 with Prof 'CHERIFI Ouafa'
+  -> Compare: [DB: 'CHERIFI Ouafa'] vs [Excel: 'CHERIFI Ouafa']
+[ROW 8] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 2_1_1
+  -> Match via ID: Part 2, Sec 1, Gr 1
+  -> Found in DB: Assignment 13672 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 9] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 2_1_2
+  -> Match via ID: Part 2, Sec 1, Gr 2
+  -> Found in DB: Assignment 13673 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 10] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 2_1_3
+  -> Match via ID: Part 2, Sec 1, Gr 3
+  -> Found in DB: Assignment 13674 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 11] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 2_1_4
+  -> Match via ID: Part 2, Sec 1, Gr 4
+  -> Found in DB: Assignment 13675 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 12] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 2_1_5
+  -> Match via ID: Part 2, Sec 1, Gr 5
+  -> Found in DB: Assignment 13676 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 13] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 2_1_6
+  -> Match via ID: Part 2, Sec 1, Gr 6
+  -> Found in DB: Assignment 13677 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 14] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 83_1_1
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 15] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 83_1_2
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 16] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 83_1_3
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 17] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 83_1_4
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 18] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 83_1_5
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 19] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 83_1_6
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 20] Analysing: Culture digitale (CM) | Type: CM | Section: GB-GEG S2 | ID: 11_1_
+  -> Match via ID: Part 11, Sec 1, Gr None
+  -> Found in DB: Assignment 13678 with Prof 'OUAARAB Aziz'
+  -> Compare: [DB: 'OUAARAB Aziz'] vs [Excel: 'OUAARAB Aziz']
+[ROW 21] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 12_1_1
+  -> Match via ID: Part 12, Sec 1, Gr 1
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 22] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 12_1_2
+  -> Match via ID: Part 12, Sec 1, Gr 2
+  -> Found in DB: Assignment 13680 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 23] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 12_1_3
+  -> Match via ID: Part 12, Sec 1, Gr 3
+  -> Found in DB: Assignment 13681 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 24] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 12_1_4
+  -> Match via ID: Part 12, Sec 1, Gr 4
+  -> Found in DB: Assignment 13682 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 25] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 12_1_5
+  -> Match via ID: Part 12, Sec 1, Gr 5
+  -> Found in DB: Assignment 13683 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 26] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 12_1_6
+  -> Match via ID: Part 12, Sec 1, Gr 6
+  -> Found in DB: Assignment 13684 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 27] Analysing: Géodynamique externe (CM) | Type: CM | Section: GB-GEG S2 | ID: 5_1_
+  -> Match via ID: Part 5, Sec 1, Gr None
+  -> Found in DB: Assignment 13685 with Prof 'IGMOULLAN Brahim'
+  -> Compare: [DB: 'IGMOULLAN Brahim'] vs [Excel: 'IGMOULLAN Brahim']
+[ROW 28] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 6_1_1
+  -> Match via ID: Part 6, Sec 1, Gr 1
+  -> Found in DB: Assignment 13686 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 29] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 6_1_2
+  -> Match via ID: Part 6, Sec 1, Gr 2
+  -> Found in DB: Assignment 13687 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 30] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 6_1_3
+  -> Match via ID: Part 6, Sec 1, Gr 3
+  -> Found in DB: Assignment 13688 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 31] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 6_1_4
+  -> Match via ID: Part 6, Sec 1, Gr 4
+  -> Found in DB: Assignment 13689 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 32] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 6_1_5
+  -> Match via ID: Part 6, Sec 1, Gr 5
+  -> Found in DB: Assignment 13690 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 33] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 6_1_6
+  -> Match via ID: Part 6, Sec 1, Gr 6
+  -> Found in DB: Assignment 13691 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 34] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 88_1_1
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 35] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 88_1_2
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 36] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 88_1_3
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 37] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 88_1_4
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 38] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 88_1_5
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 39] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 88_1_6
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 40] Analysing: Langue Etrangère 2 (CM) | Type: CM | Section: GB-GEG S2 | ID: 9_1_
+  -> Match via ID: Part 9, Sec 1, Gr None
+  -> Found in DB: Assignment 13692 with Prof 'SADOUK  Leila'
+  -> Compare: [DB: 'SADOUK  Leila'] vs [Excel: 'SADOUK  Leila']
+[ROW 41] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 10_1_1
+  -> Match via ID: Part 10, Sec 1, Gr 1
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 42] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 10_1_2
+  -> Match via ID: Part 10, Sec 1, Gr 2
+  -> Found in DB: Assignment 13694 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 43] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 10_1_3
+  -> Match via ID: Part 10, Sec 1, Gr 3
+  -> Found in DB: Assignment 13695 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 44] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 10_1_4
+  -> Match via ID: Part 10, Sec 1, Gr 4
+  -> Found in DB: Assignment 13696 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 45] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 10_1_5
+  -> Match via ID: Part 10, Sec 1, Gr 5
+  -> Found in DB: Assignment 13697 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 46] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 10_1_6
+  -> Match via ID: Part 10, Sec 1, Gr 6
+  -> Found in DB: Assignment 13698 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 47] Analysing: Mécanique des Fluides et Transfert Thermique (CM) | Type: CM | Section: GB-GEG S2 | ID: 47_1_
+  -> Match via ID: Part 47, Sec 1, Gr None
+  -> Found in DB: Assignment 13699 with Prof 'CHEHOUANI Hassan'
+  -> Compare: [DB: 'CHEHOUANI Hassan'] vs [Excel: 'CHEHOUANI Hassan']
+[ROW 48] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 48_1_1
+  -> Match via ID: Part 48, Sec 1, Gr 1
+  -> Found in DB: Assignment 13700 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 49] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 48_1_2
+  -> Match via ID: Part 48, Sec 1, Gr 2
+  -> Found in DB: Assignment 13701 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 50] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 48_1_3
+  -> Match via ID: Part 48, Sec 1, Gr 3
+  -> Found in DB: Assignment 13702 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 51] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 48_1_4
+  -> Match via ID: Part 48, Sec 1, Gr 4
+  -> Found in DB: Assignment 13703 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 52] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 48_1_5
+  -> Match via ID: Part 48, Sec 1, Gr 5
+  -> Found in DB: Assignment 13704 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 53] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 48_1_6
+  -> Match via ID: Part 48, Sec 1, Gr 6
+  -> Found in DB: Assignment 13705 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 54] Analysing: Réactivité Chimique (CM) | Type: CM | Section: GB-GEG S2 | ID: 7_1_
+  -> Match via ID: Part 7, Sec 1, Gr None
+  -> Found in DB: Assignment 13706 with Prof 'EL MAKHFOUK Mohammed'
+  -> Compare: [DB: 'EL MAKHFOUK Mohammed'] vs [Excel: 'EL MAKHFOUK Mohammed']
+[ROW 55] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 8_1_1
+  -> Match via ID: Part 8, Sec 1, Gr 1
+  -> Found in DB: Assignment 13707 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 56] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 8_1_2
+  -> Match via ID: Part 8, Sec 1, Gr 2
+  -> Found in DB: Assignment 13708 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 57] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 8_1_3
+  -> Match via ID: Part 8, Sec 1, Gr 3
+  -> Found in DB: Assignment 13709 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 58] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 8_1_4
+  -> Match via ID: Part 8, Sec 1, Gr 4
+  -> Found in DB: Assignment 13710 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 59] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 8_1_5
+  -> Match via ID: Part 8, Sec 1, Gr 5
+  -> Found in DB: Assignment 13711 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 60] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 8_1_6
+  -> Match via ID: Part 8, Sec 1, Gr 6
+  -> Found in DB: Assignment 13712 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 61] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 89_1_1
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 62] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 89_1_2
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 63] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 89_1_3
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 64] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 89_1_4
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 65] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 89_1_5
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 66] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 89_1_6
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 67] Analysing: Analyse de Données (CM) | Type: CM | Section: GB S4 | ID: 39_9_
+  -> Match via ID: Part 39, Sec 9, Gr None
+  -> Found in DB: Assignment 13650 with Prof 'OUAARAB Aziz'
+  -> Compare: [DB: 'OUAARAB Aziz'] vs [Excel: 'OUAARAB Aziz']
+[ROW 68] Analysing: Analyse de Données (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 40_9_29
+  -> Match via ID: Part 40, Sec 9, Gr 29
+  -> Found in DB: Assignment 13657 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 69] Analysing: Analyse de Données (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 40_9_35
+  -> Match via ID: Part 40, Sec 9, Gr 35
+  -> Found in DB: Assignment 13728 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 70] Analysing: Analyse de Données (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 95_9_29
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 71] Analysing: Analyse de Données (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 95_9_35
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 72] Analysing: Biochimie Métabolique et Enzymologie (CM) | Type: CM | Section: GB S4 | ID: 71_9_
+  -> Match via ID: Part 71, Sec 9, Gr None
+  -> Found in DB: Assignment 13651 with Prof 'SEDDIQI Nadia'
+  -> Compare: [DB: 'SEDDIQI Nadia'] vs [Excel: 'SEDDIQI Nadia']
+[ROW 73] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 72_9_29
+  -> Match via ID: Part 72, Sec 9, Gr 29
+  -> Found in DB: Assignment 13658 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 74] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 72_9_35
+  -> Match via ID: Part 72, Sec 9, Gr 35
+  -> Found in DB: Assignment 13729 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 75] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 90_9_29
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 76] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 90_9_35
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 77] Analysing: Biologie Moléculaire et Génétique (CM) | Type: CM | Section: GB S4 | ID: 67_9_
+  -> Match via ID: Part 67, Sec 9, Gr None
+  -> Found in DB: Assignment 13652 with Prof 'TADLAOUI OUAFI AHmed'
+  -> Compare: [DB: 'TADLAOUI OUAFI AHmed'] vs [Excel: 'TADLAOUI OUAFI AHmed']
+[ROW 78] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 68_9_29
+  -> Match via ID: Part 68, Sec 9, Gr 29
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 79] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 68_9_35
+  -> Match via ID: Part 68, Sec 9, Gr 35
+  -> Found in DB: Assignment 13730 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 80] Analysing: Développement Personnel (CM) | Type: CM | Section: GB S4 | ID: 33_9_
+  -> Match via ID: Part 33, Sec 9, Gr None
+  -> Found in DB: Assignment 13653 with Prof 'KOURAD Hanane'
+  -> Compare: [DB: 'KOURAD Hanane'] vs [Excel: 'KOURAD Hanane']
+[ROW 81] Analysing: Développement Personnel (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 34_9_29
+  -> Match via ID: Part 34, Sec 9, Gr 29
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 82] Analysing: Développement Personnel (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 34_9_35
+  -> Match via ID: Part 34, Sec 9, Gr 35
+  -> Found in DB: Assignment 13731 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 83] Analysing: LTC2 Français (CM) | Type: CM | Section: GB S4 | ID: 31_9_
+  -> Match via ID: Part 31, Sec 9, Gr None
+  -> Found in DB: Assignment 13654 with Prof 'El HASNAOUI Nadia'
+  -> Compare: [DB: 'El HASNAOUI Nadia'] vs [Excel: 'El HASNAOUI Nadia']
+[ROW 84] Analysing: LTC2 Français (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 32_9_29
+  -> Match via ID: Part 32, Sec 9, Gr 29
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 85] Analysing: LTC2 Français (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 32_9_35
+  -> Match via ID: Part 32, Sec 9, Gr 35
+  -> Found in DB: Assignment 13732 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 86] Analysing: Méthodes d'analyse (CM) | Type: CM | Section: GB S4 | ID: 69_9_
+  -> Match via ID: Part 69, Sec 9, Gr None
+  -> Found in DB: Assignment 13655 with Prof 'MGHAZLI SAFAE'
+  -> Compare: [DB: 'MGHAZLI SAFAE'] vs [Excel: 'MGHAZLI SAFAE']
+[ROW 87] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 70_9_29
+  -> Match via ID: Part 70, Sec 9, Gr 29
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 88] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 70_9_35
+  -> Match via ID: Part 70, Sec 9, Gr 35
+  -> Found in DB: Assignment 13733 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 89] Analysing: Physiologie Animale et Végétale (CM) | Type: CM | Section: GB S4 | ID: 73_9_
+  -> Match via ID: Part 73, Sec 9, Gr None
+  -> Found in DB: Assignment 13656 with Prof 'ELHACHIMI Mly Youssef'
+  -> Compare: [DB: 'ELHACHIMI Mly Youssef'] vs [Excel: 'ELHACHIMI Mly Youssef']
+[ROW 90] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 74_9_29
+  -> Match via ID: Part 74, Sec 9, Gr 29
+  -> Found in DB: Assignment 13663 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 91] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 74_9_35
+  -> Match via ID: Part 74, Sec 9, Gr 35
+  -> Found in DB: Assignment 13734 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+
+--- Checking for Deletions in 2 section(s): {1, 9} ---
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+[ROW 0] Analysing: Bases de Données (CM) | Type: CM | Section: GB-GEG S2 | ID: 13_1_
+  -> Match via ID: Part 13, Sec 1, Gr None
+  -> Found in DB: Assignment 13717 with Prof 'ED-DAOUDI Rachid'
+  -> Compare: [DB: 'ED-DAOUDI Rachid'] vs [Excel: 'Amir Laila']
+  -> !!! CHANGE DETECTED !!!
+[ROW 1] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 14_1_1
+  -> Match via ID: Part 14, Sec 1, Gr 1
+  -> Found in DB: Assignment 13737 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 2] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 14_1_2
+  -> Match via ID: Part 14, Sec 1, Gr 2
+  -> Found in DB: Assignment 13666 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 3] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 14_1_3
+  -> Match via ID: Part 14, Sec 1, Gr 3
+  -> Found in DB: Assignment 13667 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 4] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 14_1_4
+  -> Match via ID: Part 14, Sec 1, Gr 4
+  -> Found in DB: Assignment 13668 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 5] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 14_1_5
+  -> Match via ID: Part 14, Sec 1, Gr 5
+  -> Found in DB: Assignment 13669 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 6] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 14_1_6
+  -> Match via ID: Part 14, Sec 1, Gr 6
+  -> Found in DB: Assignment 13670 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 7] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 1_1_
+  -> Match via ID: Part 1, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 8] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 2_1_1
+  -> Match via ID: Part 2, Sec 1, Gr 1
+  -> Found in DB: Assignment 13672 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 9] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 2_1_2
+  -> Match via ID: Part 2, Sec 1, Gr 2
+  -> Found in DB: Assignment 13673 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 10] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 2_1_3
+  -> Match via ID: Part 2, Sec 1, Gr 3
+  -> Found in DB: Assignment 13674 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 11] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 2_1_4
+  -> Match via ID: Part 2, Sec 1, Gr 4
+  -> Found in DB: Assignment 13675 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 12] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 2_1_5
+  -> Match via ID: Part 2, Sec 1, Gr 5
+  -> Found in DB: Assignment 13676 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 13] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 2_1_6
+  -> Match via ID: Part 2, Sec 1, Gr 6
+  -> Found in DB: Assignment 13677 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 14] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 83_1_1
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 15] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 83_1_2
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 16] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 83_1_3
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 17] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 83_1_4
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 18] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 83_1_5
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 19] Analysing: Culture digitale (CM) | Type: CM | Section: GB-GEG S2 | ID: 83_1_6
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 20] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 11_1_
+  -> Match via ID: Part 11, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 21] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 12_1_1
+  -> Match via ID: Part 12, Sec 1, Gr 1
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 22] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 12_1_2
+  -> Match via ID: Part 12, Sec 1, Gr 2
+  -> Found in DB: Assignment 13680 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 23] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 12_1_3
+  -> Match via ID: Part 12, Sec 1, Gr 3
+  -> Found in DB: Assignment 13681 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 24] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 12_1_4
+  -> Match via ID: Part 12, Sec 1, Gr 4
+  -> Found in DB: Assignment 13682 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 25] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 12_1_5
+  -> Match via ID: Part 12, Sec 1, Gr 5
+  -> Found in DB: Assignment 13683 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 26] Analysing: Géodynamique externe (CM) | Type: CM | Section: GB-GEG S2 | ID: 12_1_6
+  -> Match via ID: Part 12, Sec 1, Gr 6
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'IGMOULLAN Brahim']
+  -> !!! CHANGE DETECTED !!!
+[ROW 27] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 5_1_
+  -> Match via ID: Part 5, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 28] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 6_1_1
+  -> Match via ID: Part 6, Sec 1, Gr 1
+  -> Found in DB: Assignment 13686 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 29] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 6_1_2
+  -> Match via ID: Part 6, Sec 1, Gr 2
+  -> Found in DB: Assignment 13687 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 30] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 6_1_3
+  -> Match via ID: Part 6, Sec 1, Gr 3
+  -> Found in DB: Assignment 13688 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 31] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 6_1_4
+  -> Match via ID: Part 6, Sec 1, Gr 4
+  -> Found in DB: Assignment 13689 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 32] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 6_1_5
+  -> Match via ID: Part 6, Sec 1, Gr 5
+  -> Found in DB: Assignment 13690 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 33] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 6_1_6
+  -> Match via ID: Part 6, Sec 1, Gr 6
+  -> Found in DB: Assignment 13691 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 34] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 88_1_1
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 35] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 88_1_2
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 36] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 88_1_3
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 37] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 88_1_4
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 38] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 88_1_5
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 39] Analysing: Langue Etrangère 2 (CM) | Type: CM | Section: GB-GEG S2 | ID: 88_1_6
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 40] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 9_1_
+  -> Match via ID: Part 9, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 41] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 10_1_1
+  -> Match via ID: Part 10, Sec 1, Gr 1
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 42] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 10_1_2
+  -> Match via ID: Part 10, Sec 1, Gr 2
+  -> Found in DB: Assignment 13694 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 43] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 10_1_3
+  -> Match via ID: Part 10, Sec 1, Gr 3
+  -> Found in DB: Assignment 13695 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 44] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 10_1_4
+  -> Match via ID: Part 10, Sec 1, Gr 4
+  -> Found in DB: Assignment 13696 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 45] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 10_1_5
+  -> Match via ID: Part 10, Sec 1, Gr 5
+  -> Found in DB: Assignment 13697 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 46] Analysing: Mécanique des Fluides et Transfert Thermique (CM) | Type: CM | Section: GB-GEG S2 | ID: 10_1_6
+  -> Match via ID: Part 10, Sec 1, Gr 6
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'CHEHOUANI Hassan']
+  -> !!! CHANGE DETECTED !!!
+[ROW 47] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 47_1_
+  -> Match via ID: Part 47, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 48] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 48_1_1
+  -> Match via ID: Part 48, Sec 1, Gr 1
+  -> Found in DB: Assignment 13700 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 49] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 48_1_2
+  -> Match via ID: Part 48, Sec 1, Gr 2
+  -> Found in DB: Assignment 13701 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 50] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 48_1_3
+  -> Match via ID: Part 48, Sec 1, Gr 3
+  -> Found in DB: Assignment 13702 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 51] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 48_1_4
+  -> Match via ID: Part 48, Sec 1, Gr 4
+  -> Found in DB: Assignment 13703 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 52] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 48_1_5
+  -> Match via ID: Part 48, Sec 1, Gr 5
+  -> Found in DB: Assignment 13704 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 53] Analysing: Réactivité Chimique (CM) | Type: CM | Section: GB-GEG S2 | ID: 48_1_6
+  -> Match via ID: Part 48, Sec 1, Gr 6
+  -> Found in DB: Assignment 13705 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'EL MAKHFOUK Mohammed']
+  -> !!! CHANGE DETECTED !!!
+[ROW 54] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 7_1_
+  -> Match via ID: Part 7, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 55] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 8_1_1
+  -> Match via ID: Part 8, Sec 1, Gr 1
+  -> Found in DB: Assignment 13707 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 56] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 8_1_2
+  -> Match via ID: Part 8, Sec 1, Gr 2
+  -> Found in DB: Assignment 13708 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 57] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 8_1_3
+  -> Match via ID: Part 8, Sec 1, Gr 3
+  -> Found in DB: Assignment 13709 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 58] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 8_1_4
+  -> Match via ID: Part 8, Sec 1, Gr 4
+  -> Found in DB: Assignment 13710 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 59] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 8_1_5
+  -> Match via ID: Part 8, Sec 1, Gr 5
+  -> Found in DB: Assignment 13711 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 60] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 8_1_6
+  -> Match via ID: Part 8, Sec 1, Gr 6
+  -> Found in DB: Assignment 13712 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 61] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 89_1_1
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 62] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 89_1_2
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 63] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 89_1_3
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 64] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 89_1_4
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 65] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 89_1_5
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 66] Analysing: Analyse de Données (CM) | Type: CM | Section: GB S4 | ID: 89_1_6
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 67] Analysing: Analyse de Données (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 39_9_
+  -> Match via ID: Part 39, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 68] Analysing: Analyse de Données (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 40_9_29
+  -> Match via ID: Part 40, Sec 9, Gr 29
+  -> Found in DB: Assignment 13657 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 69] Analysing: Analyse de Données (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 40_9_35
+  -> Match via ID: Part 40, Sec 9, Gr 35
+  -> Found in DB: Assignment 13728 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 70] Analysing: Analyse de Données (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 95_9_29
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 71] Analysing: Biochimie Métabolique et Enzymologie (CM) | Type: CM | Section: GB S4 | ID: 95_9_35
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 72] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 71_9_
+  -> Match via ID: Part 71, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 73] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 72_9_29
+  -> Match via ID: Part 72, Sec 9, Gr 29
+  -> Found in DB: Assignment 13658 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 74] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 72_9_35
+  -> Match via ID: Part 72, Sec 9, Gr 35
+  -> Found in DB: Assignment 13729 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 75] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 90_9_29
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 76] Analysing: Biologie Moléculaire et Génétique (CM) | Type: CM | Section: GB S4 | ID: 90_9_35
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 77] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 67_9_
+  -> Match via ID: Part 67, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 78] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 68_9_29
+  -> Match via ID: Part 68, Sec 9, Gr 29
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 79] Analysing: Développement Personnel (CM) | Type: CM | Section: GB S4 | ID: 68_9_35
+  -> Match via ID: Part 68, Sec 9, Gr 35
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'KOURAD Hanane']
+  -> !!! CHANGE DETECTED !!!
+[ROW 80] Analysing: Développement Personnel (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 33_9_
+  -> Match via ID: Part 33, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 81] Analysing: Développement Personnel (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 34_9_29
+  -> Match via ID: Part 34, Sec 9, Gr 29
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 82] Analysing: LTC2 Français (CM) | Type: CM | Section: GB S4 | ID: 34_9_35
+  -> Match via ID: Part 34, Sec 9, Gr 35
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'El HASNAOUI Nadia']
+  -> !!! CHANGE DETECTED !!!
+[ROW 83] Analysing: LTC2 Français (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 31_9_
+  -> Match via ID: Part 31, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 84] Analysing: LTC2 Français (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 32_9_29
+  -> Match via ID: Part 32, Sec 9, Gr 29
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 85] Analysing: Méthodes d'analyse (CM) | Type: CM | Section: GB S4 | ID: 32_9_35
+  -> Match via ID: Part 32, Sec 9, Gr 35
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'MGHAZLI SAFAE']
+  -> !!! CHANGE DETECTED !!!
+[ROW 86] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 69_9_
+  -> Match via ID: Part 69, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 87] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 70_9_29
+  -> Match via ID: Part 70, Sec 9, Gr 29
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 88] Analysing: Physiologie Animale et Végétale (CM) | Type: CM | Section: GB S4 | ID: 70_9_35
+  -> Match via ID: Part 70, Sec 9, Gr 35
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'ELHACHIMI Mly Youssef']
+  -> !!! CHANGE DETECTED !!!
+[ROW 89] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 73_9_
+  -> Match via ID: Part 73, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 90] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 74_9_29
+  -> Match via ID: Part 74, Sec 9, Gr 29
+  -> Found in DB: Assignment 13663 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+
+--- Checking for Deletions in 2 section(s): {1, 9} ---
+  -> Orphan CM: Biologie Animale et Végétale in GB-GEG S2
+  -> Orphan CM: Culture digitale in GB-GEG S2
+  -> Orphan CM: Géodynamique externe in GB-GEG S2
+  -> Orphan CM: Langue Etrangère 2 in GB-GEG S2
+  -> Orphan CM: Mécanique des Fluides et Transfert Thermique in GB-GEG S2
+  -> Orphan CM: Réactivité Chimique in GB-GEG S2
+  -> Orphan CM: Analyse de Données in GB S4
+  -> Orphan CM: Biochimie Métabolique et Enzymologie in GB S4
+  -> Orphan CM: Biologie Moléculaire et Génétique in GB S4
+  -> Orphan CM: Développement Personnel in GB S4
+  -> Orphan CM: LTC2 Français in GB S4
+  -> Orphan CM: Méthodes d'analyse in GB S4
+  -> Orphan CM: Physiologie Animale et Végétale in GB S4
+  -> Orphan TD: LTC2 Français (TD) - GB S4 Gr 2
+  -> Orphan TD: Méthodes d'analyse (TD) - GB S4 Gr 2
+  -> Orphan TD: Culture digitale (TD) - GB-GEG S2 Gr 6
+  -> Orphan TD: Physiologie Animale et Végétale (TD) - GB S4 Gr 2
+  -> Orphan TD: Développement Personnel (TD) - GB S4 Gr 2
+  -> Orphan TD: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6
+  -> Orphan TD: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2
+  -> Orphan TD: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6
+
+--- DEBUG START (Filiere: 1, Preview: True) ---
+[ROW 0] Analysing: Bases de Données (CM) | Type: CM | Section: GB-GEG S2 | ID: 13_1_
+  -> Match via ID: Part 13, Sec 1, Gr None
+  -> Found in DB: Assignment 13717 with Prof 'ED-DAOUDI Rachid'
+  -> Compare: [DB: 'ED-DAOUDI Rachid'] vs [Excel: 'Amir Laila']
+  -> !!! CHANGE DETECTED !!!
+[ROW 1] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 14_1_1
+  -> Match via ID: Part 14, Sec 1, Gr 1
+  -> Found in DB: Assignment 13737 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 2] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 14_1_2
+  -> Match via ID: Part 14, Sec 1, Gr 2
+  -> Found in DB: Assignment 13666 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 3] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 14_1_3
+  -> Match via ID: Part 14, Sec 1, Gr 3
+  -> Found in DB: Assignment 13667 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 4] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 14_1_4
+  -> Match via ID: Part 14, Sec 1, Gr 4
+  -> Found in DB: Assignment 13668 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 5] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 14_1_5
+  -> Match via ID: Part 14, Sec 1, Gr 5
+  -> Found in DB: Assignment 13669 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 6] Analysing: Bases de Données (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 14_1_6
+  -> Match via ID: Part 14, Sec 1, Gr 6
+  -> Found in DB: Assignment 13670 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 7] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 1_1_
+  -> Match via ID: Part 1, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 8] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 2_1_1
+  -> Match via ID: Part 2, Sec 1, Gr 1
+  -> Found in DB: Assignment 13672 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 9] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 2_1_2
+  -> Match via ID: Part 2, Sec 1, Gr 2
+  -> Found in DB: Assignment 13673 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 10] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 2_1_3
+  -> Match via ID: Part 2, Sec 1, Gr 3
+  -> Found in DB: Assignment 13674 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 11] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 2_1_4
+  -> Match via ID: Part 2, Sec 1, Gr 4
+  -> Found in DB: Assignment 13675 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 12] Analysing: Biologie Animale et Végétale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 2_1_5
+  -> Match via ID: Part 2, Sec 1, Gr 5
+  -> Found in DB: Assignment 13676 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 13] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 2_1_6
+  -> Match via ID: Part 2, Sec 1, Gr 6
+  -> Found in DB: Assignment 13677 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 14] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 83_1_1
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 15] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 83_1_2
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 16] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 83_1_3
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 17] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 83_1_4
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 18] Analysing: Biologie Animale et Végétale (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 83_1_5
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 19] Analysing: Culture digitale (CM) | Type: CM | Section: GB-GEG S2 | ID: 83_1_6
+  -> SKIP (Part 83 is TP, not managed)
+[ROW 20] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 11_1_
+  -> Match via ID: Part 11, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 21] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 12_1_1
+  -> Match via ID: Part 12, Sec 1, Gr 1
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 22] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 12_1_2
+  -> Match via ID: Part 12, Sec 1, Gr 2
+  -> Found in DB: Assignment 13680 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 23] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 12_1_3
+  -> Match via ID: Part 12, Sec 1, Gr 3
+  -> Found in DB: Assignment 13681 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 24] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 12_1_4
+  -> Match via ID: Part 12, Sec 1, Gr 4
+  -> Found in DB: Assignment 13682 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 25] Analysing: Culture digitale (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 12_1_5
+  -> Match via ID: Part 12, Sec 1, Gr 5
+  -> Found in DB: Assignment 13683 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 26] Analysing: Géodynamique externe (CM) | Type: CM | Section: GB-GEG S2 | ID: 12_1_6
+  -> Match via ID: Part 12, Sec 1, Gr 6
+  -> Found in DB: Assignment 13679 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'IGMOULLAN Brahim']
+  -> !!! CHANGE DETECTED !!!
+[ROW 27] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 5_1_
+  -> Match via ID: Part 5, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 28] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 6_1_1
+  -> Match via ID: Part 6, Sec 1, Gr 1
+  -> Found in DB: Assignment 13686 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 29] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 6_1_2
+  -> Match via ID: Part 6, Sec 1, Gr 2
+  -> Found in DB: Assignment 13687 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 30] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 6_1_3
+  -> Match via ID: Part 6, Sec 1, Gr 3
+  -> Found in DB: Assignment 13688 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 31] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 6_1_4
+  -> Match via ID: Part 6, Sec 1, Gr 4
+  -> Found in DB: Assignment 13689 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 32] Analysing: Géodynamique externe (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 6_1_5
+  -> Match via ID: Part 6, Sec 1, Gr 5
+  -> Found in DB: Assignment 13690 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 33] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 6_1_6
+  -> Match via ID: Part 6, Sec 1, Gr 6
+  -> Found in DB: Assignment 13691 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 34] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 88_1_1
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 35] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 88_1_2
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 36] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 88_1_3
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 37] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 88_1_4
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 38] Analysing: Géodynamique externe (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 88_1_5
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 39] Analysing: Langue Etrangère 2 (CM) | Type: CM | Section: GB-GEG S2 | ID: 88_1_6
+  -> SKIP (Part 88 is TP, not managed)
+[ROW 40] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 9_1_
+  -> Match via ID: Part 9, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 41] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 10_1_1
+  -> Match via ID: Part 10, Sec 1, Gr 1
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 42] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 10_1_2
+  -> Match via ID: Part 10, Sec 1, Gr 2
+  -> Found in DB: Assignment 13694 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 43] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 10_1_3
+  -> Match via ID: Part 10, Sec 1, Gr 3
+  -> Found in DB: Assignment 13695 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 44] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 10_1_4
+  -> Match via ID: Part 10, Sec 1, Gr 4
+  -> Found in DB: Assignment 13696 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 45] Analysing: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 10_1_5
+  -> Match via ID: Part 10, Sec 1, Gr 5
+  -> Found in DB: Assignment 13697 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 46] Analysing: Mécanique des Fluides et Transfert Thermique (CM) | Type: CM | Section: GB-GEG S2 | ID: 10_1_6
+  -> Match via ID: Part 10, Sec 1, Gr 6
+  -> Found in DB: Assignment 13693 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'CHEHOUANI Hassan']
+  -> !!! CHANGE DETECTED !!!
+[ROW 47] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 47_1_
+  -> Match via ID: Part 47, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 48] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 48_1_1
+  -> Match via ID: Part 48, Sec 1, Gr 1
+  -> Found in DB: Assignment 13700 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 49] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 48_1_2
+  -> Match via ID: Part 48, Sec 1, Gr 2
+  -> Found in DB: Assignment 13701 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 50] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 48_1_3
+  -> Match via ID: Part 48, Sec 1, Gr 3
+  -> Found in DB: Assignment 13702 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 51] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 48_1_4
+  -> Match via ID: Part 48, Sec 1, Gr 4
+  -> Found in DB: Assignment 13703 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 52] Analysing: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 48_1_5
+  -> Match via ID: Part 48, Sec 1, Gr 5
+  -> Found in DB: Assignment 13704 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 53] Analysing: Réactivité Chimique (CM) | Type: CM | Section: GB-GEG S2 | ID: 48_1_6
+  -> Match via ID: Part 48, Sec 1, Gr 6
+  -> Found in DB: Assignment 13705 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'EL MAKHFOUK Mohammed']
+  -> !!! CHANGE DETECTED !!!
+[ROW 54] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 7_1_
+  -> Match via ID: Part 7, Sec 1, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 55] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 8_1_1
+  -> Match via ID: Part 8, Sec 1, Gr 1
+  -> Found in DB: Assignment 13707 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 56] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 8_1_2
+  -> Match via ID: Part 8, Sec 1, Gr 2
+  -> Found in DB: Assignment 13708 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 57] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 8_1_3
+  -> Match via ID: Part 8, Sec 1, Gr 3
+  -> Found in DB: Assignment 13709 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 58] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 8_1_4
+  -> Match via ID: Part 8, Sec 1, Gr 4
+  -> Found in DB: Assignment 13710 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 59] Analysing: Réactivité Chimique (TD) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 8_1_5
+  -> Match via ID: Part 8, Sec 1, Gr 5
+  -> Found in DB: Assignment 13711 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 60] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 1 | Type: TD | Section: GB-GEG S2 | ID: 8_1_6
+  -> Match via ID: Part 8, Sec 1, Gr 6
+  -> Found in DB: Assignment 13712 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 61] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 2 | Type: TD | Section: GB-GEG S2 | ID: 89_1_1
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 62] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 3 | Type: TD | Section: GB-GEG S2 | ID: 89_1_2
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 63] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 4 | Type: TD | Section: GB-GEG S2 | ID: 89_1_3
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 64] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 5 | Type: TD | Section: GB-GEG S2 | ID: 89_1_4
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 65] Analysing: Réactivité Chimique (TP) - GB-GEG S2 Gr 6 | Type: TD | Section: GB-GEG S2 | ID: 89_1_5
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 66] Analysing: Analyse de Données (CM) | Type: CM | Section: GB S4 | ID: 89_1_6
+  -> SKIP (Part 89 is TP, not managed)
+[ROW 67] Analysing: Analyse de Données (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 39_9_
+  -> Match via ID: Part 39, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 68] Analysing: Analyse de Données (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 40_9_29
+  -> Match via ID: Part 40, Sec 9, Gr 29
+  -> Found in DB: Assignment 13657 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 69] Analysing: Analyse de Données (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 40_9_35
+  -> Match via ID: Part 40, Sec 9, Gr 35
+  -> Found in DB: Assignment 13728 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 70] Analysing: Analyse de Données (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 95_9_29
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 71] Analysing: Biochimie Métabolique et Enzymologie (CM) | Type: CM | Section: GB S4 | ID: 95_9_35
+  -> SKIP (Part 95 is TP, not managed)
+[ROW 72] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 71_9_
+  -> Match via ID: Part 71, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 73] Analysing: Biochimie Métabolique et Enzymologie (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 72_9_29
+  -> Match via ID: Part 72, Sec 9, Gr 29
+  -> Found in DB: Assignment 13658 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 74] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 72_9_35
+  -> Match via ID: Part 72, Sec 9, Gr 35
+  -> Found in DB: Assignment 13729 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 75] Analysing: Biochimie Métabolique et Enzymologie (TP) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 90_9_29
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 76] Analysing: Biologie Moléculaire et Génétique (CM) | Type: CM | Section: GB S4 | ID: 90_9_35
+  -> SKIP (Part 90 is TP, not managed)
+[ROW 77] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 67_9_
+  -> Match via ID: Part 67, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 78] Analysing: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 68_9_29
+  -> Match via ID: Part 68, Sec 9, Gr 29
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 79] Analysing: Développement Personnel (CM) | Type: CM | Section: GB S4 | ID: 68_9_35
+  -> Match via ID: Part 68, Sec 9, Gr 35
+  -> Found in DB: Assignment 13659 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'KOURAD Hanane']
+  -> !!! CHANGE DETECTED !!!
+[ROW 80] Analysing: Développement Personnel (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 33_9_
+  -> Match via ID: Part 33, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 81] Analysing: Développement Personnel (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 34_9_29
+  -> Match via ID: Part 34, Sec 9, Gr 29
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 82] Analysing: LTC2 Français (CM) | Type: CM | Section: GB S4 | ID: 34_9_35
+  -> Match via ID: Part 34, Sec 9, Gr 35
+  -> Found in DB: Assignment 13660 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'El HASNAOUI Nadia']
+  -> !!! CHANGE DETECTED !!!
+[ROW 83] Analysing: LTC2 Français (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 31_9_
+  -> Match via ID: Part 31, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 84] Analysing: LTC2 Français (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 32_9_29
+  -> Match via ID: Part 32, Sec 9, Gr 29
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 85] Analysing: Méthodes d'analyse (CM) | Type: CM | Section: GB S4 | ID: 32_9_35
+  -> Match via ID: Part 32, Sec 9, Gr 35
+  -> Found in DB: Assignment 13661 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'MGHAZLI SAFAE']
+  -> !!! CHANGE DETECTED !!!
+[ROW 86] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 69_9_
+  -> Match via ID: Part 69, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 87] Analysing: Méthodes d'analyse (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 70_9_29
+  -> Match via ID: Part 70, Sec 9, Gr 29
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+[ROW 88] Analysing: Physiologie Animale et Végétale (CM) | Type: CM | Section: GB S4 | ID: 70_9_35
+  -> Match via ID: Part 70, Sec 9, Gr 35
+  -> Found in DB: Assignment 13662 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'ELHACHIMI Mly Youssef']
+  -> !!! CHANGE DETECTED !!!
+[ROW 89] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 1 | Type: TD | Section: GB S4 | ID: 73_9_
+  -> Match via ID: Part 73, Sec 9, Gr None
+  -> Compare: [DB: 'VIDE'] vs [Excel: 'PROF']
+  -> !!! CHANGE DETECTED !!!
+[ROW 90] Analysing: Physiologie Animale et Végétale (TD) - GB S4 Gr 2 | Type: TD | Section: GB S4 | ID: 74_9_29
+  -> Match via ID: Part 74, Sec 9, Gr 29
+  -> Found in DB: Assignment 13663 with Prof 'PROF'
+  -> Compare: [DB: 'PROF'] vs [Excel: 'PROF']
+
+--- Checking for Deletions in 2 section(s): {1, 9} ---
+  -> Orphan CM: Biologie Animale et Végétale in GB-GEG S2
+  -> Orphan CM: Culture digitale in GB-GEG S2
+  -> Orphan CM: Géodynamique externe in GB-GEG S2
+  -> Orphan CM: Langue Etrangère 2 in GB-GEG S2
+  -> Orphan CM: Mécanique des Fluides et Transfert Thermique in GB-GEG S2
+  -> Orphan CM: Réactivité Chimique in GB-GEG S2
+  -> Orphan CM: Analyse de Données in GB S4
+  -> Orphan CM: Biochimie Métabolique et Enzymologie in GB S4
+  -> Orphan CM: Biologie Moléculaire et Génétique in GB S4
+  -> Orphan CM: Développement Personnel in GB S4
+  -> Orphan CM: LTC2 Français in GB S4
+  -> Orphan CM: Méthodes d'analyse in GB S4
+  -> Orphan CM: Physiologie Animale et Végétale in GB S4
+  -> Orphan TD: LTC2 Français (TD) - GB S4 Gr 2
+  -> Orphan TD: Méthodes d'analyse (TD) - GB S4 Gr 2
+  -> Orphan TD: Culture digitale (TD) - GB-GEG S2 Gr 6
+  -> Orphan TD: Physiologie Animale et Végétale (TD) - GB S4 Gr 2
+  -> Orphan TD: Développement Personnel (TD) - GB S4 Gr 2
+  -> Orphan TD: Mécanique des Fluides et Transfert Thermique (TD) - GB-GEG S2 Gr 6
+  -> Orphan TD: Biologie Moléculaire et Génétique (TD) - GB S4 Gr 2
+  -> Orphan TD: Langue Etrangère 2 (TD) - GB-GEG S2 Gr 6

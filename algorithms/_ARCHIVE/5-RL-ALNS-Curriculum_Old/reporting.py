@@ -4,7 +4,8 @@ import os
 import sys
 
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'commun')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 def get_log_path():
     """Détermine le chemin absolu du fichier de log (Force V2 Logs)."""
@@ -70,7 +71,10 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
 
 def generate_final_report(engine, total_duration, init_score, mask, actual_generations=0, verbose=True):
     """Cree et affiche le rapport final, et le sauvegarde dans un fichier."""
-    from constraints import calculate_fitness_full
+    try:
+        from constraints_optimized import calculate_fitness_full
+    except ImportError:
+        from constraints import calculate_fitness_full
     
     best_overall = engine.population[0]
     final_fitnesses = [p.fitness for p in engine.population]

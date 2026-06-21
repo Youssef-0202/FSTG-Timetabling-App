@@ -1,20 +1,20 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-20 19:04:03
+ Date : 2026-06-12 20:28:45
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
- - Population Size      : 20
- - Max Generations      : 120
- - Mutation Rate        : 0.4
- - SA Iterations        : 1200
+ - Population Size      : 30
+ - Max Generations      : 250
+ - Mutation Rate        : 0.35
+ - SA Iterations        : 200
  - SA Temp Initial      : 50.0
 
 2. STATISTIQUES DE LA BASE DE DONNEES :
- - Nombre d'Enseignants : 77
+ - Nombre d'Enseignants : 78
  - Nombre de Salles     : 29
  - Nombre de Sections   : 10
- - Seances a placer     : 243
+ - Seances a placer     : 247
  - Creneaux disponibles : 30
 
 ============================================================
@@ -24,23 +24,23 @@
 ============================================================
  ANALYSE FINALE DES PERFORMANCES 
 ============================================================
- Temps total d'execution  : 2551.61 secondes
- Generations effectuees   : 120
+ Temps total d'execution  : 806.76 secondes
+ Generations effectuees   : 250
 ------------------------------------------------------------
- Score Initial (Best)     : 87012935.75
- Score Final   (Best)     : 10265.25
+ Score Initial (Best)     : 96012559.75
+ Score Final   (Best)     : 12985.75
  Amelioration Totale      : 100.0 %
 ------------------------------------------------------------
  STATISTIQUES DE LA DERNIERE POPULATION :
-  - Meilleure Solution    : 10265.25
-  - Pire Solution         : 5623.25
-  - Moyenne Population    : 5610.1
+  - Meilleure Solution    : 12985.75
+  - Pire Solution         : 8301.75
+  - Moyenne Population    : 8300.7
 ------------------------------------------------------------
  DETAIL DES CONFLITS (MEILLEUR INDIVIDU) :
-  - S_Total              : 10265.25
-  - S3_Gaps              : 1170
-  - S4_Lunch             : 1640
-  - S6_Stab              : 4100
-  - S8_FreeApm           : 1500
+  - S_Total              : 12985.75
+  - S3_Gaps              : 2380
+  - S4_Lunch             : 1800
+  - S6_Stab              : 5600
+  - S8_FreeApm           : 1400
   - S10_Sat              : 0
 ============================================================

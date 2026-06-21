@@ -126,8 +126,8 @@ def calculate_fitness_full(schedule, mask=None):
                 if is_cm: sec_occupancy[sec_key]['cm'] = True
                 if is_gr6: sec_occupancy[sec_key]['gr6'] = True
 
-        # --- AJOUT H13 : Sanctuarisation TP ---
-        if mp.unavailable_slots and ts_id in mp.unavailable_slots:
+        # --- AJOUT H13 : Sanctuarisation TP (si applicable) ---
+        if hasattr(mp, 'unavailable_slots') and mp.unavailable_slots and ts_id in mp.unavailable_slots:
             h13 += 1
 
     # Agrégation des Hard Violations selon le masque

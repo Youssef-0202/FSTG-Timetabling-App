@@ -1,7 +1,7 @@
 import requests 
 import json
 import os
-from .models import Room, Teacher, Timeslot, Section, ModulePart
+from models import Room, Teacher, Timeslot, Section, ModulePart
 
 API_BASE_URL = "http://localhost:8000" 
 

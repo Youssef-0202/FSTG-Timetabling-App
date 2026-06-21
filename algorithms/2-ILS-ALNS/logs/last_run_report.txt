@@ -1,6 +1,6 @@
 ============================================================
  RAPPORT D'EXECUTION - GENERATION D'EMPLOIS DU TEMPS
- Date : 2026-05-15 13:00:56
+ Date : 2026-06-12 13:01:32
 ============================================================
 
 1. PARAMETRES DE L'ALGORITHME :
@@ -13,10 +13,10 @@
  - SA Cooling           : 0.98
 
 2. STATISTIQUES DE LA BASE DE DONNEES :
- - Nombre d'Enseignants : 74
+ - Nombre d'Enseignants : 78
  - Nombre de Salles     : 29
  - Nombre de Sections   : 10
- - Seances a placer     : 245
+ - Seances a placer     : 247
  - Creneaux disponibles : 30
 
 ============================================================

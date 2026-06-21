@@ -55,7 +55,11 @@ def print_generation_status(gen, individual, gen_duration, init_score, mask, ver
     if not verbose:
         return
 
-    from constraints import calculate_fitness_full
+    try:
+        from constraints_optimized import calculate_fitness_full
+    except ImportError:
+        from constraints import calculate_fitness_full
+        
     score, h, s, details = calculate_fitness_full(individual, mask)
     
     improvement = ((init_score - score) / max(1, init_score)) * 100
@@ -129,15 +133,19 @@ class HistoryLogger:
         self.headers_written = False
         print(f"[CSV] Historique sera enregistré dans : {self.filepath}")
 
-    def log(self, gen, individual, gen_duration, mask=None, diversity=0, sa_impact=0):
+    def log(self, gen, individual, gen_duration, mask=None, diversity=0, sa_impact=0, phase="Global"):
         import csv
-        from constraints import calculate_fitness_full
+        try:
+            from constraints_optimized import calculate_fitness_full
+        except ImportError:
+            from constraints import calculate_fitness_full
         
-        # Utilisation du masque passé, sinon un masque vide ou None si géré par fitness
+        # Etude du score
         score, h, s, details = calculate_fitness_full(individual, mask)
         
         row = {
             "gen": gen,
+            "phase": phase,
             "score": score,
             "h_total": h,
             "s_total": s,

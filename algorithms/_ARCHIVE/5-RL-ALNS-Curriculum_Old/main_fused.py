@@ -14,22 +14,22 @@ from agent import QLearningAgent
 from reporting import (print_generation_status, generate_final_report,
                        initialize_log_file, HistoryLogger)
 
-# CONFIGURATION ULTRA (Target < 7000, ~12-15 min)
-POP_SIZE      = 20
-MAX_GEN       = 120
+# CONFIGURATION TURBO-9000
+POP_SIZE      = 12
+MAX_GEN       = 150
 MUTATION_RATE = 0.30
-ELITISM       = 4
-SA_ITERATIONS = 1200
-SA_TEMP       = 50.0
+ELITISM       = 3
+SA_ITERATIONS = 800
+SA_TEMP       = 45.0
 SA_COOLING    = 0.99
-PATIENCE      = 40
+PATIENCE      = 15
 
 CONSTRAINTS_MASK = {
     "H1": True, "H2": True, "H3": True, "H4": True, "H9": True, "H10": True, "H12": True,
     "S_GAPS": True, "S_LUNCH": True, "S_BALANCE": True,
     "S_STABILITY": True, "S_SHORT_DAY": True, "S_FREE_APM": True,
     "S_FATIGUE": True, "S_SATURDAY": True,
-    "S_MIXING": True, "S_CM_DISPERSION": True
+    "S_MIXING": False, "S_CM_DISPERSION": False
 }
 
 def curriculum_warmup(dm, agent, mask, n_phases=3):

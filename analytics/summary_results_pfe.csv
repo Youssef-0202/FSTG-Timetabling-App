@@ -1,0 +1,16 @@
+Algorithme,Fitness,H_Violations,Soft_Score,Temps_Exec(s),Gaps_Score,Stabilité_Salles
+GA-SA (Baseline),23265.5,"h_total    0.0
+h_total    0.0
+Name: 249, dtype: float64","s_total    12897.75
+s_total    12897.75
+Name: 249, dtype: float64",798.6091749668121,0,0
+ALNS-ILS,12939.75,"h_total    0.0
+h_total    0.0
+Name: 149, dtype: float64","s_total    9217.0
+s_total    9217.0
+Name: 149, dtype: float64",9330.654765844345,0,0
+RL-ALNS (Champion),8180.100000000001,"h_total    0.0
+h_total    0.0
+Name: 119, dtype: float64","s_total    9068.0
+s_total    9068.0
+Name: 119, dtype: float64",1569.4426934719086,0,0

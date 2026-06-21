@@ -13,6 +13,16 @@ class QLearningAgent:
         self.gamma = discount_factor
         self.epsilon = epsilon
         self.q_table = {} # Key: state_bundle (tuple), Value: dict of action scores
+        self.last_td_error = 0.0
+        self.total_rewards = 0.0
+
+    def get_stats(self):
+        """Retourne les métriques de santé de l agent."""
+        return {
+            "q_size": len(self.q_table),
+            "last_td_error": self.last_td_error,
+            "epsilon": self.epsilon
+        }
 
     def _get_state_key(self, state_vector):
         """
@@ -46,6 +56,7 @@ class QLearningAgent:
         """Met à jour la Q-Table selon l équation de Bellman."""
         state_key = self._get_state_key(state)
         next_state_key = self._get_state_key(next_state)
+        self.total_rewards += reward
         
         if state_key not in self.q_table:
             self.q_table[state_key] = {a: 0.0 for a in self.actions}
@@ -56,6 +67,7 @@ class QLearningAgent:
         max_next_q = max(self.q_table[next_state_key].values())
         td_target = reward + self.gamma * max_next_q
         td_error = td_target - self.q_table[state_key][action]
+        self.last_td_error = abs(td_error)
         
         # Update
         self.q_table[state_key][action] += self.lr * td_error
@@ -71,4 +83,4 @@ class QLearningAgent:
             with open(filepath, 'r') as f:
                 data = json.load(f)
                 # On reconvertit les strings en tuples si nécessaire (ou on garde en string)
-                self.q_table = {eval(k): v for v in data.items()}
+                self.q_table = {eval(k): v for k, v in data.items()}

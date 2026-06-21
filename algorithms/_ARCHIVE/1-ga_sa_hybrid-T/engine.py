@@ -15,7 +15,7 @@ import sys
 import os
 
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from commun.models import Schedule, Assignment
 from constraints_optimized import calculate_fitness_full

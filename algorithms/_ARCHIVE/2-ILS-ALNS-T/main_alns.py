@@ -4,7 +4,7 @@ import time
 import sys
 
 # Chargement des contraintes communes
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from commun.data_manager import DataManager
 from commun.models import Schedule

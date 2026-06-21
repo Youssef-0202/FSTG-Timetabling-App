@@ -5,20 +5,16 @@ import os
 import sys
 
 def get_log_path():
-    """Détermine le chemin absolu du fichier de log (Force V2 Logs)."""
-    # Determination dynamique du dossier logs (Turbo-friendly)
-    log_dir = os.path.join(os.getcwd(), "logs")
-    
-    if not os.path.exists(log_dir):
-        # Fallback pour eviter les erreurs si lance hors dossier algo
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        log_dir = os.path.abspath(os.path.join(current_dir, "..", "ga_sa_hybrid", "v2", "logs"))
+    """Détermine le chemin du fichier de log (Le dossier logs à côté du script qui tourne)."""
+    # On cherche le dossier du script principal (ex: main_solver.py)
+    main_script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    log_dir = os.path.join(main_script_dir, "logs")
     
     if not os.path.exists(log_dir):
         try:
             os.makedirs(log_dir)
         except:
-            # Fallback ultime à la racine si même ça échoue
+            # Fallback à la racine du projet si création impossible
             return os.path.join(os.getcwd(), "last_run_report.txt")
             
     return os.path.join(log_dir, "last_run_report.txt")
@@ -121,12 +117,10 @@ def generate_final_report(engine, total_duration, init_score, mask, actual_gener
 class HistoryLogger:
     """Enregistre l'historique complet (H1, H2, S1, S2...) dans un fichier CSV."""
     def __init__(self, filename="evolution_history.csv"):
-        log_dir = os.path.join(os.getcwd(), "logs")
+        main_script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        log_dir = os.path.join(main_script_dir, "logs")
         if not os.path.exists(log_dir):
-            log_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ga_sa_hybrid", "v2", "logs"))
-        
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+            os.makedirs(log_dir, exist_ok=True)
             
         self.filepath = os.path.join(log_dir, filename)
         self.headers_written = False

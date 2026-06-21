@@ -14,7 +14,7 @@ import json
 import time
 from datetime import datetime
 # Ajouter le chemin racine 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from commun.data_manager import DataManager
 from commun.models import Schedule
 from constraints_optimized import calculate_fitness_full
@@ -25,8 +25,8 @@ from engine import HybridEngine
 # ==============================================================================
 
 # CONFIGURATION RAPIDE (Time Optimized)
-POP_SIZE = 15
-MAX_GEN = 60
+POP_SIZE = 30
+MAX_GEN = 250
 MUTATION_RATE = 0.35
 ELITISM = 5 # (33% de 15)
 SA_ITERATIONS_INTERNAL = 200 # Réduit pour la boucle GA
@@ -96,7 +96,7 @@ def run_optimization():
     }
     params = {
         "POP_SIZE": POP_SIZE, "MAX_GEN": MAX_GEN, "MUTATION_RATE": MUTATION_RATE,
-        "SA_ITERATIONS": SA_ITERATIONS, "SA_TEMP": SA_TEMP
+        "SA_ITERATIONS": SA_ITERATIONS_INTERNAL, "SA_TEMP": SA_TEMP
     }
     
     initialize_log_file(params, db_stats)
@@ -127,7 +127,7 @@ def run_optimization():
         print(f"        Initial H-Violations: {init_h} | Soft Score: {init_soft}")
     
     # ── ETAPE 3 : Evolution Memetique ──
-    PATIENCE = 40  # Supporte l'Ultra Mode pour creuser plus profond
+    PATIENCE = 50  # On laisse plus de temps pour converger
     no_improve_count = 0
     best_score_ever = float('inf')
 

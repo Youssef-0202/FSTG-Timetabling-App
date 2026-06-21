@@ -33,7 +33,7 @@ CONSTRAINTS_MASK = {
     "S_BLOCK_SYNERGY": True
 }
 
-def curriculum_warmup(dm, agent, mask, n_phases=3):
+def curriculum_warmup(dm, agent, mask, csv_logger, n_phases=3):
     """
     Phase de curriculum : 3 passes progressives pour préchauffer l'agent.
     Phase 1 : 1 section (30% des séances)
@@ -64,8 +64,12 @@ def curriculum_warmup(dm, agent, mask, n_phases=3):
         dm.module_parts = sub_mps
         sub_engine.create_initial_population()
         
-        for _ in range(8): # 8 itérations de pré-apprentissage par phase
+        for sub_gen in range(8): # 8 itérations de pré-apprentissage par phase
             sub_engine.evolve()
+            # Log de la progression curriculum
+            if csv_logger:
+                best = sub_engine.population[0]
+                csv_logger.log(sub_gen + 1, best, 0, mask=mask, phase=f"Curriculum_P{phase_idx+1}")
             
         print(f"  -> Base de connaissances agent : {len(agent.q_table)} etats memorises.")
     
@@ -101,7 +105,7 @@ def run_fused_optimization():
     agent = QLearningAgent(actions=list(range(12)), epsilon=0.15)
     
     # --- PHASE DE CURRICULUM LEARNING ---
-    curriculum_warmup(dm, agent, CONSTRAINTS_MASK)
+    curriculum_warmup(dm, agent, CONSTRAINTS_MASK, csv_logger)
     
     # --- OPTIMISATION GLOBALE ---
     engine = HybridEngine(
@@ -119,6 +123,13 @@ def run_fused_optimization():
     print("\n[STEP 2] Optimisation Fusionnee...\n")
     start_time = time.time()
     
+    # --- LOGGER RL ---
+    log_dir = os.path.join(os.path.dirname(__file__), "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    rl_log_path = os.path.join(log_dir, "agent_learning_history.csv")
+    with open(rl_log_path, 'w') as f:
+        f.write("gen,q_size,td_error,epsilon,total_reward\n")
+
     best_overall_score = float('inf')
     no_improvement_count = 0
     
@@ -136,6 +147,11 @@ def run_fused_optimization():
         best = engine.population[0]
         print_generation_status(gen, best, gen_dur, init_score, CONSTRAINTS_MASK)
         csv_logger.log(gen, best, gen_dur, mask=CONSTRAINTS_MASK)
+        
+        # --- LOG RL STATS ---
+        stats = engine.agent.get_stats()
+        with open(rl_log_path, 'a') as f:
+            f.write(f"{gen},{stats['q_size']},{stats['last_td_error']:.6f},{stats['epsilon']},{engine.agent.total_rewards:.2f}\n")
         
         # --- EARLY STOPPING (Optimisation Turbo) ---
         if best.fitness < best_overall_score:
