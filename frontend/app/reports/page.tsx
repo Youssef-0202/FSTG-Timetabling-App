@@ -34,8 +34,7 @@ export default function ReportsPage() {
 
     const handleSetMaster = async (id: number) => {
         try {
-            const API_BASE = "http://127.0.0.1:8000";
-            const response = await fetch(`${API_BASE}/timetable-results/${id}/set-master`, { method: 'POST' });
+            const response = await fetch(`/api/v1/timetable-results/${id}/set-master`, { method: 'POST' });
             if (response.ok) {
                 notify("Ce planning est désormais la référence officielle pour les TP.", "success");
                 loadData();
@@ -198,8 +197,7 @@ export default function ReportsPage() {
                                     <button
                                         onClick={async () => {
                                             try {
-                                                const API_BASE = "http://127.0.0.1:8000";
-                                                const response = await fetch(`${API_BASE}/commit-preview?result_id=${res.id}`, { method: 'POST' });
+                                                const response = await fetch(`/api/v1/commit-preview?result_id=${res.id}`, { method: 'POST' });
                                                 if (response.ok) {
                                                     router.push(`/timetable/interactive?edit_id=${res.id}`);
                                                 } else {
@@ -218,7 +216,7 @@ export default function ReportsPage() {
                                         <Layout size={16} /> Visualiser
                                     </button>
                                     <button
-                                        onClick={() => window.open(`/api/export-excel?id=${res.id}`, "_blank")}
+                                        onClick={() => window.open(`/api/v1/export-excel?id=${res.id}`, "_blank")}
                                         style={{
                                             flex: 1, padding: '10px', borderRadius: '10px', border: 'none',
                                             background: '#3b82f6', color: 'white', fontWeight: 700, fontSize: '0.85rem',

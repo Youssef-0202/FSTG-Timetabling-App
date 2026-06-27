@@ -15,7 +15,12 @@ target_section_id = sys.argv[2] if len(sys.argv) > 2 else ""
 
 file_suffix = f"_{mode}" if mode in ["alns", "rl", "fused"] else ""
 
-CACHE_PATH = os.path.join(BASE_DIR, "data_cache.json")
+# Correction du chemin du cache
+CACHE_PATH = os.path.join(BASE_DIR, "algorithms", "3-rl_controller", "data_cache.json")
+# Fallback si absent
+if not os.path.exists(CACHE_PATH):
+    CACHE_PATH = os.path.join(BASE_DIR, "algorithms", "2-ILS-ALNS", "data_cache.json")
+
 TIMETABLE_PATH = os.path.join(BASE_DIR, "backend", f"generated_timetable{file_suffix}.json")
 OUTPUT_PATH = os.path.join(BASE_DIR, "algorithms", "1-ga_sa_hybrid", "v2", "logs", f"FSTG_EXCEL_PREMIUM{file_suffix.upper()}{'_' + target_section_id if target_section_id else ''}.xlsx")
 

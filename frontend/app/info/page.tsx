@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Info, BookOpen, Layers, Terminal, ShieldCheck,
     Zap, HelpCircle, FileText, Settings, Share2,
-    CheckCircle2, AlertTriangle, Lightbulb, Workflow
+    CheckCircle2, AlertTriangle, Lightbulb, Workflow, FileSpreadsheet
 } from "lucide-react";
 
 type InfoTab = 'workflow' | 'hard-constraints' | 'soft-constraints' | 'ai-engine' | 'guide';
@@ -271,40 +271,36 @@ export default function InfoPage() {
                                     </p>
                                     <div className="constraint-list">
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Collision Enseignant</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Empêche un professeur d'être à deux endroits à la fois.</p>
+                                            <strong>H1-H3 : Conflits d'Unicité</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Garantit qu'un enseignant, une salle ou un groupe n'ont jamais deux cours au même moment.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Collision Salle</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Interdit d'affecter deux modules différents à la même salle au même moment.</p>
+                                            <strong>H4 : Capacité de Salle</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Le nombre d'étudiants ne doit jamais dépasser le nombre de places physiques disponibles.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Capacité de Salle</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>L'effectif du groupe ne doit jamais dépasser la capacité physique de la salle.</p>
+                                            <strong>H5-H7 : Logique Administrative</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Respect du volume horaire (H6), de la modalité (online/présentiel) et des équipements requis.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Disponibilité Enseignant (H8)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Respect strict des créneaux bloqués par les professeurs.</p>
+                                            <strong>H8 : Disponibilité Enseignant</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Interdiction absolue de placer un cours sur un créneau bloqué par un professeur.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Sanctuarisation TP (H9)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Interdiction de placer un CM/TD sur les créneaux labs.</p>
+                                            <strong>H9 : Spécificité Pédagogique</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Affectation stricte selon le type (Amphi pour CM, Labo pour TP, Salle pour TD).</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Volume Hebdomadaire (H6)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Respect strict du volume d'heures par module (maquette).</p>
+                                            <strong>H10 : Verrouillage Manuel</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Respect des affectations "Type 1" figées manuellement par l'administrateur.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>CM le Samedi Interdits (H11)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Journée réservée aux TD/TP si nécessaire.</p>
+                                            <strong>H11 : CM le Samedi Interdits</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Restriction institutionnelle interdisant les cours magistraux en fin de semaine.</p>
                                         </div>
                                         <div className="constraint-card constraint-hard">
-                                            <strong>Verrouillage Manuel (H10)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Les choix administratifs priment sur l'IA.</p>
-                                        </div>
-                                        <div className="constraint-card constraint-hard">
-                                            <strong>Conflit de Structure (H3)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Gestion des filières liées et redoublants.</p>
+                                            <strong>H12 : Sanctuarisation des TP</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Protection des plages horaires réservées aux laboratoires pour le Tronc Commun.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -324,36 +320,36 @@ export default function InfoPage() {
                                     </p>
                                     <div className="constraint-list">
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Compacité (Anti-Trous)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Minimiser les fenêtres vides entre deux cours pour les étudiants.</p>
+                                            <strong>S1 : Minimisation des Trous</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Élimination des heures creuses intra-journalières pour les étudiants.</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Pause Déjeuner</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Garantir un créneau libre entre 12h30 et 14h30.</p>
+                                            <strong>S2 : Regroupement de Module</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Favoriser l'enchaînement des séances d'une même matière.</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Rythme & Fatigue (S9)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Éviter les fins de journées (16h35) chargées.</p>
+                                            <strong>S3 : Stabilité des Salles</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Réduction du "nomadisme" (changements de salle au sein d'une même journée).</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Pédagogie CM (S3)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Cours magistraux le matin pour une meilleure concentration.</p>
+                                            <strong>S4 : Pause Déjeuner</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Garantir un créneau libre entre 12h30 et 14h30 pour la restauration.</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Après-midis Libres (S8)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Favoriser 2 demi-journées libres pour le travail personnel.</p>
+                                            <strong>S5 : Équilibre de la Charge</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Répartition homogène des heures sur la semaine (Éviter les journées trop denses).</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Compactage Prof (S5)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Réduire les temps morts pour les enseignants.</p>
+                                            <strong>S6 : Priorité Matinale</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Placer les cours magistraux le matin pour une meilleure réceptivité.</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Stabilité Salles (S6)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Éviter les changements de salle pour un même module.</p>
+                                            <strong>S7 : Compactage Enseignant</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Réduction des heures creuses pour les professeurs vacataires et permanents.</p>
                                         </div>
                                         <div className="constraint-card constraint-soft">
-                                            <strong>Journées Hachées (S7)</strong>
-                                            <p style={{ fontSize: '0.85rem' }}>Éviter de faire déplacer un étudiant pour un seul cours.</p>
+                                            <strong>S8 : Minimisation du Samedi</strong>
+                                            <p style={{ fontSize: '0.85rem' }}>Réduire au maximum les séances en fin de semaine pour le confort de tous.</p>
                                         </div>
                                     </div>
                                     <div style={{ marginTop: '30px', padding: '20px', background: 'rgba(26, 158, 122, 0.05)', borderRadius: '16px', fontSize: '0.9rem', border: '1px dashed var(--teal)' }}>
@@ -423,6 +419,36 @@ export default function InfoPage() {
                                             <div>
                                                 <strong>Sauvegarde Manuelle</strong>
                                                 <p style={{ fontSize: '0.85rem' }}>Chaque modification manuelle doit être enregistrée via le bouton "Enregistrer la Session" pour créer une nouvelle version dans vos archives.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="info-block" style={{ marginTop: '30px' }}>
+                                    <h2 style={{ color: '#1a6fba' }}><FileSpreadsheet size={22} /> Synchronisation des Maquettes (Excel)</h2>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--muted)', marginBottom: '20px' }}>
+                                        Le système utilise une technologie de comparaison intelligente (Smart Diff) pour lier le monde Excel à la base de données.
+                                    </p>
+                                    <div className="step-list">
+                                        <div className="step-item">
+                                            <div className="step-num" style={{ background: '#1a6fba' }}>A</div>
+                                            <div>
+                                                <strong>Génération & IDs Masqués</strong>
+                                                <p style={{ fontSize: '0.85rem' }}>Lors de l'exportation, le système insère une colonne masquée (ID) contenant une clé unique (ex: 45_6_12). <b>Ne supprimez jamais cette colonne !</b> Elle permet de reconnaître les modules même si leur nom est modifié.</p>
+                                            </div>
+                                        </div>
+                                        <div className="step-item">
+                                            <div className="step-num" style={{ background: '#1a6fba' }}>B</div>
+                                            <div>
+                                                <strong>Processus de Comparaison (Smart Matching)</strong>
+                                                <p style={{ fontSize: '0.85rem' }}>Lors de l'import, le système compare chaque ligne : si un nouveau professeur est détecté, il propose de créer sa fiche. Si une ligne est absente de l'Excel, l'affectation est marquée pour suppression.</p>
+                                            </div>
+                                        </div>
+                                        <div className="step-item" style={{ marginBottom: 0 }}>
+                                            <div className="step-num" style={{ background: '#1a6fba' }}>C</div>
+                                            <div>
+                                                <strong>Analyse d'Impact (Preview)</strong>
+                                                <p style={{ fontSize: '0.85rem' }}>Avant toute modification, une fenêtre modale affiche le "Diff" (Ancien vs Nouveau). Aucune donnée n'est modifiée tant que vous ne cliquez pas sur "Confirmer l'import".</p>
                                             </div>
                                         </div>
                                     </div>

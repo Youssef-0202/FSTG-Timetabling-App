@@ -18,7 +18,7 @@ from constraints_optimized import calculate_fitness_full
 # CONFIGURATION TURBO (Cible < 10 min)
 POP_SIZE      = 12
 MAX_GEN       = 100
-MUTATION_RATE = 0.25
+MUTATION_RATE = 0.35
 ELITISM       = 3
 SA_ITERATIONS = 800
 SA_TEMP       = 40.0

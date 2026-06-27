@@ -6,6 +6,8 @@ from typing import List, Optional
 import models, schemas
 from sqlalchemy import text
 from database import engine, get_db
+import sys
+import subprocess
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -1411,6 +1413,22 @@ def run_algorithm(algo: str):
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from datetime import time as dt_time
+
+@app.get("/export-excel")
+async def export_excel(id: int):
+    """Génère et télécharge le fichier Excel pour un résultat spécifique."""
+    try:
+        # Appel du script externe (python export_excel_db.py <ID>)
+        cmd = [sys.executable, "export_excel_db.py", str(id)]
+        subprocess.run(cmd, check=True)
+        
+        file_path = f"export_result_{id}.xlsx"
+        if os.path.exists(file_path):
+            return FileResponse(file_path, filename=f"Emploi_du_temps_{id}.xlsx")
+        else:
+            raise HTTPException(status_code=500, detail="Fichier Excel non généré.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/export-tp-excel/{section_id}")
 async def export_tp_excel(section_id: int, merge: bool = True, db: Session = Depends(get_db)):

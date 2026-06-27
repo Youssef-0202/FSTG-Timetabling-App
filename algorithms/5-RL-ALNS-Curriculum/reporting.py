@@ -51,25 +51,38 @@ def initialize_log_file(params, db_stats):
         f.write("\n".join(header))
 
 def print_generation_status(gen, individual, gen_duration, init_score, mask, verbose=True):
-    """Affiche le statut d'une generation."""
+    """Affiche le statut d'une generation avec le double score (Optimisé vs Standard)."""
     if not verbose:
         return
 
+    # Import des deux moteurs de calcul
     try:
-        from constraints_optimized import calculate_fitness_full
+        from constraints_optimized import calculate_fitness_full as calc_opt
     except ImportError:
-        from constraints import calculate_fitness_full
+        def calc_opt(ind, m): return (0, 0, 0, {})
         
-    score, h, s, details = calculate_fitness_full(individual, mask)
+    try:
+        # On force l'import du fichier standard en remontant d'un cran si besoin
+        from constraints import calculate_fitness_full as calc_std
+    except ImportError:
+        # Fallback si constraints.py n'est pas accessible directement
+        def calc_std(ind, m): return (0, 0, 0, {})
+
+    # Calcul des deux scores
+    score_opt, h, s_opt, details_opt = calc_opt(individual, mask)
+    score_std, _, s_std, _          = calc_std(individual, mask)
     
-    improvement = ((init_score - score) / max(1, init_score)) * 100
-    line = f" Gen {gen:03d} | Score: {score:8.0f} | H: {h} | S: {s:5.0f} | Imp: {improvement:>5.1f}% | Time: {gen_duration:4.2f}s"
+    improvement = ((init_score - score_opt) / max(1, init_score)) * 100
+    
+    # Affichage compact : [Score Opt (IA)] | [Score Std (Rapport)]
+    line = f" Gen {gen:03d} | Opt: {score_opt:8.0f} | Std: {score_std:6.0f} | H: {h} | Imp: {improvement:>5.1f}% | {gen_duration:4.2f}s"
     
     if h > 0:
-        h_details = " - Hard: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('H') and v > 0])
+        h_details = " - Hard: " + ", ".join([f"{k}:{v}" for k,v in details_opt.items() if k.startswith('H') and v > 0])
         print(line + h_details)
     else:
-        s_details = " - Soft: " + ", ".join([f"{k}:{v}" for k,v in details.items() if k.startswith('S') and v > 0])
+        # On affiche les détails pédagogiques (Soft) basés sur le moteur optimisé pour voir les Big-M
+        s_details = " - Soft: " + ", ".join([f"{k}:{v}" for k,v in details_opt.items() if (k.startswith('S') or k.startswith('S12')) and v > 0])
         print(line + s_details)
 
 def generate_final_report(engine, total_duration, init_score, mask, actual_generations=0, verbose=True):

@@ -1,752 +1,10 @@
 [
     {
-        "id": 13671,
-        "module_part_id": 1,
-        "teacher_id": 181,
-        "room_id": 90,
-        "slot_id": 13,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13678,
-        "module_part_id": 11,
-        "teacher_id": 175,
-        "room_id": 87,
-        "slot_id": 20,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13685,
-        "module_part_id": 5,
-        "teacher_id": 183,
-        "room_id": 90,
-        "slot_id": 19,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13692,
-        "module_part_id": 9,
-        "teacher_id": 180,
-        "room_id": 88,
-        "slot_id": 14,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13699,
-        "module_part_id": 47,
-        "teacher_id": 185,
-        "room_id": 90,
-        "slot_id": 5,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13706,
-        "module_part_id": 7,
-        "teacher_id": 182,
-        "room_id": 87,
-        "slot_id": 6,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13717,
-        "module_part_id": 13,
-        "teacher_id": 184,
-        "room_id": 90,
-        "slot_id": 12,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            },
-            {
-                "id": 4
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13670,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 18,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13677,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 22,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13684,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 16,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13691,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 21,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13698,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 11,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13705,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 15,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13712,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 17,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 6
-            }
-        ]
-    },
-    {
-        "id": 13666,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 1,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13667,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 7,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13668,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 3,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13669,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 15,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13672,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 17,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13673,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 10,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13674,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 4,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13675,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 4,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13676,
-        "module_part_id": 2,
-        "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 18,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13679,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 11,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13680,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 2,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13681,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 3,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13682,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 7,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13683,
-        "module_part_id": 12,
-        "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 17,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13686,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 18,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13687,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 17,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13688,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 8,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13689,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 11,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13690,
-        "module_part_id": 6,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 22,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13693,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 3,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13694,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 18,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13695,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 16,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13696,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 21,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13697,
-        "module_part_id": 10,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 16,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13737,
-        "module_part_id": 14,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 9,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13700,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 10,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13701,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 4,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13702,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 22,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13703,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 8,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13704,
-        "module_part_id": 48,
-        "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 21,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
-        "id": 13707,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 4,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 1
-            }
-        ]
-    },
-    {
-        "id": 13708,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 11,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 2
-            }
-        ]
-    },
-    {
-        "id": 13709,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 21,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 3
-            }
-        ]
-    },
-    {
-        "id": 13710,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 22,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 4
-            }
-        ]
-    },
-    {
-        "id": 13711,
-        "module_part_id": 8,
-        "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 11,
-        "section_id": 1,
-        "td_groups": [
-            {
-                "id": 5
-            }
-        ]
-    },
-    {
         "id": 9930,
         "module_part_id": 31,
         "teacher_id": 164,
         "room_id": 87,
-        "slot_id": 19,
+        "slot_id": 12,
         "section_id": 4,
         "td_groups": [
             {
@@ -776,8 +34,8 @@
         "id": 9993,
         "module_part_id": 33,
         "teacher_id": 193,
-        "room_id": 88,
-        "slot_id": 9,
+        "room_id": 87,
+        "slot_id": 13,
         "section_id": 4,
         "td_groups": [
             {
@@ -807,8 +65,8 @@
         "id": 9954,
         "module_part_id": 11,
         "teacher_id": 175,
-        "room_id": 87,
-        "slot_id": 2,
+        "room_id": 88,
+        "slot_id": 26,
         "section_id": 3,
         "td_groups": [
             {
@@ -835,8 +93,8 @@
         "id": 10000,
         "module_part_id": 17,
         "teacher_id": 176,
-        "room_id": 88,
-        "slot_id": 6,
+        "room_id": 90,
+        "slot_id": 8,
         "section_id": 3,
         "td_groups": [
             {
@@ -863,8 +121,8 @@
         "id": 10100,
         "module_part_id": 9,
         "teacher_id": 180,
-        "room_id": 88,
-        "slot_id": 11,
+        "room_id": 90,
+        "slot_id": 17,
         "section_id": 3,
         "td_groups": [
             {
@@ -891,8 +149,8 @@
         "id": 10145,
         "module_part_id": 21,
         "teacher_id": 174,
-        "room_id": 88,
-        "slot_id": 12,
+        "room_id": 90,
+        "slot_id": 19,
         "section_id": 3,
         "td_groups": [
             {
@@ -919,8 +177,8 @@
         "id": 10106,
         "module_part_id": 15,
         "teacher_id": 177,
-        "room_id": 90,
-        "slot_id": 7,
+        "room_id": 88,
+        "slot_id": 1,
         "section_id": 3,
         "td_groups": [
             {
@@ -947,8 +205,8 @@
         "id": 10113,
         "module_part_id": 25,
         "teacher_id": 186,
-        "room_id": 90,
-        "slot_id": 16,
+        "room_id": 87,
+        "slot_id": 4,
         "section_id": 3,
         "td_groups": [
             {
@@ -975,8 +233,8 @@
         "id": 9919,
         "module_part_id": 23,
         "teacher_id": 187,
-        "room_id": 87,
-        "slot_id": 28,
+        "room_id": 88,
+        "slot_id": 16,
         "section_id": 3,
         "td_groups": [
             {
@@ -1000,11 +258,207 @@
         ]
     },
     {
+        "id": 13671,
+        "module_part_id": 1,
+        "teacher_id": 181,
+        "room_id": 87,
+        "slot_id": 19,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13678,
+        "module_part_id": 11,
+        "teacher_id": 175,
+        "room_id": 88,
+        "slot_id": 20,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13685,
+        "module_part_id": 5,
+        "teacher_id": 183,
+        "room_id": 88,
+        "slot_id": 5,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13692,
+        "module_part_id": 9,
+        "teacher_id": 180,
+        "room_id": 90,
+        "slot_id": 3,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13699,
+        "module_part_id": 47,
+        "teacher_id": 185,
+        "room_id": 87,
+        "slot_id": 11,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13706,
+        "module_part_id": 7,
+        "teacher_id": 182,
+        "room_id": 87,
+        "slot_id": 14,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13717,
+        "module_part_id": 13,
+        "teacher_id": 184,
+        "room_id": 90,
+        "slot_id": 13,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            },
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
         "id": 9956,
         "module_part_id": 3,
         "teacher_id": 179,
         "room_id": 88,
-        "slot_id": 8,
+        "slot_id": 9,
         "section_id": 2,
         "td_groups": [
             {
@@ -1031,8 +485,8 @@
         "id": 10003,
         "module_part_id": 21,
         "teacher_id": 174,
-        "room_id": 88,
-        "slot_id": 3,
+        "room_id": 90,
+        "slot_id": 7,
         "section_id": 2,
         "td_groups": [
             {
@@ -1059,8 +513,8 @@
         "id": 10056,
         "module_part_id": 19,
         "teacher_id": 178,
-        "room_id": 90,
-        "slot_id": 11,
+        "room_id": 87,
+        "slot_id": 6,
         "section_id": 2,
         "td_groups": [
             {
@@ -1087,8 +541,8 @@
         "id": 9977,
         "module_part_id": 9,
         "teacher_id": 180,
-        "room_id": 88,
-        "slot_id": 2,
+        "room_id": 90,
+        "slot_id": 5,
         "section_id": 2,
         "td_groups": [
             {
@@ -1115,8 +569,8 @@
         "id": 9981,
         "module_part_id": 11,
         "teacher_id": 175,
-        "room_id": 87,
-        "slot_id": 29,
+        "room_id": 88,
+        "slot_id": 28,
         "section_id": 2,
         "td_groups": [
             {
@@ -1143,8 +597,8 @@
         "id": 9988,
         "module_part_id": 17,
         "teacher_id": 176,
-        "room_id": 88,
-        "slot_id": 7,
+        "room_id": 90,
+        "slot_id": 11,
         "section_id": 2,
         "td_groups": [
             {
@@ -1171,8 +625,8 @@
         "id": 10107,
         "module_part_id": 15,
         "teacher_id": 177,
-        "room_id": 90,
-        "slot_id": 27,
+        "room_id": 88,
+        "slot_id": 8,
         "section_id": 2,
         "td_groups": [
             {
@@ -1200,7 +654,7 @@
         "module_part_id": 27,
         "teacher_id": 160,
         "room_id": 90,
-        "slot_id": 1,
+        "slot_id": 14,
         "section_id": 4,
         "td_groups": [
             {
@@ -1227,8 +681,8 @@
         "id": 10119,
         "module_part_id": 29,
         "teacher_id": 211,
-        "room_id": 88,
-        "slot_id": 13,
+        "room_id": 87,
+        "slot_id": 29,
         "section_id": 4,
         "td_groups": [
             {
@@ -1253,7 +707,7 @@
         "module_part_id": 35,
         "teacher_id": 175,
         "room_id": 88,
-        "slot_id": 5,
+        "slot_id": 18,
         "section_id": 4,
         "td_groups": [
             {
@@ -1275,7 +729,7 @@
         "module_part_id": 39,
         "teacher_id": 175,
         "room_id": 89,
-        "slot_id": 1,
+        "slot_id": 10,
         "section_id": 9,
         "td_groups": [
             {
@@ -1293,8 +747,8 @@
         "id": 13653,
         "module_part_id": 33,
         "teacher_id": 193,
-        "room_id": 88,
-        "slot_id": 10,
+        "room_id": 87,
+        "slot_id": 17,
         "section_id": 9,
         "td_groups": [
             {
@@ -1331,8 +785,8 @@
         "id": 13655,
         "module_part_id": 69,
         "teacher_id": 222,
-        "room_id": 87,
-        "slot_id": 9,
+        "room_id": 88,
+        "slot_id": 12,
         "section_id": 9,
         "td_groups": [
             {
@@ -1350,8 +804,8 @@
         "id": 9932,
         "module_part_id": 41,
         "teacher_id": 189,
-        "room_id": 89,
-        "slot_id": 3,
+        "room_id": 88,
+        "slot_id": 10,
         "section_id": 4,
         "td_groups": [
             {
@@ -1369,8 +823,8 @@
         "id": 10104,
         "module_part_id": 43,
         "teacher_id": 184,
-        "room_id": 89,
-        "slot_id": 18,
+        "room_id": 88,
+        "slot_id": 6,
         "section_id": 4,
         "td_groups": [
             {
@@ -1388,8 +842,8 @@
         "id": 10027,
         "module_part_id": 37,
         "teacher_id": 226,
-        "room_id": 88,
-        "slot_id": 4,
+        "room_id": 90,
+        "slot_id": 15,
         "section_id": 8,
         "td_groups": [
             {
@@ -1404,8 +858,8 @@
         "id": 13651,
         "module_part_id": 71,
         "teacher_id": 215,
-        "room_id": 87,
-        "slot_id": 4,
+        "room_id": 89,
+        "slot_id": 9,
         "section_id": 9,
         "td_groups": [
             {
@@ -1420,8 +874,8 @@
         "id": 13652,
         "module_part_id": 67,
         "teacher_id": 216,
-        "room_id": 87,
-        "slot_id": 3,
+        "room_id": 90,
+        "slot_id": 1,
         "section_id": 9,
         "td_groups": [
             {
@@ -1436,8 +890,8 @@
         "id": 13656,
         "module_part_id": 73,
         "teacher_id": 217,
-        "room_id": 90,
-        "slot_id": 8,
+        "room_id": 87,
+        "slot_id": 7,
         "section_id": 9,
         "td_groups": [
             {
@@ -1449,206 +903,11 @@
         ]
     },
     {
-        "id": 9959,
-        "module_part_id": 49,
-        "teacher_id": 218,
-        "room_id": 89,
-        "slot_id": 5,
-        "section_id": 6,
-        "td_groups": [
-            {
-                "id": 23
-            }
-        ]
-    },
-    {
-        "id": 9999,
-        "module_part_id": 61,
-        "teacher_id": 212,
-        "room_id": 87,
-        "slot_id": 18,
-        "section_id": 7,
-        "td_groups": [
-            {
-                "id": 25
-            }
-        ]
-    },
-    {
-        "id": 10012,
-        "module_part_id": 79,
-        "teacher_id": 223,
-        "room_id": 89,
-        "slot_id": 2,
-        "section_id": 10,
-        "td_groups": [
-            {
-                "id": 31
-            }
-        ]
-    },
-    {
-        "id": 10016,
-        "module_part_id": 45,
-        "teacher_id": 229,
-        "room_id": 87,
-        "slot_id": 10,
-        "section_id": 5,
-        "td_groups": [
-            {
-                "id": 21
-            }
-        ]
-    },
-    {
-        "id": 10062,
-        "module_part_id": 53,
-        "teacher_id": 220,
-        "room_id": 87,
-        "slot_id": 1,
-        "section_id": 6,
-        "td_groups": [
-            {
-                "id": 23
-            }
-        ]
-    },
-    {
-        "id": 10072,
-        "module_part_id": 47,
-        "teacher_id": 185,
-        "room_id": 90,
-        "slot_id": 3,
-        "section_id": 5,
-        "td_groups": [
-            {
-                "id": 21
-            }
-        ]
-    },
-    {
-        "id": 10096,
-        "module_part_id": 55,
-        "teacher_id": 219,
-        "room_id": 87,
-        "slot_id": 13,
-        "section_id": 6,
-        "td_groups": [
-            {
-                "id": 23
-            }
-        ]
-    },
-    {
-        "id": 10068,
-        "module_part_id": 59,
-        "teacher_id": 213,
-        "room_id": 87,
-        "slot_id": 17,
-        "section_id": 7,
-        "td_groups": [
-            {
-                "id": 25
-            }
-        ]
-    },
-    {
-        "id": 10071,
-        "module_part_id": 81,
-        "teacher_id": 224,
-        "room_id": 89,
-        "slot_id": 29,
-        "section_id": 10,
-        "td_groups": [
-            {
-                "id": 31
-            }
-        ]
-    },
-    {
-        "id": 9960,
-        "module_part_id": 39,
-        "teacher_id": 227,
-        "room_id": 89,
-        "slot_id": 13,
-        "section_id": 8,
-        "td_groups": [
-            {
-                "id": 27
-            }
-        ]
-    },
-    {
-        "id": 9985,
-        "module_part_id": 57,
-        "teacher_id": 191,
-        "room_id": 89,
-        "slot_id": 14,
-        "section_id": 7,
-        "td_groups": [
-            {
-                "id": 25
-            }
-        ]
-    },
-    {
-        "id": 9990,
-        "module_part_id": 75,
-        "teacher_id": 225,
-        "room_id": 87,
-        "slot_id": 26,
-        "section_id": 10,
-        "td_groups": [
-            {
-                "id": 31
-            }
-        ]
-    },
-    {
-        "id": 9992,
-        "module_part_id": 51,
-        "teacher_id": 221,
-        "room_id": 88,
-        "slot_id": 17,
-        "section_id": 6,
-        "td_groups": [
-            {
-                "id": 23
-            }
-        ]
-    },
-    {
-        "id": 10117,
-        "module_part_id": 39,
-        "teacher_id": 175,
-        "room_id": 88,
-        "slot_id": 18,
-        "section_id": 6,
-        "td_groups": [
-            {
-                "id": 23
-            }
-        ]
-    },
-    {
-        "id": 9921,
-        "module_part_id": 63,
-        "teacher_id": 228,
-        "room_id": 90,
-        "slot_id": 14,
-        "section_id": 8,
-        "td_groups": [
-            {
-                "id": 27
-            }
-        ]
-    },
-    {
         "id": 9928,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 17,
+        "room_id": 112,
+        "slot_id": 2,
         "section_id": 3,
         "td_groups": [
             {
@@ -1660,8 +919,8 @@
         "id": 9933,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 8,
+        "room_id": 114,
+        "slot_id": 25,
         "section_id": 3,
         "td_groups": [
             {
@@ -1673,8 +932,8 @@
         "id": 10036,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 26,
+        "room_id": 108,
+        "slot_id": 5,
         "section_id": 3,
         "td_groups": [
             {
@@ -1686,8 +945,8 @@
         "id": 10063,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 14,
+        "room_id": 115,
+        "slot_id": 7,
         "section_id": 3,
         "td_groups": [
             {
@@ -1699,8 +958,8 @@
         "id": 10074,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 29,
+        "room_id": 114,
+        "slot_id": 3,
         "section_id": 3,
         "td_groups": [
             {
@@ -1712,8 +971,8 @@
         "id": 10094,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 15,
+        "room_id": 113,
+        "slot_id": 9,
         "section_id": 3,
         "td_groups": [
             {
@@ -1725,7 +984,7 @@
         "id": 10129,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 111,
+        "room_id": 108,
         "slot_id": 27,
         "section_id": 3,
         "td_groups": [
@@ -1738,8 +997,8 @@
         "id": 9939,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 10,
+        "room_id": 111,
+        "slot_id": 4,
         "section_id": 2,
         "td_groups": [
             {
@@ -1751,8 +1010,8 @@
         "id": 9942,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 20,
+        "room_id": 109,
+        "slot_id": 25,
         "section_id": 2,
         "td_groups": [
             {
@@ -1764,8 +1023,8 @@
         "id": 9953,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 6,
+        "room_id": 115,
+        "slot_id": 27,
         "section_id": 2,
         "td_groups": [
             {
@@ -1778,7 +1037,7 @@
         "module_part_id": 4,
         "teacher_id": 231,
         "room_id": 110,
-        "slot_id": 25,
+        "slot_id": 19,
         "section_id": 2,
         "td_groups": [
             {
@@ -1790,8 +1049,8 @@
         "id": 10001,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 12,
+        "room_id": 112,
+        "slot_id": 20,
         "section_id": 2,
         "td_groups": [
             {
@@ -1803,8 +1062,8 @@
         "id": 10004,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 15,
+        "room_id": 112,
+        "slot_id": 10,
         "section_id": 2,
         "td_groups": [
             {
@@ -1813,11 +1072,102 @@
         ]
     },
     {
+        "id": 13670,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 8,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13677,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 26,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13684,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 15,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13691,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 16,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13698,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 4,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13705,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 29,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
+        "id": 13712,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 6,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 6
+            }
+        ]
+    },
+    {
         "id": 10121,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 16,
+        "room_id": 108,
+        "slot_id": 26,
         "section_id": 2,
         "td_groups": [
             {
@@ -1829,8 +1179,8 @@
         "id": 9931,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 8,
+        "room_id": 113,
+        "slot_id": 13,
         "section_id": 3,
         "td_groups": [
             {
@@ -1842,8 +1192,8 @@
         "id": 9934,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 16,
+        "room_id": 115,
+        "slot_id": 12,
         "section_id": 2,
         "td_groups": [
             {
@@ -1855,7 +1205,7 @@
         "id": 9941,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 112,
+        "room_id": 114,
         "slot_id": 19,
         "section_id": 2,
         "td_groups": [
@@ -1869,7 +1219,7 @@
         "module_part_id": 12,
         "teacher_id": 231,
         "room_id": 110,
-        "slot_id": 27,
+        "slot_id": 15,
         "section_id": 3,
         "td_groups": [
             {
@@ -1881,8 +1231,8 @@
         "id": 9950,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 1,
+        "room_id": 113,
+        "slot_id": 5,
         "section_id": 3,
         "td_groups": [
             {
@@ -1894,8 +1244,8 @@
         "id": 9951,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 13,
+        "room_id": 110,
+        "slot_id": 14,
         "section_id": 2,
         "td_groups": [
             {
@@ -1907,8 +1257,8 @@
         "id": 9958,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 1,
+        "room_id": 111,
+        "slot_id": 28,
         "section_id": 3,
         "td_groups": [
             {
@@ -1920,8 +1270,8 @@
         "id": 9998,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 9,
+        "room_id": 114,
+        "slot_id": 1,
         "section_id": 2,
         "td_groups": [
             {
@@ -1933,8 +1283,8 @@
         "id": 10010,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 5,
+        "room_id": 112,
+        "slot_id": 15,
         "section_id": 2,
         "td_groups": [
             {
@@ -1946,8 +1296,8 @@
         "id": 10011,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 5,
+        "room_id": 108,
+        "slot_id": 14,
         "section_id": 3,
         "td_groups": [
             {
@@ -1959,8 +1309,8 @@
         "id": 10020,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 29,
+        "room_id": 108,
+        "slot_id": 25,
         "section_id": 3,
         "td_groups": [
             {
@@ -1972,8 +1322,8 @@
         "id": 10026,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 13,
+        "room_id": 111,
+        "slot_id": 15,
         "section_id": 2,
         "td_groups": [
             {
@@ -1985,8 +1335,8 @@
         "id": 10028,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 12,
+        "room_id": 112,
+        "slot_id": 1,
         "section_id": 2,
         "td_groups": [
             {
@@ -1998,8 +1348,8 @@
         "id": 10035,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 20,
+        "room_id": 109,
+        "slot_id": 18,
         "section_id": 3,
         "td_groups": [
             {
@@ -2024,8 +1374,8 @@
         "id": 10042,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 1,
+        "room_id": 108,
+        "slot_id": 29,
         "section_id": 3,
         "td_groups": [
             {
@@ -2037,8 +1387,8 @@
         "id": 10047,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 19,
+        "room_id": 112,
+        "slot_id": 7,
         "section_id": 3,
         "td_groups": [
             {
@@ -2050,8 +1400,8 @@
         "id": 10049,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 9,
+        "room_id": 108,
+        "slot_id": 28,
         "section_id": 3,
         "td_groups": [
             {
@@ -2064,7 +1414,7 @@
         "module_part_id": 10,
         "teacher_id": 231,
         "room_id": 112,
-        "slot_id": 10,
+        "slot_id": 6,
         "section_id": 3,
         "td_groups": [
             {
@@ -2076,8 +1426,8 @@
         "id": 10052,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 27,
+        "room_id": 108,
+        "slot_id": 18,
         "section_id": 3,
         "td_groups": [
             {
@@ -2089,8 +1439,8 @@
         "id": 10057,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 14,
+        "room_id": 110,
+        "slot_id": 10,
         "section_id": 3,
         "td_groups": [
             {
@@ -2102,8 +1452,8 @@
         "id": 10075,
         "module_part_id": 4,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 9,
+        "room_id": 110,
+        "slot_id": 12,
         "section_id": 2,
         "td_groups": [
             {
@@ -2116,7 +1466,7 @@
         "module_part_id": 16,
         "teacher_id": 231,
         "room_id": 108,
-        "slot_id": 5,
+        "slot_id": 12,
         "section_id": 3,
         "td_groups": [
             {
@@ -2129,7 +1479,7 @@
         "module_part_id": 10,
         "teacher_id": 231,
         "room_id": 115,
-        "slot_id": 4,
+        "slot_id": 11,
         "section_id": 3,
         "td_groups": [
             {
@@ -2141,8 +1491,8 @@
         "id": 10087,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 3,
+        "room_id": 108,
+        "slot_id": 6,
         "section_id": 3,
         "td_groups": [
             {
@@ -2154,8 +1504,8 @@
         "id": 10089,
         "module_part_id": 4,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 25,
+        "room_id": 110,
+        "slot_id": 17,
         "section_id": 2,
         "td_groups": [
             {
@@ -2167,7 +1517,7 @@
         "id": 10091,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 111,
+        "room_id": 110,
         "slot_id": 3,
         "section_id": 3,
         "td_groups": [
@@ -2181,7 +1531,7 @@
         "module_part_id": 16,
         "teacher_id": 231,
         "room_id": 110,
-        "slot_id": 29,
+        "slot_id": 13,
         "section_id": 3,
         "td_groups": [
             {
@@ -2193,8 +1543,8 @@
         "id": 10103,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 20,
+        "room_id": 112,
+        "slot_id": 13,
         "section_id": 2,
         "td_groups": [
             {
@@ -2206,8 +1556,8 @@
         "id": 10124,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 5,
+        "room_id": 109,
+        "slot_id": 12,
         "section_id": 3,
         "td_groups": [
             {
@@ -2219,8 +1569,8 @@
         "id": 10125,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 17,
+        "room_id": 115,
+        "slot_id": 2,
         "section_id": 3,
         "td_groups": [
             {
@@ -2232,8 +1582,8 @@
         "id": 10134,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 26,
+        "room_id": 113,
+        "slot_id": 20,
         "section_id": 3,
         "td_groups": [
             {
@@ -2245,8 +1595,8 @@
         "id": 10137,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 13,
+        "room_id": 112,
+        "slot_id": 29,
         "section_id": 3,
         "td_groups": [
             {
@@ -2255,11 +1605,466 @@
         ]
     },
     {
+        "id": 13666,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 113,
+        "slot_id": 10,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13667,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 111,
+        "slot_id": 26,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13668,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 8,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13669,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 111,
+        "slot_id": 12,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13672,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 6,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13673,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 28,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13674,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 16,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13675,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 2,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13676,
+        "module_part_id": 2,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 17,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13679,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 27,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13680,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 9,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13681,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 4,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13682,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 111,
+        "slot_id": 1,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13683,
+        "module_part_id": 12,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 7,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13686,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 12,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13687,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 2,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13688,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 1,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13689,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 26,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13690,
+        "module_part_id": 6,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 29,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13693,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 9,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13694,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 112,
+        "slot_id": 17,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13695,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 15,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13696,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 111,
+        "slot_id": 6,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13697,
+        "module_part_id": 10,
+        "teacher_id": 231,
+        "room_id": 115,
+        "slot_id": 6,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13737,
+        "module_part_id": 14,
+        "teacher_id": 231,
+        "room_id": 108,
+        "slot_id": 1,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13700,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 28,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13701,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 113,
+        "slot_id": 27,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13702,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 113,
+        "slot_id": 12,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13703,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 113,
+        "slot_id": 15,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13704,
+        "module_part_id": 48,
+        "teacher_id": 231,
+        "room_id": 113,
+        "slot_id": 28,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
+        "id": 13707,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 17,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 1
+            }
+        ]
+    },
+    {
+        "id": 13708,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 1,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 2
+            }
+        ]
+    },
+    {
+        "id": 13709,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 110,
+        "slot_id": 8,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 3
+            }
+        ]
+    },
+    {
+        "id": 13710,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 28,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 4
+            }
+        ]
+    },
+    {
+        "id": 13711,
+        "module_part_id": 8,
+        "teacher_id": 231,
+        "room_id": 114,
+        "slot_id": 18,
+        "section_id": 1,
+        "td_groups": [
+            {
+                "id": 5
+            }
+        ]
+    },
+    {
         "id": 9968,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 19,
+        "room_id": 115,
+        "slot_id": 4,
         "section_id": 2,
         "td_groups": [
             {
@@ -2271,8 +2076,8 @@
         "id": 9972,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 18,
+        "room_id": 114,
+        "slot_id": 12,
         "section_id": 3,
         "td_groups": [
             {
@@ -2284,8 +2089,8 @@
         "id": 9974,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 9,
+        "room_id": 111,
+        "slot_id": 11,
         "section_id": 3,
         "td_groups": [
             {
@@ -2297,8 +2102,8 @@
         "id": 9975,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 15,
+        "room_id": 114,
+        "slot_id": 9,
         "section_id": 3,
         "td_groups": [
             {
@@ -2310,8 +2115,8 @@
         "id": 9976,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 18,
+        "room_id": 113,
+        "slot_id": 7,
         "section_id": 3,
         "td_groups": [
             {
@@ -2323,7 +2128,7 @@
         "id": 9989,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 112,
+        "room_id": 108,
         "slot_id": 13,
         "section_id": 3,
         "td_groups": [
@@ -2337,7 +2142,7 @@
         "module_part_id": 22,
         "teacher_id": 231,
         "room_id": 109,
-        "slot_id": 20,
+        "slot_id": 28,
         "section_id": 3,
         "td_groups": [
             {
@@ -2349,8 +2154,8 @@
         "id": 10141,
         "module_part_id": 26,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 4,
+        "room_id": 114,
+        "slot_id": 5,
         "section_id": 3,
         "td_groups": [
             {
@@ -2362,8 +2167,8 @@
         "id": 10143,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 13,
+        "room_id": 115,
+        "slot_id": 25,
         "section_id": 3,
         "td_groups": [
             {
@@ -2375,8 +2180,8 @@
         "id": 10144,
         "module_part_id": 24,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 27,
+        "room_id": 114,
+        "slot_id": 13,
         "section_id": 3,
         "td_groups": [
             {
@@ -2388,8 +2193,8 @@
         "id": 10110,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 19,
+        "room_id": 115,
+        "slot_id": 18,
         "section_id": 3,
         "td_groups": [
             {
@@ -2401,8 +2206,8 @@
         "id": 10116,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 1,
+        "room_id": 112,
+        "slot_id": 9,
         "section_id": 3,
         "td_groups": [
             {
@@ -2414,8 +2219,8 @@
         "id": 9905,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 10,
+        "room_id": 109,
+        "slot_id": 20,
         "section_id": 2,
         "td_groups": [
             {
@@ -2428,7 +2233,7 @@
         "module_part_id": 22,
         "teacher_id": 231,
         "room_id": 112,
-        "slot_id": 8,
+        "slot_id": 25,
         "section_id": 3,
         "td_groups": [
             {
@@ -2440,8 +2245,8 @@
         "id": 9920,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 28,
+        "room_id": 115,
+        "slot_id": 13,
         "section_id": 2,
         "td_groups": [
             {
@@ -2453,8 +2258,8 @@
         "id": 9925,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 1,
+        "room_id": 112,
+        "slot_id": 3,
         "section_id": 2,
         "td_groups": [
             {
@@ -2466,8 +2271,8 @@
         "id": 10006,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 1,
+        "room_id": 114,
+        "slot_id": 2,
         "section_id": 2,
         "td_groups": [
             {
@@ -2479,8 +2284,8 @@
         "id": 10022,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 9,
+        "room_id": 112,
+        "slot_id": 16,
         "section_id": 2,
         "td_groups": [
             {
@@ -2492,8 +2297,8 @@
         "id": 10065,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 16,
+        "room_id": 111,
+        "slot_id": 14,
         "section_id": 2,
         "td_groups": [
             {
@@ -2505,7 +2310,7 @@
         "id": 10079,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 113,
+        "room_id": 109,
         "slot_id": 4,
         "section_id": 2,
         "td_groups": [
@@ -2519,7 +2324,7 @@
         "module_part_id": 4,
         "teacher_id": 231,
         "room_id": 110,
-        "slot_id": 13,
+        "slot_id": 26,
         "section_id": 2,
         "td_groups": [
             {
@@ -2532,7 +2337,7 @@
         "module_part_id": 16,
         "teacher_id": 231,
         "room_id": 111,
-        "slot_id": 19,
+        "slot_id": 10,
         "section_id": 2,
         "td_groups": [
             {
@@ -2545,7 +2350,7 @@
         "module_part_id": 10,
         "teacher_id": 231,
         "room_id": 113,
-        "slot_id": 5,
+        "slot_id": 3,
         "section_id": 2,
         "td_groups": [
             {
@@ -2557,8 +2362,8 @@
         "id": 9937,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 25,
+        "room_id": 115,
+        "slot_id": 10,
         "section_id": 2,
         "td_groups": [
             {
@@ -2570,8 +2375,8 @@
         "id": 10021,
         "module_part_id": 16,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 10,
+        "room_id": 110,
+        "slot_id": 20,
         "section_id": 2,
         "td_groups": [
             {
@@ -2583,8 +2388,8 @@
         "id": 10023,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 15,
+        "room_id": 113,
+        "slot_id": 18,
         "section_id": 2,
         "td_groups": [
             {
@@ -2596,8 +2401,8 @@
         "id": 10037,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 14,
+        "room_id": 111,
+        "slot_id": 13,
         "section_id": 2,
         "td_groups": [
             {
@@ -2609,8 +2414,8 @@
         "id": 10043,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 25,
+        "room_id": 114,
+        "slot_id": 10,
         "section_id": 2,
         "td_groups": [
             {
@@ -2622,8 +2427,8 @@
         "id": 10045,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 9,
+        "room_id": 114,
+        "slot_id": 26,
         "section_id": 2,
         "td_groups": [
             {
@@ -2635,8 +2440,8 @@
         "id": 10054,
         "module_part_id": 18,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 20,
+        "room_id": 108,
+        "slot_id": 19,
         "section_id": 2,
         "td_groups": [
             {
@@ -2648,8 +2453,8 @@
         "id": 10058,
         "module_part_id": 12,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 20,
+        "room_id": 111,
+        "slot_id": 25,
         "section_id": 2,
         "td_groups": [
             {
@@ -2661,8 +2466,8 @@
         "id": 10060,
         "module_part_id": 4,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 6,
+        "room_id": 113,
+        "slot_id": 16,
         "section_id": 2,
         "td_groups": [
             {
@@ -2675,7 +2480,7 @@
         "module_part_id": 16,
         "teacher_id": 231,
         "room_id": 108,
-        "slot_id": 13,
+        "slot_id": 20,
         "section_id": 2,
         "td_groups": [
             {
@@ -2687,8 +2492,8 @@
         "id": 10146,
         "module_part_id": 10,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 1,
+        "room_id": 115,
+        "slot_id": 19,
         "section_id": 2,
         "td_groups": [
             {
@@ -2700,8 +2505,8 @@
         "id": 9991,
         "module_part_id": 4,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 9,
+        "room_id": 113,
+        "slot_id": 26,
         "section_id": 2,
         "td_groups": [
             {
@@ -2713,8 +2518,8 @@
         "id": 10109,
         "module_part_id": 20,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 19,
+        "room_id": 114,
+        "slot_id": 14,
         "section_id": 2,
         "td_groups": [
             {
@@ -2726,8 +2531,8 @@
         "id": 9923,
         "module_part_id": 22,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 19,
+        "room_id": 112,
+        "slot_id": 14,
         "section_id": 2,
         "td_groups": [
             {
@@ -2739,8 +2544,8 @@
         "id": 9935,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 11,
+        "room_id": 108,
+        "slot_id": 10,
         "section_id": 6,
         "td_groups": [
             {
@@ -2752,8 +2557,8 @@
         "id": 9936,
         "module_part_id": 40,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 19,
+        "room_id": 108,
+        "slot_id": 4,
         "section_id": 10,
         "td_groups": [
             {
@@ -2765,8 +2570,8 @@
         "id": 9945,
         "module_part_id": 62,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 11,
+        "room_id": 114,
+        "slot_id": 7,
         "section_id": 7,
         "td_groups": [
             {
@@ -2778,8 +2583,8 @@
         "id": 9946,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 20,
+        "room_id": 109,
+        "slot_id": 14,
         "section_id": 10,
         "td_groups": [
             {
@@ -2791,8 +2596,8 @@
         "id": 9947,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 14,
+        "room_id": 112,
+        "slot_id": 5,
         "section_id": 4,
         "td_groups": [
             {
@@ -2804,8 +2609,8 @@
         "id": 9949,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 16,
+        "room_id": 111,
+        "slot_id": 19,
         "section_id": 7,
         "td_groups": [
             {
@@ -2817,8 +2622,8 @@
         "id": 9952,
         "module_part_id": 44,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 27,
+        "room_id": 110,
+        "slot_id": 7,
         "section_id": 4,
         "td_groups": [
             {
@@ -2830,8 +2635,8 @@
         "id": 9957,
         "module_part_id": 36,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 27,
+        "room_id": 115,
+        "slot_id": 3,
         "section_id": 4,
         "td_groups": [
             {
@@ -2840,11 +2645,24 @@
         ]
     },
     {
+        "id": 9959,
+        "module_part_id": 49,
+        "teacher_id": 218,
+        "room_id": 90,
+        "slot_id": 2,
+        "section_id": 6,
+        "td_groups": [
+            {
+                "id": 23
+            }
+        ]
+    },
+    {
         "id": 9996,
         "module_part_id": 36,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 29,
+        "room_id": 111,
+        "slot_id": 9,
         "section_id": 8,
         "td_groups": [
             {
@@ -2853,11 +2671,24 @@
         ]
     },
     {
+        "id": 9999,
+        "module_part_id": 61,
+        "teacher_id": 212,
+        "room_id": 90,
+        "slot_id": 16,
+        "section_id": 7,
+        "td_groups": [
+            {
+                "id": 25
+            }
+        ]
+    },
+    {
         "id": 10005,
         "module_part_id": 54,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 6,
+        "room_id": 111,
+        "slot_id": 8,
         "section_id": 6,
         "td_groups": [
             {
@@ -2869,8 +2700,8 @@
         "id": 10007,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 28,
+        "room_id": 111,
+        "slot_id": 27,
         "section_id": 4,
         "td_groups": [
             {
@@ -2882,8 +2713,8 @@
         "id": 10008,
         "module_part_id": 60,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 2,
+        "room_id": 115,
+        "slot_id": 9,
         "section_id": 7,
         "td_groups": [
             {
@@ -2895,8 +2726,8 @@
         "id": 10009,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 3,
+        "room_id": 115,
+        "slot_id": 8,
         "section_id": 7,
         "td_groups": [
             {
@@ -2905,11 +2736,37 @@
         ]
     },
     {
+        "id": 10012,
+        "module_part_id": 79,
+        "teacher_id": 223,
+        "room_id": 88,
+        "slot_id": 7,
+        "section_id": 10,
+        "td_groups": [
+            {
+                "id": 31
+            }
+        ]
+    },
+    {
+        "id": 10016,
+        "module_part_id": 45,
+        "teacher_id": 229,
+        "room_id": 89,
+        "slot_id": 6,
+        "section_id": 5,
+        "td_groups": [
+            {
+                "id": 21
+            }
+        ]
+    },
+    {
         "id": 10025,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 28,
+        "room_id": 108,
+        "slot_id": 11,
         "section_id": 4,
         "td_groups": [
             {
@@ -2921,8 +2778,8 @@
         "id": 10032,
         "module_part_id": 30,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 11,
+        "room_id": 109,
+        "slot_id": 9,
         "section_id": 4,
         "td_groups": [
             {
@@ -2934,8 +2791,8 @@
         "id": 10033,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 7,
+        "room_id": 111,
+        "slot_id": 2,
         "section_id": 5,
         "td_groups": [
             {
@@ -2960,8 +2817,8 @@
         "id": 10044,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 12,
+        "room_id": 109,
+        "slot_id": 2,
         "section_id": 7,
         "td_groups": [
             {
@@ -2973,8 +2830,8 @@
         "id": 10046,
         "module_part_id": 40,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 27,
+        "room_id": 113,
+        "slot_id": 19,
         "section_id": 8,
         "td_groups": [
             {
@@ -2986,8 +2843,8 @@
         "id": 10048,
         "module_part_id": 52,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 16,
+        "room_id": 112,
+        "slot_id": 18,
         "section_id": 6,
         "td_groups": [
             {
@@ -2999,8 +2856,8 @@
         "id": 10053,
         "module_part_id": 58,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 26,
+        "room_id": 114,
+        "slot_id": 20,
         "section_id": 7,
         "td_groups": [
             {
@@ -3009,11 +2866,37 @@
         ]
     },
     {
+        "id": 10062,
+        "module_part_id": 53,
+        "teacher_id": 220,
+        "room_id": 89,
+        "slot_id": 3,
+        "section_id": 6,
+        "td_groups": [
+            {
+                "id": 23
+            }
+        ]
+    },
+    {
+        "id": 10072,
+        "module_part_id": 47,
+        "teacher_id": 185,
+        "room_id": 87,
+        "slot_id": 10,
+        "section_id": 5,
+        "td_groups": [
+            {
+                "id": 21
+            }
+        ]
+    },
+    {
         "id": 10073,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 14,
+        "room_id": 112,
+        "slot_id": 19,
         "section_id": 4,
         "td_groups": [
             {
@@ -3025,8 +2908,8 @@
         "id": 10082,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 12,
+        "room_id": 109,
+        "slot_id": 17,
         "section_id": 8,
         "td_groups": [
             {
@@ -3038,7 +2921,7 @@
         "id": 10083,
         "module_part_id": 76,
         "teacher_id": 231,
-        "room_id": 113,
+        "room_id": 114,
         "slot_id": 15,
         "section_id": 10,
         "td_groups": [
@@ -3051,8 +2934,8 @@
         "id": 10088,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 26,
+        "room_id": 111,
+        "slot_id": 5,
         "section_id": 4,
         "td_groups": [
             {
@@ -3061,11 +2944,24 @@
         ]
     },
     {
+        "id": 10096,
+        "module_part_id": 55,
+        "teacher_id": 219,
+        "room_id": 89,
+        "slot_id": 16,
+        "section_id": 6,
+        "td_groups": [
+            {
+                "id": 23
+            }
+        ]
+    },
+    {
         "id": 10098,
         "module_part_id": 64,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 6,
+        "room_id": 114,
+        "slot_id": 16,
         "section_id": 8,
         "td_groups": [
             {
@@ -3077,8 +2973,8 @@
         "id": 10099,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 5,
+        "room_id": 109,
+        "slot_id": 19,
         "section_id": 5,
         "td_groups": [
             {
@@ -3091,7 +2987,7 @@
         "module_part_id": 38,
         "teacher_id": 231,
         "room_id": 113,
-        "slot_id": 6,
+        "slot_id": 1,
         "section_id": 5,
         "td_groups": [
             {
@@ -3104,7 +3000,7 @@
         "module_part_id": 38,
         "teacher_id": 231,
         "room_id": 113,
-        "slot_id": 18,
+        "slot_id": 8,
         "section_id": 8,
         "td_groups": [
             {
@@ -3116,8 +3012,8 @@
         "id": 10132,
         "module_part_id": 44,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 7,
+        "room_id": 110,
+        "slot_id": 16,
         "section_id": 4,
         "td_groups": [
             {
@@ -3129,8 +3025,8 @@
         "id": 10066,
         "module_part_id": 42,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 10,
+        "room_id": 109,
+        "slot_id": 16,
         "section_id": 4,
         "td_groups": [
             {
@@ -3139,11 +3035,24 @@
         ]
     },
     {
+        "id": 10068,
+        "module_part_id": 59,
+        "teacher_id": 213,
+        "room_id": 87,
+        "slot_id": 15,
+        "section_id": 7,
+        "td_groups": [
+            {
+                "id": 25
+            }
+        ]
+    },
+    {
         "id": 10070,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 12,
+        "room_id": 108,
+        "slot_id": 17,
         "section_id": 4,
         "td_groups": [
             {
@@ -3152,11 +3061,37 @@
         ]
     },
     {
+        "id": 10071,
+        "module_part_id": 81,
+        "teacher_id": 224,
+        "room_id": 89,
+        "slot_id": 18,
+        "section_id": 10,
+        "td_groups": [
+            {
+                "id": 31
+            }
+        ]
+    },
+    {
+        "id": 9960,
+        "module_part_id": 39,
+        "teacher_id": 227,
+        "room_id": 89,
+        "slot_id": 2,
+        "section_id": 8,
+        "td_groups": [
+            {
+                "id": 27
+            }
+        ]
+    },
+    {
         "id": 9964,
         "module_part_id": 42,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 2,
+        "room_id": 109,
+        "slot_id": 11,
         "section_id": 4,
         "td_groups": [
             {
@@ -3168,8 +3103,8 @@
         "id": 9965,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 8,
+        "room_id": 109,
+        "slot_id": 27,
         "section_id": 8,
         "td_groups": [
             {
@@ -3181,8 +3116,8 @@
         "id": 9966,
         "module_part_id": 36,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 8,
+        "room_id": 111,
+        "slot_id": 3,
         "section_id": 4,
         "td_groups": [
             {
@@ -3194,8 +3129,8 @@
         "id": 9971,
         "module_part_id": 30,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 15,
+        "room_id": 109,
+        "slot_id": 10,
         "section_id": 7,
         "td_groups": [
             {
@@ -3207,8 +3142,8 @@
         "id": 9982,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 4,
+        "room_id": 109,
+        "slot_id": 13,
         "section_id": 10,
         "td_groups": [
             {
@@ -3220,8 +3155,8 @@
         "id": 9983,
         "module_part_id": 46,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 12,
+        "room_id": 110,
+        "slot_id": 4,
         "section_id": 5,
         "td_groups": [
             {
@@ -3230,11 +3165,50 @@
         ]
     },
     {
+        "id": 9985,
+        "module_part_id": 57,
+        "teacher_id": 191,
+        "room_id": 87,
+        "slot_id": 3,
+        "section_id": 7,
+        "td_groups": [
+            {
+                "id": 25
+            }
+        ]
+    },
+    {
         "id": 9987,
         "module_part_id": 56,
         "teacher_id": 231,
-        "room_id": 113,
-        "slot_id": 3,
+        "room_id": 112,
+        "slot_id": 11,
+        "section_id": 6,
+        "td_groups": [
+            {
+                "id": 23
+            }
+        ]
+    },
+    {
+        "id": 9990,
+        "module_part_id": 75,
+        "teacher_id": 225,
+        "room_id": 87,
+        "slot_id": 2,
+        "section_id": 10,
+        "td_groups": [
+            {
+                "id": 31
+            }
+        ]
+    },
+    {
+        "id": 9992,
+        "module_part_id": 51,
+        "teacher_id": 221,
+        "room_id": 88,
+        "slot_id": 15,
         "section_id": 6,
         "td_groups": [
             {
@@ -3246,7 +3220,7 @@
         "id": 10114,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 113,
+        "room_id": 111,
         "slot_id": 7,
         "section_id": 8,
         "td_groups": [
@@ -3259,8 +3233,8 @@
         "id": 10115,
         "module_part_id": 82,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 13,
+        "room_id": 113,
+        "slot_id": 6,
         "section_id": 10,
         "td_groups": [
             {
@@ -3269,11 +3243,24 @@
         ]
     },
     {
+        "id": 10117,
+        "module_part_id": 39,
+        "teacher_id": 175,
+        "room_id": 89,
+        "slot_id": 1,
+        "section_id": 6,
+        "td_groups": [
+            {
+                "id": 23
+            }
+        ]
+    },
+    {
         "id": 10118,
         "module_part_id": 70,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 14,
+        "room_id": 111,
+        "slot_id": 20,
         "section_id": 10,
         "td_groups": [
             {
@@ -3285,8 +3272,8 @@
         "id": 9902,
         "module_part_id": 80,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 3,
+        "room_id": 115,
+        "slot_id": 5,
         "section_id": 10,
         "td_groups": [
             {
@@ -3298,8 +3285,8 @@
         "id": 9908,
         "module_part_id": 40,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 2,
+        "room_id": 113,
+        "slot_id": 17,
         "section_id": 6,
         "td_groups": [
             {
@@ -3311,8 +3298,8 @@
         "id": 9912,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 29,
+        "room_id": 109,
+        "slot_id": 7,
         "section_id": 5,
         "td_groups": [
             {
@@ -3324,8 +3311,8 @@
         "id": 9914,
         "module_part_id": 30,
         "teacher_id": 231,
-        "room_id": 108,
-        "slot_id": 2,
+        "room_id": 110,
+        "slot_id": 11,
         "section_id": 5,
         "td_groups": [
             {
@@ -3337,8 +3324,8 @@
         "id": 9915,
         "module_part_id": 48,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 8,
+        "room_id": 110,
+        "slot_id": 18,
         "section_id": 5,
         "td_groups": [
             {
@@ -3347,11 +3334,24 @@
         ]
     },
     {
+        "id": 9921,
+        "module_part_id": 63,
+        "teacher_id": 228,
+        "room_id": 88,
+        "slot_id": 3,
+        "section_id": 8,
+        "td_groups": [
+            {
+                "id": 27
+            }
+        ]
+    },
+    {
         "id": 9924,
         "module_part_id": 30,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 2,
+        "room_id": 109,
+        "slot_id": 15,
         "section_id": 4,
         "td_groups": [
             {
@@ -3363,8 +3363,8 @@
         "id": 9926,
         "module_part_id": 50,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 10,
+        "room_id": 109,
+        "slot_id": 26,
         "section_id": 6,
         "td_groups": [
             {
@@ -3376,8 +3376,8 @@
         "id": 13657,
         "module_part_id": 40,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 26,
+        "room_id": 111,
+        "slot_id": 18,
         "section_id": 9,
         "td_groups": [
             {
@@ -3389,8 +3389,8 @@
         "id": 13658,
         "module_part_id": 72,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 7,
+        "room_id": 110,
+        "slot_id": 25,
         "section_id": 9,
         "td_groups": [
             {
@@ -3402,8 +3402,8 @@
         "id": 13659,
         "module_part_id": 68,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 6,
+        "room_id": 108,
+        "slot_id": 3,
         "section_id": 9,
         "td_groups": [
             {
@@ -3415,8 +3415,8 @@
         "id": 13660,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 17,
+        "room_id": 109,
+        "slot_id": 5,
         "section_id": 9,
         "td_groups": [
             {
@@ -3428,8 +3428,8 @@
         "id": 13661,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 5,
+        "room_id": 109,
+        "slot_id": 8,
         "section_id": 9,
         "td_groups": [
             {
@@ -3441,8 +3441,8 @@
         "id": 13662,
         "module_part_id": 70,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 12,
+        "room_id": 113,
+        "slot_id": 4,
         "section_id": 9,
         "td_groups": [
             {
@@ -3454,8 +3454,8 @@
         "id": 13663,
         "module_part_id": 74,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 2,
+        "room_id": 113,
+        "slot_id": 29,
         "section_id": 9,
         "td_groups": [
             {
@@ -3467,8 +3467,8 @@
         "id": 13728,
         "module_part_id": 40,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 2,
+        "room_id": 109,
+        "slot_id": 6,
         "section_id": 9,
         "td_groups": [
             {
@@ -3480,8 +3480,8 @@
         "id": 13729,
         "module_part_id": 72,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 6,
+        "room_id": 110,
+        "slot_id": 5,
         "section_id": 9,
         "td_groups": [
             {
@@ -3493,8 +3493,8 @@
         "id": 13730,
         "module_part_id": 68,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 17,
+        "room_id": 113,
+        "slot_id": 25,
         "section_id": 9,
         "td_groups": [
             {
@@ -3506,8 +3506,8 @@
         "id": 13731,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 110,
-        "slot_id": 7,
+        "room_id": 108,
+        "slot_id": 8,
         "section_id": 9,
         "td_groups": [
             {
@@ -3519,8 +3519,8 @@
         "id": 13732,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 12,
+        "room_id": 113,
+        "slot_id": 11,
         "section_id": 9,
         "td_groups": [
             {
@@ -3532,8 +3532,8 @@
         "id": 13733,
         "module_part_id": 70,
         "teacher_id": 231,
-        "room_id": 112,
-        "slot_id": 5,
+        "room_id": 111,
+        "slot_id": 29,
         "section_id": 9,
         "td_groups": [
             {
@@ -3545,8 +3545,8 @@
         "id": 13734,
         "module_part_id": 74,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 18,
+        "room_id": 113,
+        "slot_id": 2,
         "section_id": 9,
         "td_groups": [
             {
@@ -3558,8 +3558,8 @@
         "id": 10055,
         "module_part_id": 44,
         "teacher_id": 231,
-        "room_id": 109,
-        "slot_id": 28,
+        "room_id": 115,
+        "slot_id": 20,
         "section_id": 4,
         "td_groups": [
             {
@@ -3571,8 +3571,8 @@
         "id": 10093,
         "module_part_id": 34,
         "teacher_id": 231,
-        "room_id": 111,
-        "slot_id": 6,
+        "room_id": 114,
+        "slot_id": 11,
         "section_id": 4,
         "td_groups": [
             {
@@ -3584,7 +3584,7 @@
         "id": 10102,
         "module_part_id": 30,
         "teacher_id": 231,
-        "room_id": 108,
+        "room_id": 110,
         "slot_id": 27,
         "section_id": 4,
         "td_groups": [
@@ -3597,8 +3597,8 @@
         "id": 10130,
         "module_part_id": 42,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 14,
+        "room_id": 109,
+        "slot_id": 3,
         "section_id": 4,
         "td_groups": [
             {
@@ -3610,8 +3610,8 @@
         "id": 9916,
         "module_part_id": 28,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 20,
+        "room_id": 111,
+        "slot_id": 17,
         "section_id": 4,
         "td_groups": [
             {
@@ -3623,8 +3623,8 @@
         "id": 9978,
         "module_part_id": 36,
         "teacher_id": 231,
-        "room_id": 114,
-        "slot_id": 26,
+        "room_id": 111,
+        "slot_id": 16,
         "section_id": 4,
         "td_groups": [
             {
@@ -3636,8 +3636,8 @@
         "id": 9979,
         "module_part_id": 32,
         "teacher_id": 231,
-        "room_id": 115,
-        "slot_id": 7,
+        "room_id": 109,
+        "slot_id": 1,
         "section_id": 4,
         "td_groups": [
             {

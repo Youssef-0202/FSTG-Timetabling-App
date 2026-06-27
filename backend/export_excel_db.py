@@ -9,11 +9,17 @@ from openpyxl.utils import get_column_letter
 # Paramètres
 DB_ID = sys.argv[1] if len(sys.argv) > 1 else None
 
-API = "http://localhost:8000"
-BASE_DIR = r"c:\Users\HP\OneDrive\Bureau\pfe\_Project_PFE"
+API = os.getenv("API_URL", "http://localhost:8000")
+# Détection dynamique du dossier racine (PFE)
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(BACKEND_DIR)
 
-CACHE_PATH = os.path.join(BASE_DIR, "data_cache.json")
-OUTPUT_PATH = os.path.join(BASE_DIR, "backend", f"export_result_{DB_ID}.xlsx")
+# Correction du chemin du cache
+CACHE_PATH = os.path.join(BASE_DIR, "algorithms", "3-rl_controller", "data_cache.json")
+# Fallback si absent
+if not os.path.exists(CACHE_PATH):
+    CACHE_PATH = os.path.join(BASE_DIR, "algorithms", "2-ILS-ALNS", "data_cache.json")
+OUTPUT_PATH = os.path.join(BACKEND_DIR, f"export_result_{DB_ID}.xlsx")
 
 if not DB_ID:
     print("Erreur: ID de TimetableResult requis.")

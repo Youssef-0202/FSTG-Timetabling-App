@@ -442,8 +442,16 @@ class HybridEngine:
             if random.random() < self.mutation_rate: 
                 op_random_shift(child, list(range(len(child.assignments))), self.dm)
             
-            # SA Light (25% des itérations) pour l'exploration rapide
-            new_gen.append(self.simulated_annealing_search(child, iterations=self.sa_iterations // 4))
+            # --- LOGIQUE TURBO : COMPÉTITION (Optimisation temporelle et convergence) ---
+            # On ne polit l'individu que s'il est prometteur ou proche du parent.
+            score_child = self.get_score(child)
+            if score_child < p1.fitness * 1.05:
+                # L'enfant est prometteur : on l'optimise via SA Light
+                refined = self.simulated_annealing_search(child, iterations=self.sa_iterations // 4)
+                new_gen.append(refined)
+            else:
+                # L'enfant est trop mauvais : on conserve le parent pour maintenir la qualité (Économie CPU)
+                new_gen.append(copy.deepcopy(p1))
             
         self.population = new_gen
         return 0, 0
