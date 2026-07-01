@@ -1,0 +1,41 @@
+﻿Collection count: 330
+
+============================================================
+QUERY: C'est quoi la contrainte souple S8 ?
+
+  Dist: 10.3887 | pfe_report_clean.txt chunk 67
+  >> anctuaris├® pour la restauration. Son occupation est fortement ├®vit├®e pour garantir une pause physiologique d├®cente et n├®cessaire.
+En somme, ces huit leviers d'optimisation  S_1 ├á S_8 permettent ├á notr
+
+  Dist: 11.2221 | pfe_report_clean.txt chunk 190
+  >> t les conditions r├®elles d'utilisation par l'administration universitaire :
+Processeur : Intel(R) Core(TM) i5-1135G7 .
+Stockage : SSD NVMe .
+Couche Syst├¿me : Architecture x64 avec virtualisation Docke
+
+============================================================
+QUERY: Comment fonctionne le Curriculum Learning ?
+
+  Dist: 11.3307 | pfe_report_clean.txt chunk 140
+  >> le signal de r├®compense est trop bruit├® pour permettre une convergence.
+Pour r├®soudre structurellement ce verrou, nous adoptons le paradigme
+du Curriculum Learning, formalis├® par Bengio et al. (2009),
+
+  Dist: 12.3288 | pfe_report_clean.txt chunk 98
+  >> ier ├á chaque configuration d'├®tat la s├®quence d'op├®rateurs la plus efficace.
+Pour stabiliser cet apprentissage face ├á la complexit├® du Tronc Commun de la FSTG, nous adoptons le Curriculum Learning. Ce
+
+============================================================
+QUERY: Comment importer une maquette de fili├¿re ?
+
+  Dist: 9.4141 | ui_user_guide.md chunk 2
+  >> e moteur IA (RL-ALNS)** lors des phases d'optimisation ult├®rieures.
+
+---
+
+## ­ƒôÑ 2. Importation des Donn├®es & Maquettes (Mockup Imports)
+*   **Processus d'Importation** : L'administration charge des fic
+
+  Dist: 11.1344 | pfe_report_clean.txt chunk 249
+  >> un outil de mod├®lisation pour analyser et comprendre les sc├®narios d'ex├®cution et les flux de contr├┤le.
+Pour la plateforme , nous avons identifi├® deux sc├®narios critiques n├®cessitant une mod├®lisation 

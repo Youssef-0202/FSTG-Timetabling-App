@@ -1,0 +1,1368 @@
+MÉMOIRE DE FIN D'ÉTUDES
+En vue de l'obtention du diplôme de :
+Master en Sciences et Techniques
+Spécialité : Intelligence Artificielle et Ingénierie Informatique
+Sous le thème
+du jury :
+Année Universitaire :
+mypurpleDédicace
+Je dédie humblement ce travail à  Allah,
+le Tout-Puissant, dont la miséricorde et les bénédictions
+ont éclairé chacun de mes pas.
+À mes  parents bien-aimés,
+pour leur amour inconditionnel, leur patience infinie
+et leurs sacrifices silencieux.
+À ma  famille et à mes frères et sœurs,
+pour leur affection sincère et leur soutien constant
+dans toutes les épreuves.
+À mes  enseignants et encadrants,
+pour leur accompagnement généreux, leur sagesse
+et leurs conseils éclairés.
+À mes  camarades de promotion,
+pour leur esprit d’entraide et les précieux
+moments partagés.
+Et à toutes celles et ceux
+qui ont, d’une manière ou d’une autre,
+contribué à l’accomplissement de ce chemin.
+2224   mypurpleRemerciements
+Avant tout, je tiens à exprimer ma profonde gratitude envers Allah, le Tout-Puissant, pour Sa miséricorde et pour m'avoir accordé la force, la patience et la santé nécessaires pour mener à bien ce modeste travail. Ce projet marque l'aboutissement d'un parcours académique complet effectué avec fierté au sein de la Faculté des Sciences et Techniques de Marrakech (FSTG), un établissement d’excellence où j'ai eu l'honneur de forger l'ensemble de mes compétences.
+J'exprime mes remerciements les plus sincères à Monsieur le Doyen de la Faculté, pour son encadrement institutionnel et pour avoir favorisé un cadre académique propice à l’épanouissement scientifique. Mes remerciements s’adressent tout particulièrement au Professeur Aziz Ouaarab, mon encadrant, pour son accompagnement attentif, sa grande rigueur et ses précieux conseils durant toutes les phases de ce projet de fin d'études.
+Je tiens à témoigner de ma reconnaissance envers le Professeur BENCHAREF  Omar , Chef de filière IAII, pour leur implication constante et leur dévouement au bon déroulement de notre formation. Ma gratitude s'étend également à l’ensemble des professeurs  qui nous ont dirigés, guidés et transmis leur savoir avec une générosité exemplaire.
+Une mention spéciale de gratitude est adressée aux experts qui ont généreusement partagé leur expérience lors de nos échanges techniques : Monsieur le Vice-Président de l’Université, le Pr. Ali Bachnou, ainsi que le Pr.ED-DAOUDI Rachid . Leurs remarques pertinentes et leurs suggestions constructives ont été fondamentales pour la maturité de ce projet professionnel.
+Je n'oublie pas mes partenaires et camarades de promotion pour leur esprit d'entraide, les précieux moments partagés et le soutien mutuel durant ces années de formation. Enfin, je remercie les membres du jury,  ,  ,  , et   pour l'honneur qu'ils me font d'évaluer ce travail, ainsi que ma famille et mes proches, dont les encouragements quotidiens ont été ma plus grande motivation.
+1822   mypurpleRésumé
+La planification des emplois du temps universitaires (UCTP) au sein de la Faculté des Sciences et Techniques de Marrakech représente un défi majeur en raison de la complexité combinatoire et du volume massif des contraintes pédagogiques à satisfaire. La gestion de cet espace de recherche devient critique face à la densité structurelle de l'établissement. Ce projet vise à concevoir une plateforme décisionnelle intelligente capable d'automatiser et d'optimiser la génération de plannings sans conflits, tout en garantissant un confort pédagogique accru pour les enseignants et étudiants.
+L'innovation technique repose sur une architecture hybride RL-ALNS fusionnant l'Apprentissage par Renforcement (Reinforcement Learning) et la recherche à large voisinage adaptative (ALNS). Ce moteur utilise un agent intelligent pour piloter dynamiquement des opérateurs de réparation stratifiés. L'approche est renforcée par une stratégie de Curriculum Learning pour accélérer la convergence et garantir la stabilisation des affectations.
+Le système est concrétisé par une architecture micro-services performante exploitant FastAPI pour le backend et Next.js pour l'interface utilisateur. Un processus préliminaire de collection et de nettoyage de données a été élaboré pour assurer l'intégrité des informations académiques initiales. Les expérimentations sur l'instance réelle de la FSTG démontrent une résolution systématique des contraintes dures alliée à une minimisation majeure des contraintes souples. Cette double optimisation garantit des emplois du temps d'une haute qualité pédagogique en moins de 10 minutes, surpassant les méthodes mémétiques traditionnelles.
+Mots-clés : UCTP, Reinforcement Learning, ALNS, Optimisation Hybride, FSTG Marrakech, FastAPI, Curriculum Learning.
+1822   AccentBlueAbstract
+University Course Timetabling (UCTP) at the Faculty of Sciences and Techniques of Marrakech represents a major challenge due to combinatorial complexity and the massive volume of pedagogical constraints. Managing this search space is critical given the structural density of the institution. This project aims to design an intelligent decision-making platform capable of automating and optimizing the generation of conflict-free schedules, while ensuring enhanced pedagogical comfort for both faculty and students.
+The technical innovation is based on a hybrid RL-ALNS architecture merging Reinforcement Learning (RL) and Adaptive Large Neighborhood Search (ALNS). This engine employs an intelligent agent to dynamically steer stratified repair operators. The approach is enhanced by a Curriculum Learning strategy to accelerate convergence and ensure the stabilization of assignments.
+The system is implemented through a high-performance micro-services architecture using FastAPI for the backend and Next.js for the user interface. A preliminary data collection and cleaning process was developed to ensure the integrity of the initial academic information. Experiments on the real FSTG instance demonstrate a systematic resolution of hard constraints combined with a major minimization of soft constraints. This dual optimization guarantees high pedagogical quality schedules in under 10 minutes, outperforming traditional memetic methods.
+Keywords: UCTP, Reinforcement Learning, ALNS, Hybrid Optimization, FSTG Marrakech, FastAPI, Curriculum Learning.
+1820   mypurpleListe des abréviations
+PrimaryBlue
+figures_auto.tex
+plan_auto.tex
+Introduction Générale
+tocchapterIntroduction Générale
+Le paysage de l'enseignement supérieur connaît aujourd'hui une transformation majeure, portée par la complexification des structures académiques et l'exigence croissante d'une gestion optimale des ressources. Au cœur de cette transition, la planification des emplois du temps universitaires, connue sous le nom de University Course Timetabling Problem (UCTP), s'impose comme un défi logistique et algorithmique de premier plan. Ce problème, classé dans la catégorie des problèmes NP-complets, ne se limite pas à une simple affectation de créneaux ; il s'agit d'une orchestration délicate entre les disponibilités des enseignants, la capacité des salles et les impératifs pédagogiques des étudiants.
+La Faculté des Sciences et Techniques de Marrakech (FSTG), acteur majeur de la formation scientifique au Maroc, illustre parfaitement cette complexité. Avec un corps professoral de 198 enseignants-chercheurs et une hétérogénéité de salles spécialisées, la gestion manuelle est devenue une tâche quasi-insurmontable. Cette difficulté est aujourd'hui accentuée par le récent changement de l'architecture pédagogique de l'établissement. La transformation des filières classiques vers une structure plus fluide et modulaire a brisé les schémas de planification traditionnels, créant une explosion combinatoire que les méthodes de gestion artisanales ne peuvent plus absorber.
+C'est dans ce contexte de rupture que s'inscrit ce projet de fin d'études. L'objectif est de transcender les approches classiques de recherche locale en proposant une plateforme décisionnelle intelligente basée sur une architecture hybride. Notre contribution repose sur la fusion entre l'Algorithme de Recherche Locale Adaptative (ALNS) et l'Apprentissage par Renforcement (RL). Ce système mémétique ne se contente pas de satisfaire les contraintes dures d'absence de conflits, mais apprend dynamiquement à optimiser la satisfaction des enseignants et l'usage des ressources à travers un mécanisme innovant de Curriculum Learning.
+Le présent rapport détaille cette trajectoire scientifique en cinq chapitres complémentaires et progressifs.
+Le premier chapitre pose les fondations scientifiques et institutionnelles de notre démarche. Il analyse en profondeur le contexte logistique de la FSTG, sa volumétrie critique , 198 enseignants, 3 400 étudiants, 25 filières accréditées  et la rupture combinatoire engendrée par la réforme du Tronc Commun. Il brosse ensuite un panorama de l'état de l'art international du timetabling universitaire, depuis les benchmarks ITC-2007 jusqu'aux approches hybrides modernes, avant de formaliser rigoureusement l'instance FSTG à travers un modèle mathématique à six dimensions, articulé autour de douze contraintes de faisabilité et de huit leviers de confort pédagogique.
+Le deuxième chapitre explore l'arsenal algorithmique mobilisé pour dompter cet espace de recherche estimé à 10^60 configurations. Il retrace une trajectoire de sophistication croissante à travers quatre approches successives : l'algorithme mémétique GA-SA, le moteur adaptatif ILS-ALNS piloté par un bandit UCB1, le contrôleur RL par Q-Learning, et enfin l'architecture finale RL-ALNS fusionnée. Pour chaque approche, ses fondements théoriques, ses innovations architecturales et ses limites motivant le perfectionnement suivant sont exposés avec rigueur. La stratégie de Curriculum Learning, qui parachève cette architecture en structurant l'apprentissage de l'agent par phases de complexité croissante, y est également formalisée.
+Le troisième chapitre constitue le pont entre la théorie algorithmique et la réalité opérationnelle de la FSTG. Il détaille l'infrastructure logicielle conçue pour transformer des données brutes en plannings optimisés : le pipeline ETL automatisé par Dagster et Polars garantissant l'intégrité de la source de vérité, les structures de données haute performance , objets Assignment et SlotMaps de détection en O(1)  ainsi que la calibration précise et justifiée de l'ensemble des hyperparamètres du moteur. Le pseudocode intégral du système, couvrant les quatre niveaux d'imbrication de l'algorithme maître jusqu'à la règle de Bellman, y est exposé avec une transparence scientifique totale.
+Le quatrième chapitre présente la validation expérimentale et scientifique de nos approches sur l'instance réelle de la FSTG. Une étude de répétabilité sur dix exécutions indépendantes établit la supériorité statistique du moteur RL-ALNS, avec une fitness moyenne de 9 118,1 points et un gain global de 55,6\,\
+Le cinquième et dernier chapitre est consacré à la concrétisation logicielle de nos travaux à travers la plateforme décisionnelle DashTime. Après une présentation des spécifications et de la démarche de conception UML, l'architecture micro-services , FastAPI, Next.js, PostgreSQL est détaillée. Le chapitre illustre l'ensemble des interfaces réalisées : du tableau de bord stratégique à l'éditeur interactif en drag \  drop, en passant par le centre d'optimisation IA, la gestion spécifique des Travaux Pratiques et le module de reporting avec archivage des versions Master Reference. Cette réalisation transforme la complexité du moteur RL-ALNS en un outil décisionnel accessible, traçable et pérenne pour l'administration de la FSTG.
+La réalisation de ce projet s'est articulée autour de cinq phases majeures,
+menées de février à juin 2026, formant une trajectoire progressive et cohérente
+allant de la compréhension théorique jusqu'au déploiement d'une solution industrielle validée.
+La première phase a été consacrée à l'étude approfondie de la problématique UCTP
+et à la formalisation mathématique complète de l'instance réelle de la FSTG.
+La deuxième phase a permis la construction de l'infrastructure technique incluant
+le pipeline ETL orchestré par Dagster et Polars, garantissant l'intégrité totale des
+données académiques. La troisième phase a vu l'émergence du premier moteur hybride
+GA-SA couplé au tableau de bord administratif sous Next.js. La quatrième phase,
+véritable c  ur de l'innovation, a abouti à la fusion neuro-symbolique RL-ALNS
+pilotée par un agent Q-Learning, atteignant une fitness record de 7 067 points
+sur l'instance réelle. Enfin, la cinquième phase a été dédiée à la finalisation
+complète de la plateforme DashTime et à la rédaction du présent manuscrit,
+déposé le 19 juin 2026.
+justification=centering
+figureDiagramme de Gantt : Trajectoire des cinq phases de réalisation
+du projet .
+fig:gantt_introduction
+Au terme de cette démarche structurée et itérative, ce projet démontre
+qu'il est possible de dompter la complexité combinatoire massive de l'UCTP à travers
+une intelligence hybride apprenante. La synergie entre la rigueur mathématique
+de la modélisation, la puissance adaptative du moteur RL-ALNS et l'ergonomie
+de la plateforme DashTime constitue la contribution centrale de ce travail.
+Elle offre à la FSTG un outil décisionnel robuste, reproductible et prêt pour un
+déploiement institutionnel pérenne, prouvant, au passage, que l'intelligence
+artificielle n'est plus seulement un sujet de recherche académique, mais un levier
+opérationnel concret au service de l'excellence pédagogique.
+chapter1section0
+Chapitre 1 : État de l'Art et Modélisation
+tocchapterChapitre 1 : État de l'Art et Modélisation
+[coldblue  ]   Contexte et Problématique
+[coldblue  ]   État de l'Art du Timetabling (UCTP)
+[coldblue  ]   Modélisation Mathématique
+coldblue0.6 0.8pt
+Ce chapitre pose les fondations scientifiques de notre étude. Nous y analysons les spécificités logistiques de la FST de Marrakech avant d'explorer l'état de l'art du problème de timetabling universitaire (UCTP). Enfin, nous formalisons mathématiquement l'instance réelle de la FSTG à travers une modélisation par contraintes robuste.
+0.3  coldblue0.6 0.8pt
+--- Section : Contexte : Le problème de planification à la FSTG ---
+La Faculté des Sciences et Techniques de Gueliz (FSTG) de Marrakech, relevant de l'Université Cadi Ayyad, se positionne comme un pivot stratégique de la formation d'ingénierie au Maroc. L'orchestration de son emploi du temps ne constitue plus une simple tâche administrative, mais un véritable défi de système d'information décisionnel. Dans un environnement académique en constante mutation, l'optimisation des flux spatio-temporels est devenue une condition sine qua non de la réussite pédagogique.
+* Sous-section : L'écosystème institutionnel et la volumétrie *
+L'écosystème de la FSTG est caractérisé par une hétérogénéité complexe de flux académiques. Avec un corps de plus de 3 400 étudiants répartis dans 25 filières accréditées (LST, MST et Cycle Ingénieur), l'institution gère une masse critique de données pédagogiques. Cette diversité discipline impose une gestion extrêmement fine des contraintes croisées, où chaque filière possède des spécificités de planification (créneaux de TP mobiles, cours intégrés, etc.).
+Cette structure est encadrée par 198 enseignants-chercheurs. Leurs contraintes d'indisponibilité, liées à la recherche ou à l'encadrement, réduisent drastiquement l'espace des solutions admissibles. La rareté des ressources physiques (Amphithéâtres, laboratoires spécialisés), combinée à une saturation quasi-totale des créneaux de haute vigilance (08h30-12h30), transforme la planification en un puzzle combinatoire de haute dimension.
+justification=centering
+figureIndicateurs clés de la masse de données sous-jacente au problème UCTP.
+fig:dashboard_volumetrie
+Au-delà de cette volumétrie brute, la criticité du problème réside dans la nature dynamique et souvent imprévisible des paramètres académiques. La gestion des vœux spécifiques des enseignants, les ajustements d'affectation de dernière minute ou encore l'exigibilité de salles dotées d'équipements techniques précis, introduisent une volatilité que les outils de gestion statiques ne peuvent absorber. Cette instabilité des données d'entrée impose une flexibilité totale : la moindre modification locale nécessite une réévaluation globale de la cohérence, un défi qui devient insurmontable face à la structure mutualisée du Tronc Commun.
+* Sous-section : Le point de rupture : Réforme et Tronc Commun *
+La transition vers une architecture pédagogique modulaire a sonné la fin des emplois du temps "statiques" à la FSTG. Auparavant, le cycle préparatoire de l'établissement était structuré autour de deux filières majeures (BCG et MIPC). La réforme pédagogique actuelle a profondément fragmenté cette organisation en instaurant 7 filières distinctes (GP, GC, GI, BG, GESE, GEG, MSD) sur une durée de deux ans de Tronc Commun.
+Cette évolution, bien que favorisant une spécialisation précoce, impose une structure de Mutualisation des Ressources critique. Le cœur du problème réside dans les Sections Mutualisées. Mathématiquement, cela se traduit par une contrainte d'égalité stricte sur les ressources de plusieurs groupes d'étudiants. Un seul Cours Magistral (CM) programmé en Amphithéâtre verrouille simultanément les emplois du temps de plusieurs centaines d'étudiants appartenant à des filières différentes. Cette interdépendance crée une rigidité structurelle inédite.
+justification=centering
+figureToile de contraintes de la S2 : représentation du graphe de dépendance structurelle entre les filières du Tronc Commun.
+fig:toile_contraintes
+L'analyse des données de terrain révèle une réalité complexe : des cohortes comme GC, GESE et MSD partagent jusqu'à 7 modules communs, créant une fusion quasi-totale de leurs emplois du temps. Cette densité relationnelle transforme le problème en un puzzle où l'affectation d'une unique ressource (Professeur/Salle) verrouille simultanément plusieurs filières. C'est cette Toile de Contraintes qui rend la gestion artisanale inefficace pour certifier un  Hard Score nul tout en garantissant une qualité pédagogique optimale.
+* Sous-section : Fiabilité des Données et Intégration par Pipeline ETL *
+L'un des obstacles majeurs identifiés lors de l'audit technique de la FSTG réside dans la volatilité et l'hétérogénéité des informations pédagogiques sources. Les données critiques telles que les affectations d'enseignants ou les caractéristiques des locaux proviennent de flux disparates, incluant des fichiers Excel hétérogènes et des documents souvent saisis manuellement. Ces sources sont fréquemment altérées par des incohérences, des erreurs de typographie ou des écarts entre les effectifs théoriques et réels.
+Pour garantir la cohérence intégrale du système, nous avons instauré un pipeline de nettoyage et de normalisation automatisé. S'appuyant sur l'orchestrateur Dagster et la puissance de traitement de Polars, ce processus traite systématiquement les flux entrants pour éliminer les redondances et réconcilier les données au sein d'une base PostgreSQL robuste. Cette étape constitue le socle de confiance indispensable , elle assure que la phase d'optimisation intelligente repose sur des informations certifiées, éliminant ainsi les risques de planification erronée liés à la manipulation artisanale des données.
+* Sous-section : Synergie de l'Expertise Humaine et de l'IA pour l'Aide à la Décision *
+Au-delà de la puissance algorithmique, notre solution est conçue comme un véritable partenaire décisionnel. Cette approche repose sur une synergie où l'IA résout la complexité combinatoire numérique, tandis que l'utilisateur humain conserve la maîtrise des raffinements stratégiques et des cas particuliers.
+Cette médiation est cruciale pour répondre à la problématique majeure des étudiants redoublants. Leurs parcours atypiques, nécessitant de suivre des modules de différentes années simultanément, génèrent des conflits d'emploi du temps que les méthodes classiques ne parviennent pas à anticiper. Notre système d'aide à la décision permet d'identifier ces nœuds de friction dès la phase de conception. Grâce à une interface interactive et des mécanismes de verrouillage stratégique, l'administrateur peut ajuster les créneaux pour garantir aux redoublants un parcours sans chevauchements, transformant ainsi un obstacle administratif majeur en une planification fluide et personnalisée.
+--- Section : État de l'Art du Problème de Timetabling (UCTP) ---
+Le problème d'emploi du temps universitaire, désigné dans la littérature sous l'acronyme UCTP (University Course Timetabling Problem), s'inscrit dans la famille élargie des problèmes d'ordonnancement et de satisfaction de contraintes. Ce problème varie considérablement selon les institutions et les systèmes éducatifs, ce qui a conduit la communauté scientifique à développer des modèles abstraits permettant une comparaison rigoureuse des performances. Dans le milieu académique, on distingue deux branches majeures  :
+University Course Timetabling (UCTT) : Organisation hebdomadaire des cours en allouant de manière cohérente les créneaux horaires, les enseignants et les groupes d'étudiants aux salles disponibles.
+University Examination Timetabling (UETT) : Planification des sessions d'examens avec des contraintes renforcées de sécurité, d'espacement cognitif et de gestion des conflits de surveillance.
+de périmètre : Ce travail se concentre exclusivement sur la problématique de l'UCTT, dont la nature cyclique et la forte densité de contraintes hebdomadaires constituent le cœur du défi opérationnel à la FSTG.
+* Sous-section : Définition et Classification de la Complexité *
+D'un point de vue théorique, l'UCTP est classé comme un problème NP-Difficile (NP-Hard). Sa première formalisation rigoureuse est attribuée aux travaux de Even, Itai et Shamir (1976), qui ont établi la NP-complétude du problème par une réduction polynomiale depuis le problème de coloriage de graphe. Cette démonstration formelle signifie qu'il est mathématiquement impossible de garantir l'obtention d'une solution optimale en temps polynomial pour le cas général.
+D'un point de vue mathématique, l'espace de recherche X est défini par le produit cartésien de toutes les affectations possibles pour chaque séance de cours. Pour l'instance réelle de la FSTG, avec |T| = 30 créneaux hebdomadaires, |N| = 29 salles disponibles, |L| = 78 enseignants et 247 séances à planifier, la cardinalité de cet espace est modélisée par la relation suivante :
+où |T|, |N| et |L| représentent respectivement les cardinaux des ensembles de créneaux, de salles et d'enseignants, et n_m désigne le nombre de séances hebdomadaires requises pour le module m   M.
+Cette immensité combinatoire est fondamentale : elle implique que l'espace admissible F   X, c'est-à-dire l'ensemble des solutions ne violant aucune contrainte dure (H_1 à H_12), ne peut être exploré par force brute. Trouver un élément de F est déjà un défi d'optimisation de premier ordre, et le minimiser selon les critères de confort (S_1 à S_8) constitue le véritable enjeu de ce projet.
+Selon Aguirre Lam et al. (2025), la résolution de l'UCTT représente l'un des défis d'optimisation les plus complexes dans les systèmes d'information, exigeant un compromis constant entre les capacités logistiques et les ambitions pédagogiques . L'ordonnancement touche par ailleurs des secteurs critiques tels que le transport, la santé et la logistique d'entreprise, ce qui explique l'intensité des recherches dans ce domaine depuis les années 1960.
+* Sous-section : Benchmarks Internationaux : ITC-2007 et ITC-2019 *
+La standardisation de l'UCTP a été portée par l'International Timetabling Competition (ITC), une série de compétitions mondiales dont l'objectif est de permettre une comparaison équitable et reproductible des algorithmes sur des instances réelles. Chaque édition a constitué un tournant dans l'évolution des méthodes de résolution.
+ITC-2002 : Premier benchmark de référence historique, proposant 20 instances standardisées conçues par Ben Paechter. Il a démontré la supériorité des approches hybrides basées sur le Recuit Simulé pour la résolution des conflits de base.
+ITC-2007 : L'édition la plus influente, introduisant trois pistes distinctes : l'Examination Timetabling (UETP), le Post Enrollment Course Timetabling (PE-CTP) et le Curriculum-Based Course Timetabling (CB-CTP). La Track 3 (CB-CTP), avec ses 21 instances à programmes fixes, est particulièrement pertinente pour les structures de type FSTG. Les vainqueurs ont systématiquement recouru à des hybrides complexes, démontrant qu'aucune méthode pure ne suffit .
+ITC-2019 : L'édition la plus récente, organisée par UniTime. Sa difficulté réside dans l'intégration du Student Sectioning : les étudiants ne sont plus affectés à des groupes fixes, mais doivent être sectionnés dynamiquement, couplant la planification des cours avec l'affectation des effectifs. Cette contrainte additive dépasse en complexité toutes les éditions précédentes.
+Ces compétitions ont forgé une vérité empirique fondamentale : les algorithmes les plus performants ne sont jamais des méthodes pures. Ce sont invariablement des architectures hybrides, combinant une exploration globale et une intensification.
+Cependant, il convient de noter qu'une comparaison stricte entre les différents résultats de la littérature reste complexe. La performance d'un algorithme est intrinsèquement liée aux instances utilisées (taille, densité de conflits) et aux contraintes fixées, faisant de chaque problème de timetabling un défi unique dont les résultats dépendent fortement du contexte institutionnel.
+* Sous-section : Panorama des Approches de Résolution : de l'Exact au Hybride *
+Face à la nature NP-Difficile de l'UCTP, la communauté scientifique a développé trois familles d'approches dont l'évolution reflète une quête progressive d'efficacité computationnelle.
+1. Méthodes Exactes
+La Programmation Linéaire en Nombres Entiers (PLNE) modélise le problème via des variables binaires x_s,t,r   \0,1\ et minimise une fonction de coût sous contraintes d'unicité d'affectation. La Programmation par Contraintes (CP) procède par réduction des domaines de variables via filtrage et propagation. Ces méthodes garantissent l'optimalité mais leur coût est exponentiel. Pour la FSTG, un modèle PLNE pur nécessiterait plus de 225\,000 variables binaires, rendant la convergence du Branch \  Bound prohibitivement lente face à l'échéance opérationnelle.
+2. Métaheuristiques Classiques
+Les métaheuristiques acceptent de sacrifier l'optimalité absolue pour obtenir une solution de haute qualité en temps raisonnable . On distingue deux grandes familles :
+Méthodes à solution unique : le Recuit Simulé (SA) et la Recherche Tabou (TS), excellents en intensification et réparation locale minutieuse, mais limités dans leur capacité d'exploration globale.
+Méthodes de population : les Algorithmes Génétiques (AG) et les Colonies de Fourmis (ACO), puissants pour explorer le paysage de recherche, mais lents à converger face à la densité des contraintes de salles de la FSTG.
+3. Approches Hybrides et Pilotage Intelligent
+La tendance actuelle réside dans l'hybridation intégrative , couplant un moteur adaptatif à un apprentissage par renforcement  pour une sélection dynamique d'opérateurs. Notre architecture RL-ALNS s'inscrit dans cette vision, détaillée au Chapitre 2.
+tableComparaison structurée des familles d'approches pour l'UCTP.
+--- Section : Modélisation Mathématique du Problème ---
+« L'optimisation ne consiste pas seulement à trouver la meilleure solution, mais à comprendre la structure profonde de la complexité pour dompter le chaos. »
+Principe de la Recherche Opérationnelle
+* Sous-section : Introduction à la modélisation et rôle des contraintes *
+La modélisation mathématique constitue le socle scientifique de notre travail. Elle permet de transformer le défi logistique concret de l'emploi du temps de la FSTG en un modèle formel manipulable par nos algorithmes intelligents.
+Dans ce cadre, les contraintes jouent un rôle dual et fondamental :
+Cœur de la Faisabilité : Les contraintes strictes, dites Hard, définissent l'espace des solutions possibles. Sans leur respect total, l'emploi du temps est physiquement inexécutable.
+Moteur de la Qualité : Les contraintes souples, dites Soft, traduisent la satisfaction des usagers et permettent à l'algorithme de privilégier le confort pédagogique parmi les solutions valides.
+* Sous-section : Ensembles et Paramètres *
+Nous définissons les ensembles fondamentaux qui régissent la structure du système :
+T : Ensemble des créneaux horaires hebdomadaires.
+K : Ensemble des groupes et sections d'étudiants (cohortes).
+L : Ensemble des enseignants intervenant dans le Tronc Commun.
+M : Ensemble des modules académiques à planifier.
+N : Ensemble des ressources physiques incluant amphis et salles spécialisées.
+P : Ensemble des modalités d'enseignement \F2F, Online, Hybrid\.
+Paramètres de contrôle :
+Eff_k : Effectif total du groupe d'étudiants k.
+Cap_n : Capacité physique maximale de la salle n.
+D_l,t : Disponibilité binaire de l'enseignant l au créneau t.
+T^TP_k : Ensemble des créneaux sanctuarisés (réservés) pour les TP du groupe k.
+n_m : Volume horaire hebdomadaire requis pour le module m.
+* Sous-section : Variable de Décision *
+La variable de décision est un tenseur binaire à 6 dimensions encodant l'intégralité des décisions d'affectation spatio-temporelles. Elle est notée :
+Cette variable constitue l'unité atomique de l'emploi du temps. Sa structure multi-dimensionnelle permet de lier dynamiquement les ressources humaines, les ressources physiques et les besoins pédagogiques au sein d'un référentiel temporel discret.
+L'espace de recherche ainsi défini est d'une complexité combinatoire extrême. Avec 6 dimensions interdépendantes, le nombre de configurations possibles croît de manière exponentielle, rendant la résolution par force brute algorithmiquement impossible. Chaque valeur égale à 1 dans ce tenseur représente une "séance" validée qui doit satisfaire l'intégralité des contraintes de faisabilité.
+* Sous-section : Contraintes Strictes (Hard Constraints) *
+Les contraintes strictes définissent l'ensemble des conditions nécessaires à la faisabilité physique, organisationnelle et académique de l'emploi du temps. Toute violation d'une seule de ces contraintes rend la solution invalide.
+Conflit Enseignant : Un enseignant est une ressource humaine indivisible.
+Conflit de Salle : Une salle est une ressource physique exclusive.
+Conflit de Groupe : Un étudiant ne peut assister qu'à un seul enseignement.
+Capacité de Salle : L'effectif du groupe doit respecter la capacité physique.
+Compatibilité Équipements : Satisfaction des besoins techniques du module.
+Volume Hebdomadaire : Chaque module doit être programmé pour son volume horaire n_m.
+Cohérence de Modalité : Si un cours est en ligne, aucune salle n'est mobilisée.
+Disponibilité Enseignant : Respect strict des créneaux D_l,t déclarés.
+Spécificité Pédagogique : Adéquation entre type de module (CM/TD/TP) et salle.
+Verrouillage Manuel (UI Locking) : Les pré-assignations de l'administrateur.
+Interdiction des CM le Samedi : Samedi réservé aux TP et rattrapages.
+Sanctuarisation TP : Si un créneau appartient à l'ensemble sanctuarisé du groupe, aucun autre cours ne peut y être planifié.
+En conclusion, cet ensemble de contraintes  H_1 à H_12 définit la frontière entre l'admissibilité et l'échec. La satisfaction totale de ces règles est le premier objectif de l'agent RL, garantissant que l'emploi du temps généré est non seulement optimal, mais surtout applicable sur le terrain de la FSTG.
+* Sous-section : Contraintes Souples (Soft Constraints) *
+La qualité pédagogique d'un emploi du temps se mesure à sa capacité à offrir un environnement de travail serein et efficace. Nous avons identifié huit leviers d'optimisation majeurs :
+S1 : Compactage (Gaps) : Ce critère vise à supprimer les heures creuses au milieu de la journée d'un étudiant. Un planning compact évite l'inactivité forcée sur le campus et permet de mieux valoriser le temps de présence.
+S2 : Équilibre Hebdomadaire : L'objectif est d'éviter les pics de charge hachés. Une répartition fluide sur la semaine favorise une meilleure assimilation des cours et une vigilance constante des étudiants.
+S3 : Usage du Samedi : Afin de préserver le droit au repos et la vie sociale des usagers, l'usage du samedi est lourdement pénalisé et réservé uniquement aux cas de saturation absolue des ressources physiques.
+S4 : Stabilité des Salles : L'IA doit sédentariser chaque module dans une même salle fixe tout au long du semestre pour faciliter la logistique et créer des repères spatiaux stables pour les étudiants.
+S5 : Évitement des Journées Hachées : Une journée ne contenant qu'une seule séance est jugée inefficace. On encourage le regroupement des enseignements pour éviter aux usagers un déplacement coûteux.
+S6 : Droit aux Après-midis Libres : Fondamental pour le travail personnel et la vie associative, ce critère incite l'algorithme à libérer au moins deux après-midis par semaine pour chaque cohorte.
+S7 : Gestion de la Fatigue : Analyse la charge mentale journalière. Bloquer un module dense en fin de journée est pénalisé, l'algorithme cherchant à privilégier les créneaux de haute vigilance matinale.
+S8 : Respect du Déjeuner : Le créneau de 12h30 est sanctuarisé pour la restauration. Son occupation est fortement évitée pour garantir une pause physiologique décente et nécessaire.
+En somme, ces huit leviers d'optimisation  S_1 à S_8 permettent à notre moteur de sculpter un emploi du temps qui dépasse la simple faisabilité pour atteindre une excellence pédagogique et un confort de travail optimal pour les usagers de la FSTG.
+de Pilotage et Fonction de Fitness
+Dans la théorie de l'optimisation combinatoire, la Fonction de Fitness agit comme une boussole mathématique essentielle. Sa mission est d'agréger la violation de l'ensemble des contraintes (H_i et S_j) en un score scalaire unique, permettant au moteur RL-ALNS de naviguer intelligemment dans un espace de recherche complexe.
+Pour garantir une priorité absolue aux règles de gestion (H_1 à H_12) sur le confort pédagogique, nous utilisons un facteur de pénalité massif (Big-M) selon la formulation suivante :
+Fitness(x) = M    _i=1^12 H_i(x) +  _j=1^8 w_j   S_j(x)
+Cette approche lexicographique assure qu'une solution violant une seule contrainte dure sera toujours moins bien classée qu'une solution admissible, quel que soit son score de confort. La fitness remplit ainsi trois rôles vitaux : quantifier la "distance" vers la faisabilité, fournir un gradient de récompense à l'agent RL, et arbitrer les compromis entre des objectifs contradictoires.
+Où H_i(x) représente les violations de contraintes strictes et S_j(x) les pénalités de confort. Les poids w_j sont calibrés pour refléter les priorités pédagogiques, comme le malus particulièrement élevé appliqué à l'usage du samedi. Le poids M est choisi tel qu'une seule violation critique pèse plus lourd que l'optimisation totale des vœux, forçant l'algorithme à privilégier la validité légale avant toute recherche de confort. Ce facteur Big-M agit ainsi comme un véritable isolateur de signaux, permettant à l'intelligence artificielle de se focaliser rigoureusement sur l'ordre lexicographique des contraintes.
+Conclusion
+coldblueE n conclusion, ce premier chapitre a posé les fondations scientifiques et formelles indispensables à notre démarche. En partant de l'analyse institutionnelle de l'instance FSTG, nous avons mis en évidence la rupture combinatoire engendrée par la réforme du Tronc Commun, avant de formaliser rigoureusement le problème UCTP à travers un modèle mathématique à six dimensions. L'arsenal de contraintes défini  douze règles de faisabilité (H_1 à H_12) et huit leviers de confort pédagogique (S_1 à S_8) , constitue le référentiel normatif sur lequel repose l'intégralité de notre moteur d'optimisation. La fonction de fitness lexicographique, armée du facteur Big-M, garantit que la recherche de qualité ne se fera jamais au détriment de l'admissibilité. Ces bases étant établies, le chapitre suivant explorera l'arsenal algorithmique mobilisé pour dompter cet espace de recherche estimé à 10^60 configurations.
+chapter2section0
+Chapitre 2 : Approches Algorithmiques Étudiées
+tocchapterChapitre 2 : Approches Algorithmiques Étudiées
+[coldblue  ]   État de l'Art Algorithmique
+[coldblue  ]   Trajectoire de Résolution
+[coldblue  ]   Moteurs de Recherche Locale Adaptative
+[coldblue  ]   Pilotage Intelligent par Reinforcement Learning
+coldblue0.6 0.8pt
+Ce chapitre explore l'arsenal algorithmique mobilisé pour dompter la complexité combinatoire de l'instance FSTG. Après une revue sélective de l'état de l'art mondial, nous exposons notre trajectoire de recherche progressive. Nous détaillons ici l'évolution de nos moteurs, depuis les métaheuristiques mémétiques jusqu'aux architectures hybrides RL-ALNS pilotées par l'intelligence artificielle.
+0.3  coldblue0.6 0.8pt
+--- Section : Introduction : État de l'Art Algorithmique ---
+« Un algorithme n'est pas simplement une séquence d'instructions ; c'est la
+cristallisation d'une stratégie de pensée face à la complexité. »
+--- Blum \  Roli,
+Metaheuristics in Combinatorial Optimization: Overview and Conceptual Comparison,
+ACM Computing Surveys, 35(3), pp. 268--308, 2003.
+L'ordonnancement universitaire constitue l'un des champs les plus prolifiques de la
+recherche opérationnelle et de l'intelligence artificielle combinatoire. Depuis les
+premières formalisations des années 1960 jusqu'aux architectures neuro-symboliques
+modernes, la communauté scientifique a développé un écosystème méthodologique riche
+pour répondre à ce défi. Cette section retrace cette trajectoire intellectuelle et
+positionne précisément notre approche RL-ALNS dans ce panorama.
+figureTrajectoire d'évolution des approches algorithmiques pour le problème UCTP.
+fig:frise_uctp
+L'analyse de la figure fig:frise_uctp permet d'identifier une rupture technologique majeure. Si les méthodes exactes classiques se heurtaient au mur de la complexité exponentielle, les métaheuristiques ont apporté une souplesse nécessaire pour traiter des instances de taille réelle. Cependant, l'approche RL-ALNS que nous avons développée franchit un palier supplémentaire en injectant une capacité de généralisation , l'algorithme n'est plus un simple exécutant statique, mais devient capable d'ajuster sa stratégie dynamiquement en fonction de l'état actuel de l'emploi du temps, mimant ainsi l'expertise d'un planificateur humain tout en conservant une puissance de calcul exhaustive.
+* Sous-section : Méthodes Exactes : Puissance et Limites du Déterminisme *
+Historiquement, l'UCTP a d'abord été abordé via le prisme de la Recherche Opérationnelle classique. Ces méthodes cherchent à garantir l'obtention d'une solution optimale globale en explorant l'arborescence des possibles de manière exhaustive ou intelligemment élaguée.
+La Programmation Linéaire en Nombres Entiers (PLNE)
+Cette approche modélise le planning comme un système d'équations linéaires. Pour chaque séance s, chaque créneau t et chaque salle r, on définit une variable binaire x_s,t,r   \0, 1\. Le problème se résume à minimiser une fonction de coût Z traduisant les violations de contraintes :
+Z =  _s   S  _t   T  _r   R C_s,t,r   x_s,t,r
+Où les ensembles et variables sont définis par :
+S, T, R : Ensembles respectifs des séances, créneaux et salles.
+x_s,t,r   \0, 1\ : Variable binaire d'affectation de la séance s au couple (t, r).
+C_s,t,r : Coefficient de coût associé à l'affectation (s, t, r).
+Sous réserve que chaque séance soit planifiée exactement une fois :  _t,r x_s,t,r = 1,   s   S. Bien que cette méthode soit mathématiquement élégante, elle se heurte à une explosion du nombre de variables. Pour l'instance de la FSTG, avec environ 250 séances, 30 créneaux et 30 salles, le modèle nécessiterait plus de 225 000 variables binaires, rendant la convergence du Branch \  Bound prohibitivement lente.
+La Programmation par Contraintes (CP)
+Contrairement au PLNE, la programmation par contraintes ne repose pas sur une linéarisation du problème mais sur la réduction des domaines de variables par filtrage et propagation. Chaque contrainte H_i agit comme un filtre : dès qu'un enseignant est affecté à un créneau, le moteur de propagation retire instantanément ce créneau du domaine de toutes les autres séances de cet enseignant. Si la CP est excellente pour prouver l'infaisabilité d'un problème, elle peine à optimiser les préférences souples (Soft Constraints) car elle manque de vision globale sur la topologie de la fonction objectif.
+En définitive, l'explosion combinatoire rend les méthodes déterministes impraticables pour notre instance. Le temps requis pour certifier un optimum mathématique y dépasse les délais opérationnels, imposant une transition vers les métaheuristiques.
+Plus souples, ces dernières privilégient la faisabilité satisfaisante à l'optimalité absolue, permettant d'obtenir un planning valide en quelques minutes. Cette agilité est vitale dans un contexte académique dynamique où les données évoluent sans cesse, exigeant un moteur capable de réagir sans une reconfiguration exhaustive.
+* Sous-section : Panoramique des Métaheuristiques : Taxonomie et Fondements *
+Dans le cadre de l'optimisation combinatoire massive, la métaheuristique s'impose comme le paradigme dominant. Contrairement à une heuristique simple, limitée à une règle de décision locale et gloutonne, la métaheuristique agit comme un mécanisme de guidage de haut niveau. Selon la définition classique de Blum et Roli (2003), elle orchestre un ensemble d'heuristiques subordonnées pour explorer l'espace de recherche de manière intelligente, ce qui permet d'éviter les pièges des optima locaux .
+Le choix des métaheuristiques pour notre architecture n'est pas arbitraire : il est dicté par l'aspect NP-Hard de l'UCTP. Là où un solveur exact s'arrêterait face à l'immensité des 10^60 possibilités, la métaheuristique accepte de sacrifier l'optimalité absolue au profit d'une efficacité computationnelle, permettant d'extraire une solution de haute qualité pédagogique en quelques minutes.
+figureTaxonomie des métaheuristiques appliquées à l'UCTP .
+fig:taxonomie_meta
+Cette classification souligne une dichotomie fondamentale dans la gestion du compromis Exploration / Intensification. Tandis que les méthodes S-Based (basées sur une solution unique) excellent dans l'intensification et la réparation locale minutieuse, les approches P-Based (basées sur une population) garantissent une exploration globale du paysage de recherche, préservant la diversité pour éviter une convergence prématurée.
+Notre recherche se positionne à la convergence de ces deux mondes. L'objectif est de concevoir une architecture Hybride capable de coupler la puissance exploratoire des algorithmes évolutionnaires avec la finesse de réparation du LNS (Large Neighborhood Search). Ce couplage est l'ingrédient clé pour traiter les contraintes complexes de l'instance de FST, où chaque mouvement peut créer une cascade de conflits secondaires.
+* Sous-section : Paradigmes Métaheuristiques et Plateformes de Benchmark *
+La recherche de solutions pour l'UCTP a connu un tournant majeur avec l'International Timetabling Competition (ITC-2007)/(ITC-2019). Ce benchmark mondial, et particulièrement sa piste Curriculum-Based Course Timetabling (CB-CTT), est devenu l'étalon-or pour évaluer la robustesse des algorithmes. Il a révélé que la performance d'une méthode n'est pas seulement liée à sa logique interne, mais à son aptitude à naviguer dans des paysages de fitness extrêmement tourmentés.
+A- Méthodes de Population : Diversification et Exploration
+Inspirées du vivant, ces méthodes exploitent le parallélisme intrinsèque d'une population pour éviter les minima locaux.
+Algorithmes Génétiques (AG) : Ils modélisent l'évolution via le théorème des schémas de Holland. En croisant deux emplois du temps (Crossover), l'AG espère combiner des sous-structures performantes. Cependant, sur les instances de l'ITC-2007, le croisement détruit souvent la faisabilité (epistasis), rendant l'AG très lent à converger. Pour la FSTG, un AG seul mettrait plusieurs heures à simplement éliminer les conflits de base.
+Optimisation par Colonies de Fourmis (ACO) : L'ACO construit des solutions par itérations probabilistes guidées par des phéromones. Bien que très performant pour identifier des chemins globaux,Cette approche rencontre des difficultés majeures pour gérer la disponibilité des salles au sein de grandes institutions. En effet, la représentation du problème sous forme de graphe entraîne une saturation de la mémoire nécessaire pour stocker les traces de phéromones, rendant la recherche inefficace face à la volumétrie massive imposée par l'instance de FSTG.
+tableComparaison simplifiée
+ésultats Officiels ITC-2007 (Track 3: CB-CTT) :
+tableClassement officiel ITC-2007 Track 3 — moyennes calculées sur les 21 instances
+(Source : Geiger, 2008, Table 5 ; McCollum et al., 2010).
+B- Méthodes de Trajectoire : Intensification et Localité
+Ces approches se focalisent sur l'amélioration continue d'une solution unique, une stratégie qui s'est avérée redoutable lors de la compétition ITC-2007.
+Recuit Simulé (SA) : Fondé sur la thermodynamique, le SA autorise des dégradations temporaires de la fonction coût selon la probabilité de Boltzmann : P = e^-  f / T. C'est l'algorithme qui a produit les meilleurs résultats sur les instances Curriculum d'ITC-2007, car il excelle dans la ``finition'' des plannings. Sa limite réside dans son incapacité à s'adapter si la structure du Tronc Commun change brusquement.
+Recherche Tabou (TS) : La TS introduit une dimension cognitive via une mémoire à court terme (liste taboue) interdisant le retour en arrière immédiat. Elle force ainsi l'exploration de régions vierges, mais sa performance reste tributaire d'un calibrage manuel délicat du paramètre de durée taboue, particulièrement instable face à la topologie changeante des filières de la FSTG.
+Recherche à Voisinage Variable (VNS) : Proposée par Mladenović et Hansen (1997), la VNS repose sur l'idée de changer systématiquement la structure du voisinage dès qu'un optimum local est atteint. En alternant entre différents types de mouvements (ex : déplacer un cours vs échanger deux cours), elle parvient à s'extraire de zones de blocage où d'autres méthodes stagnent.
+tableComparaison simplifiée .
+èse Qualitative des Méthodes de Trajectoire sur CB-CTT :
+tableSynthèse qualitative des méthodes de trajectoire d'après le classement ITC-2007 Track 3
+(McCollum et al., 2010 ; Geiger, 2008).
+* Sous-section : L'Ère des Hyper-heuristiques et du Pilotage par l'IA *
+L'aboutissement des recherches en ordonnancement universitaire se cristallise autour d'une question fondamentale soulevée par Burke et al. (2013) : plutôt que de concevoir une métaheuristique taillée pour une instance unique, peut-on concevoir un système qui apprend à orchestrer plusieurs stratégies selon le contexte ? C'est l'essence du paradigme des hyper-heuristiques, qui introduit une séparation stricte entre le moteur de décision et les algorithmes de bas niveau.
+Ce concept se définit ainsi comme une « heuristique pour choisir des heuristiques ». Au lieu d'opérer directement sur l'emploi du temps, l'algorithme se place à un niveau d'abstraction supérieur : il dispose d'une bibliothèque de règles spécialisées (heuristiques de bas niveau) et son rôle est de décider laquelle est la plus pertinente à appliquer selon la situation courante.
+L'Approche Adaptive Large Neighborhood Search (ALNS)
+Dans la lignée de ces recherches, le Large Neighborhood Search (LNS) opère par un cycle de Destruction et Réparation. Au lieu de modifier localement une solution, l'algorithme retire une portion substantielle du planning pour la reconstruire de manière optimale dans le contexte résiduel.
+L'ALNS, formalisé par Ropke et Pisinger (2006), étend ce cadre en utilisant une bibliothèque d'opérateurs spécialisés. Un mécanisme statistique de type bandit adaptatif sélectionne dynamiquement l'opérateur le plus rentable. Cependant, cette sélection reste souvent aveugle à la sémantique de la solution, ouvrant la voie à une intégration de stratégies d'apprentissage cognitif pour un pilotage plus fin
+Pilotage Stratégique par Apprentissage : L'Intelligence du Moteur RL-ALNS
+La réponse à cette limite émerge de la convergence entre l'ALNS et l'Apprentissage par Renforcement (RL). Dans ce paradigme, un Agent IA interagit avec l'emploi du temps comme avec un environnement dynamique via un cycle décisionnel itératif incluant un État s_t, une Action a_t et une Récompense r_t. Contrairement aux méthodes statistiques classiques, l'agent RL apprend une politique contextuelle capable d'associer à chaque configuration d'état la séquence d'opérateurs la plus efficace.
+Pour stabiliser cet apprentissage face à la complexité du Tronc Commun de la FSTG, nous adoptons le Curriculum Learning. Ce concept, formalisé par Bengio et al. (2009), stipule qu'un agent apprend plus efficacement en affrontant des tâches de difficulté croissante.
+L'hybridation RL-ALNS pilotée par curriculum représente aujourd'hui le sommet de la hiérarchie technologique pour l'UCTP . C'est précisément dans cette trajectoire d'innovation cognitive que s'inscrit notre travail, dont la méthodologie détaillée fait l'objet du partie suivant.
+--- Section : Trajectoire de Résolution Algorithmique ---
+Le développement de notre moteur d'optimisation a suivi une démarche de recherche
+progressive et rigoureusement stratifiée. Chaque approche a été conçue comme une
+réponse analytique aux limites structurelles de la précédente, formant une trajectoire
+de sophistication croissante qui conduit de l'optimisation stochastique
+,  fondée sur le hasard dirigé vers l'optimisation cognitive et
+fondée sur une intelligence mémétique apprenante.
+Ce choix de progression par couches n'est pas anodin : il répond à une contrainte
+fondamentale de l'instance FSTG. En effet, la coplanification de 78 professeurs,
+de 42 modules et de 29 salles sur un horizon de 30 créneaux
+hebdomadaires génère un espace de recherche estimé à 10^60 configurations
+distinctes. Dans un tel contexte, une approche unique se révèle structurellement insuffisante.
+Un Algorithme Génétique classique, sans mécanisme d'intensification locale, converge
+prématurément. À l'inverse, un Recuit Simulé isolé ne dispose pas du levier de diversification structurale nécessaire pour s'extraire des plateaux de qualité.
+Par conséquent, notre démarche s'articule autour de quatre niveaux de montée en puissance technologique. Les approches A1 et A2 créent le moteur de base : elles assurent la gestion des contraintes critiques et le raffinement local des plannings. Le passage à l'approche A3 marque un tournant majeur avec l'introduction de l'intelligence artificielle (Q-Learning) pour piloter l'optimisation. Enfin, l'approche A4 représente l'aboutissement de notre architecture : un système hybride RL-ALNS fusionné où l'agent gère simultanément 12 actions (ALNS + ILS), dont l'entraînement est optimisé par une stratégie de Curriculum Learning pour dompter la complexité massive des données de la FSTG.
+figureArchitecture incrémentale de la solution : Du hasard dirigé vers l'intelligence cognitive.
+fig:roadmap_tech
+Cette progression ne constitue pas une simple addition de techniques, mais une véritable synergie évolutive. Chaque étape prépare le terrain pour la suivante : les approches A1 et A2 agissent comme des moteurs de "débroussaillage", éliminant les conflits massifs pour stabiliser une base de planning viable. Cette base permet ensuite à l'agent intelligent de l'approche A3, puis au système fusionné de l'approche A4, de se concentrer sur l'optimisation fine et la résolution des conflits résiduels les plus complexes.
+Cette approche hybride garantit l'obtention d'un score H=0  et une stabilité optimale des salles, même sur les périodes de forte densité comme le tronc commun, surpassant largement les capacités des méthodes uni-algorithmiques classiques.
+--- Section : Approche 1 : Algorithme Génétique hybridé avec Recuit Simulé (GA-SA) ---
+* Sous-section : Définition et Principe *
+L'algorithme GA-SA Hybride est un algorithme mémétique : il combine l'évolution d'une population de solutions (Algorithme Génétique) avec un apprentissage individuel par Recuit Simulé. Chaque individu de la population est un emploi du temps complet pour la FSTG. Le GA orchestre l'évolution globale entre les individus, tandis que le SA raffine chaque individu localement avant qu'il soit transmis à la génération suivante.
+* Sous-section : Flux contrôle du processus évolutionnaire *
+figureFlux de contrôle du processus évolutionnaire GA-SA.
+fig:flux_gasa
+La figure ci-dessous illustre l'architecture séquentielle de notre approche. Le processus débute par une injection de connaissances métier dès l'initialisation, suivie d'un cycle de reproduction mémétique où chaque enfant subit un polissage intensif avant d'intégrer la population.
+* Sous-section : Composants du moteur et Logique de Flux *
+Le diagramme opérationnel présenté précédemment repose sur une orchestration rigoureuse de trois piliers fonctionnels. Cette logique de flux garantit à la fois l'exploration de l'immense espace de recherche de la FSTG et l'exploitation chirurgicale des meilleures solutions.
+1. Encodage et Évaluation (Fitness)
+Chaque emploi du temps est modélisé comme un individu (chromosome) composé d'une suite d'affectations. La qualité d'un individu est mesurée par une fonction de fitness hiérarchisée :
+F(x) = M   H(x) + S(x)
+Où H(x) représente la somme des violations des contraintes dures (collisions) et S(x) l'indice de pénalité des contraintes souples. Le facteur de pondération M = 10^6 assure la dominance absolue de la faisabilité sur le confort.
+2. Mécanismes de Sélection et de Survie
+La pression évolutive est maintenue par deux leviers stratégiques :
+Élitisme (E=2) : Les deux meilleures solutions de chaque génération sont transmises intactes à la suivante. Cela préserve les records historiques et garantit que l'algorithme ne régresse jamais.
+Sélection par Tournoi (k=3) : Pour choisir les parents du croisement, on tire trois individus au hasard et on sélectionne le plus performant. Ce mécanisme permet de favoriser les bons gènes tout en maintenant une pression sélective équilibrée.
+3. Cycle Mémétique et Dynamique de Convergence
+Le processus évolutif suit une dynamique itérative et mémétique où chaque génération renforce la qualité globale de la population. Une fois les opérateurs de croisement et de mutation appliqués, chaque nouvel individu traverse une phase d'intensification locale par le Recuit Simulé afin de corriger les imperfections structurelles résiduelles. Ce cycle se poursuit de manière continue jusqu'à l'obtention d'une solution optimisée et stabilisée. Pour garantir une exploration robuste de l'espace de recherche, un mécanisme de surveillance de la convergence analyse le score de l'élite à chaque itération. En cas de stagnation prolongée sur cinq générations successives, le système déclenche automatiquement une procédure de renouvellement de la diversité génétique en réinjectant trente-trois pour cent d'individus neufs, permettant ainsi de s'extraire des plateaux de fitness et de relancer la recherche vers l'optimum global.
+* Sous-section : Les 3 Innovations Architecturales Clés *
+PrimaryBlue1. Mouvements Guidés par la Connaissance du Domaine
+Le SA ne choisit pas ses mouvements au hasard. Il opère selon deux phases distinctes déterminées dynamiquement :
+Phase Hard : Dès qu'un conflit existe (H > 0), l'algorithme construit un conflict\_cache en scannant toutes les séances. Il applique ensuite une stratégie 70/30 : 70\
+Phase Soft : Quand H = 0, le moteur bascule vers 4 mouvements pédagogiques spécialisés : Aligner les salles d'un module (25\
+PrimaryBlue2. Delta-Scoring : Évaluation en O(1) au lieu de O(N^2)
+L'évaluation naïve d'une solution recalcule l'intégralité des contraintes (O(N^2)). Notre implémentation maintient un cache de fitness (schedule.fitness) qui n'est invalidé qu'après une modification. Ainsi, chaque mouvement du SA ne recalcule que la variation locale ( ), réduisant le coût de 95\
+PrimaryBlue3. Logique Turbo : Élitisme 30\
+Pour maximiser la vitesse de convergence, nous avons introduit une mécanique de survie sélective rigoureuse. Un taux d’élitisme de 30\
+* Sous-section : Limites et Motivation du Perfectionnement *
+Malgré sa robustesse face aux conflits massifs, l'approche GA-SA révèle
+une limite structurelle fondamentale. Ses opérateurs de mutation et de
+croisement opèrent avec des probabilités fixes, restant aveugles à la
+dynamique réelle de la solution en cours d'évolution. Le système ignore
+ainsi quels leviers seraient les plus efficaces à chaque étape, gaspillant
+une fraction significative de ses itérations sur des transformations peu
+rentables. Ces contraintes motivent la transition vers l'Approche 2, un système plus réactif capable d'auto-ajuster sa stratégie de voisinage.
+--- Section : Approche 2 : Recherche à Large Voisinage Adaptative  ---
+* Sous-section : Définition et Principe *
+L’approche ILS-ALNS (Iterated Local Search — Adaptive Large Neighborhood Search) marque une rupture avec les méthodes mémétiques classiques en remplaçant le brassage génétique par un cycle itératif de diversification contrôlée et d'intensification chirurgicale. Le principe repose sur le paradigme "Kick-and-Polish" : la solution élite est périodiquement déstructurée par un "choc" stochastique (le Kick) avant d’être raffinée par un moteur de recherche locale intelligente capable de s'adapter dynamiquement à la topologie du problème sans dépendre de paramètres fixes.
+* Sous-section : Architecture du cycle opérationnel ALNS *
+figureArchitecture du cycle opérationnel ALNS
+Contrairement au GA-SA, l'ALNS intègre un mécanisme d'apprentissage statistique (Bandit) qui arbitre entre les différents opérateurs de voisinage pour maximiser le gain de fitness tout en gérant le compromis exploration-exploitation.
+1. Distinction entre ALNS et Bandit UCB1
+Pour bien comprendre l'architecture, il faut distinguer le cadre stratégique du moteur de décision :
+L'ALNS  : C'est la stratégie de recherche globale. Elle définit la capacité du solveur à utiliser une grande bibliothèque d'opérateurs de voisinage. L'ALNS fournit les "outils" pour transformer l'emploi du temps.
+Le Bandit UCB1  : C'est l'intelligence mathématique embarquée dans l'ALNS. Son rôle unique est de décider, à chaque itération, quel "outil" est le plus pertinent. Sans le bandit, l'ALNS serait une recherche multi-voisinage aléatoire ; grâce au bandit, elle devient une recherche adaptative qui apprend de ses succès.
+2. La Formule de l'Upper Confidence Bound 'UCB1'
+Pour arbitrer ce choix, l'ALNS utilise la formule UCB1 pour calculer la priorité de chaque opérateur i :
+Score_i =  R_in_i_Performance + C    (N)n_i_Incertitude
+R_i/n_i : Récompense moyenne obtenue (Efficacité passée).
+n_i : Nombre de fois où l'opérateur a été sollicité.
+N : Nombre total d'itérations de polissage.
+C : Constante d'exploration (fixée à 1.1).
+3. Dynamique d'Apprentissage :
+Le processus d'apprentissage du bandit repose sur un cycle itératif en deux temps :
+Sélection  :
+Avant d'agir, l'algorithme utilise le Score UCB1 pour choisir l'opérateur ayant le meilleur compromis entre succès passé et potentiel d'exploration.
+Évaluation  :
+Après l'application du mouvement, l'algorithme observe   = Fitness_apres - Fitness_avant. Si   < 0, une Récompense est injectée dans le bandit.
+r =  \! (0,\; - Meilleur\_Fitness )   150
+Le multiplicateur de 150 amplifie le signal d'apprentissage. L'algorithme maintient un registre cumulatif des performances et de l'utilisation pour chaque opérateur, garantissant une efficacité mémoire optimale.
+* Sous-section : Bibliothèque des Opérateurs de Voisinage *
+Les opérateurs de voisinage de l'ALNS ne sont pas des mouvements aléatoires génériques. Chacun d'eux a été conçu en réponse à une contrainte pédagogique précise identifiée lors de l'analyse de l'instance FSTG.Plutôt que de modifier aveuglément l'emploi du temps, chaque opérateur sait exactement quel type de pénalité il cherche à corriger.
+Ces 8 opérateurs sont organisés en deux familles fonctionnelles :
+Opérateurs de Réparation  : Actifs lorsque H > 0. Ils ciblent directement les séances en conflit pour éliminer les collisions dures.
+Opérateurs de Confort : Actifs lorsque H = 0. Ils optimisent les contraintes souples , stabilité des salles, regroupement des enseignants et confort des étudiants.
+tableBibliothèque complète des opérateurs ALNS.
+* Sous-section : Bilan et Motivation du perfectionnement *
+L'approche ILS-ALNS constitue un saut qualitatif majeur par rapport aux méthodes génétiques classiques. Sa force réside dans sa capacité à orchestrer une bibliothèque d'opérateurs "chirurgicaux" et à s'auto-ajuster dynamiquement selon la topologie du problème. Cependant, malgré sa robustesse face aux conflits massifs, le système atteint un plateau de performance lié à sa "cécité contextuelle".
+En effet, le Bandit UCB1 opère sur une mémoire purement statistique : il sait quel opérateur a fonctionné en moyenne dans le passé, mais il ne comprend pas pourquoi il a fonctionné, ni si l'état actuel du planning se prête à son utilisation. Le bandit traite chaque itération comme un tirage indépendant, ignorant totalement si le planning est actuellement "saturé", "truffé de trous" ou "quasi-faisable". Cette absence de lecture sémantique empêche l'algorithme de développer des stratégies à long terme ou d'anticiper des séquences d'actions complexes.
+Pour dépasser cette limite, il est nécessaire d'injecter un "cerveau" capable de  percevoir l'état du planning avant de décider. C'est l'objet de l'Approche finale : une architecture RL-ALNS où un agent de Reinforcement Learning apprend une politique contextuelle, transformant le moteur adaptatif en un système véritablement intelligent et proactif.
+--- Section : Architecture RL-ALNS et Pilotage par Agent Q-Learning ---
+* Sous-section : Définition et Architecture de Perception *
+L'approche RL-ALNS naît d'un constat fondamental : le Bandit UCB1 de l'Approche 2 est réactif. Il ajuste ses probabilités en fonction de récompenses passées, mais il ne voit jamais l'état de l'emploi du temps. Il ignore si le système est proche de la faisabilité, si les gaps explosent ou si le planning stagne. En réponse à cette cécité contextuelle, nous introduisons un agent Q-Learning qui, lui, perçoit l'état courant de la solution et anticipe l'effet à long terme de chaque action. Le RL ne réagit plus aux succès passés , il raisonne sur la situation présente pour décider quelle stratégie déclencher. C'est le passage du statistique vers l'intelligence contextuelle.
+Un planning brut possède une dimensionnalité trop élevée pour un apprentissage direct. Le vecteur d'état s_t  joue donc un rôle de pivot sémantique : il résume en 4 dimensions discrètes l'information critique dont l'agent a besoin pour prendre une décision, en encodant les coefficients de pondération issus de l'analyse de l'instace de FSTG .
+figurePipeline de perception de l'agent : de l'emploi du temps brut au vecteur d'état discrétisé s_t.
+fig:state_vector
+Pour que l'agent puisse lire l'emploi du temps, le vecteur d'état s_t   N^4 résume en 4 dimensions discrètes l'information critique, transformant la complexité brute du planning en une photo instantanée sans bruit, exploitable directement par la Q-Table :
+s_t[0]  = 1_H > 0   \0, 1\    (Bit de faisabilité : 1 si conflit dur existe)
+s_t[1]  =    S_ gaps500       (Palier de pénalité Gaps/Trous)
+s_t[2]  =    S_ stab1000       (Palier de pénalité Stabilité/Nomadisme)
+s_t[3]  =    tT_    10      [0, 10]    (Avancement temporel du cycle)
+* Sous-section : Les Trois Piliers de l'Apprentissage par Renforcement (RL) *
+1: La Politique de Décision :  -Greedy
+À chaque itération, l'agent arbitre le compromis entre exploitation et exploration :
+Exploitation (1-  = 90\
+Exploration (  = 10\
+2: Le Signal de Récompense R_t
+La récompense est le seul professeur de l'agent. Elle est calculée uniquement en phase Soft (H = 0), une fois la faisabilité acquise :
+R_t \;=\; F(x_t) - F(x_t+1)50 \; \;  (1 + F^*(x)10\,000 )
+La division par 50 normalise le signal pour éviter des mises à jour trop brutales, tandis que le multiplicateur adaptatif amplifie la récompense en début de run pour favoriser l'exploration des gains majeurs. La condition H=0 garantit que l'IA n'apprend que lors des phases d'optimisation stratégique.
+3 : La Règle de Mise à Jour
+L'agent affine sa connaissance via la règle de Temporal Difference. Cette formule permet d'ajuster la valeur Q d'une action en fonction de trois composants critiques :
+Le Taux d'Apprentissage   : Il définit la vitesse à laquelle l'agent intègre une nouvelle expérience. Une valeur modérée garantit une stabilité face au bruit des récompenses locales.
+L'Erreur de Prédiction : Le terme entre crochets mesure l'écart entre le résultat obtenu et l'estimation initiale. Plus cet écart est grand, plus la mise à jour de la mémoire est significative.
+L'Anticipation du Futur     Q_s+1 : Ce facteur valorise la promesse de l'état suivant. Il permet à l'agent de comprendre qu'une action de stabilisation, bien que peu rémunératrice dans l'immédiat, est cruciale si elle prépare le terrain pour un compactage massif de l'emploi du temps au cycle suivant.
+Q(s_t, a_t)   Q(s_t, a_t) +   [ R_t +    _a' Q(s_t+1, a') - Q(s_t, a_t) ]
+* Sous-section : Espace d'Actions, Cycle RL et Paramètres *
+La distinction fondamentale entre les mouvements de l'ALNS et les décisions de l'agent RL réside dans une hiérarchie de granularité.
+À l'inverse, l'agent RL se positionne au niveau Macro : il agit comme un stratège,
+Au lieu de déplacer une séance lui-même, il perçoit l'état global du planning  et décide quelle stratégie activer  par exemple, déclencher une restructuration complète d'un bloc de modules ou changer radicalement la zone de recherche. En résumé : l'ALNS répare le planning, tandis que le RL pilote la trajectoire de réparation pour éviter que l'algorithme ne s'enferme dans des impasses statistiques.
+Ils permettent à l'agent d'orchestrer des changements profonds , comme la stabilisation globale des salles ou le regroupement massif d'un enseignant, là où un opérateur local resterait bloqué par une vision trop étroite du planning.
+4 Leviers de l'Agent (Espace d'Actions  A) :
+L'espace de décision est volontairement compact ,4 heuristiques composites pour garantir un signal de récompense lisible et une convergence rapide :
+Stabilisation Salles : Aligne les salles pour réduire le nomadisme (35\
+Compactage Prof : Regroupe les séances pour éliminer les trous enseignants.
+Compactage Section : Supprime les gaps et "tunnels de faim" des étudiants.
+Exploration Aléatoire : Micro-mutation ciblée pour sortir des plateaux locaux.
+* Sous-section : Mécanisme d'Apprentissage de l'Agent *
+L'agent RL-Controller ne naît pas expert , il le devient. Son intelligence se construit itérativement, génération après génération, à travers un cycle de décision, d'observation et de correction. Ce mécanisme repose sur trois piliers fondamentaux : la politique de décision, le signal de récompense, et la règle de mise à jour qui sera détaillée au sein de l'algorithme.
+figureCycle d'apprentissage de l'agent RL Controller via l'équation de Bellman
+Au fil des générations, la Q-Table converge vers une politique stable : pour chaque configuration typique de l'emploi du temps, l'agent identifie la stratégie à déclencher en priorité. Cette convergence transforme l'IA en un expert contextuel capable de sélectionner l'opérateur le plus rentable au sens de la fitness globale, réduisant ainsi drastiquement le nombre d'itérations infructueuses par rapport à une recherche locale stochastique classique.
+* Sous-section : La Synergie RL-ALNS : Vers un Moteur d'Optimisation Intelligent *
+Le cœur technologique de notre solution réside dans la fusion organique entre la puissance chirurgicale de l'ALNS (Approche 2) et l'intelligence contextuelle du Reinforcement Learning (Approche 3). Cette architecture hybride combine l’efficacité opérationnelle de l’ALNS pour le réordonnancement des séances avec le mécanisme de pilotage adaptatif du RL.
+Contrairement aux approches isolées, l'agent ne se contente plus de réagir mécaniquement à des succès statistiques passés. En combinant ces deux mondes, le système apprend que l'efficacité d'un opérateur ALNS dépend de la situation présente (s_t) de l'emploi du temps. Cette symbiose permet à l'agent d'arbitrer intelligemment : il peut décider d'utiliser un opérateur Micro-ALNS pour éteindre un conflit local, ou déclencher une action Macro-RL pour restructurer globalement un bloc de cours. C'est cette capacité d'arbitrage contextuel qui permet de naviguer avec une efficacité sans précédent dans l'espace de recherche complexe de la FSTG.
+tableArsenal unifié de l'agent RL-ALNS : 12 actions pilotées par Q-Learning.
+Pour matérialiser cette fusion, nous avons structuré l'architecture autour d'un pipeline de décision circulaire. L'agent ne se contente pas d'exécuter une action ; il ferme la boucle d'apprentissage en évaluant l'impact de chaque strate (Micro, Macro ou Choc) sur la fitness globale de la FSTG. Le schéma ci-dessous illustre cette orchestration neuro-symbolique où l'intelligence contextuelle pilote la précision chirurgicale.
+* Sous-section : Curriculum Learning : Résolution du Démarrage à Froid *
+Appliquer directement le pilotage RL sur le dataset complet de la FSTG (243 séances) confronte l'agent à un problème de cold start : sa Q-Table est initialement vide et le signal de récompense est trop bruité pour permettre une convergence.
+Pour résoudre structurellement ce verrou, nous adoptons le paradigme
+du Curriculum Learning, formalisé par Bengio et al. (2009),
+qui stipule qu'un agent apprend plus efficacement et plus rapidement lorsqu'il
+est exposé à une suite de tâches de complexité croissante, plutôt
+qu'à la complexité maximale dès le départ. L'analogie pédagogique est
+immédiate : de même qu'un étudiant maîtrise d'abord l'arithmétique avant
+d'aborder le calcul intégral, notre agent RL doit d'abord apprendre à
+résoudre les conflits d'une seule section avant d'orchestrer
+l'intégralité du Tronc Commun de la FSTG.
+Le Curriculum Learning résout ce défi en entraînant l'agent sur une suite de sous-problèmes de complexité croissante :
+Phase 1 (Micro) : Entraînement sur une seule section. L'agent apprend à « réparer » les conflits de base (H   0) et à maîtriser les contraintes de chevauchement.
+Phase 2 (Méso) : Entraînement sur un Département complet. L'agent apprend à orchestrer les salles partagées et à gérer la rareté des ressources communes.
+Phase 3 (Macro) : Passage au planning complet FSTG. L'agent démarre avec une expertise héritée (Q-seed), ce qui accélère la convergence de 40\
+figurePipeline du Curriculum Learning
+Théoriquement, dans un espace de recherche aussi vaste, la probabilité de recevoir une récompense positive (Reward Shaping) par pur hasard est proche de zéro au début de l'apprentissage. En segmentant la résolution en trois phases : Micro (3 sections), Meso (6 sections) et Full (10 sections) , nous permettons à l'agent de peupler sa Q-Table avec des schémas de décisions fondamentaux comme la gestion des pauses déjeuner ou la stabilisation des salles dans un environnement moins bruité.
+Ce Transfer Learning interne garantit que lors de la phase finale, l'agent  utilise une base de connaissances déjà riche de plus de 300 états pré-optimisés. Cette montée en charge progressive est le moteur principal qui permet à l'algorithme  d'atteindre des scores de confort pédagogique inaccessibles aux métaheuristiques classiques en un temps record.
+Cette synergie permet de transformer des milliers de contraintes pédagogiques en un emploi du temps harmonieux, garantissant une stabilité des salles et un confort pour les enseignants en un temps d'exécution record. Nous disposons désormais d'un outil robuste, prêt à être soumis à une évaluation expérimentale rigoureuse pour valider ses performances face aux standards académiques.
+Conclusion
+coldblueE n conclusion, ce chapitre a tracé une trajectoire algorithmique rigoureuse, des métaheuristiques classiques vers l'intelligence contextuelle hybride. Chaque approche étudiée  GA-SA, ILS-ALNS et RL-Controller  a servi de tremplin vers l'architecture finale RL-ALNS, où un agent apprenant pilote dynamiquement une bibliothèque de douze opérateurs spécialisés. La stratégie de Curriculum Learning parachève cette conception en dotant le système d'une expertise héritée, accélérant la convergence de 40\
+chapter3section0
+Chapitre 3 : Conception et Implémentation sur l'Instance FSTG
+tocchapterChapitre 3 : Conception et Implémentation
+[coldblue  ]   Ingénierie des Données \  Pipeline ETL
+[coldblue  ]   Architecture Technique \  Représentation
+[coldblue  ]   Stratégies de Construction
+[coldblue  ]   Moteur RL-ALNS en Production
+coldblue0.6 0.8pt
+Ce chapitre constitue le pont entre la théorie algorithmique et la réalité opérationnelle de la FSTG. Nous y détaillons l'infrastructure logicielle conçue pour transformer des données brutes en plannings optimisés. De l'ingénierie des données via Polars jusqu'à la coordination complexe des groupes et salles, nous exposons les choix d'implémentation qui garantissent la performance et la fiabilité de notre moteur RL-ALNS.
+0.3  coldblue0.6 0.8pt
+--- Section : Ingénierie des Données et Architecture ETL ---
+La performance d'un algorithme d'optimisation dépend de la pureté de sa donnée. Pour l'instance FSTG, nous avons dû transformer un chaos informationnel, des fichiers Excel (.xlsx) , fichier csv hétérogènes , en une Source de Vérité  exploitable par l'IA via une database PostgreSQL 15.
+1. Pipeline d'Orchestration avec Dagster
+L'organisation du flux de données est confiée à Dagster. Ce système traite chaque étape de la préparation comme un composant logiciel indépendant. Dagster agit comme la couche de contrôle supérieure. Son rôle n'est pas de transformer la donnée, mais de garantir l'intégrité du workflow. Il décompose le processus ETL en "Assets" logiciels. Si une donnée source est manquante ou corrompue, Dagster bloque la suite du pipeline, empêchant ainsi d'injecter des erreurs dans l'algorithme RL-ALNS.
+2. Transformation des Données avec Polars
+Polars est le moteur d'exécution utilisé à l'intérieur de chaque étape Dagster. C'est lui qui réalise les jointures complexes et le nettoyage des données hétérogènes. Grâce à sa structure multithreadée, il permet de traiter les 247 séances et les contraintes associées en quelques millisecondes, assurant une réactivité totale lors de la phase de préparation.
+figureArchitecture du Pipeline ETL
+fig:pipeline_etl
+3. Alimentation de la Base de Données via Power BI
+Une fois les fichiers produits par Polars nettoyés et structurés, une étape de réconciliation manuelle assistée est réalisée via Power BI. Cet outil permet de visualiser les données issues des différents fichiers Excel, d'établir les relations entre les identifiants des modules, des enseignants et des salles, puis de valider la cohérence des affectations pédagogiques avant leur injection. Le résultat final est ensuite transmis directement à PostgreSQL 15, qui constitue la source de vérité unique alimentant le moteur RL-ALNS.
+4. Volumétrie et Calibration de l'Instance Tronc Commun
+L'instance traitée par ce pipeline représente le segment le plus complexe de la faculté :
+--- Section : Modélisation de la Solution et Structures de Données ---
+La qualité et la rapidité du moteur RL-ALNS dépendent directement de la façon dont la solution est représentée en mémoire. Cette section décrit les structures de données conçues pour permettre une évaluation ultra-rapide de chaque solution candidate.
+1. L'Unité Fondamentale : L'Objet  Assignment
+Chaque séance placée dans le planning est modélisée par un objet Assignment, qui agit comme le pivot central entre le modèle relationnel de la base de données et le moteur d'exécution algorithmique. Cet objet encapsule de manière atomique l'ensemble des relations critiques : la séance pédagogique (ModulePart), la salle allouée (Room) et le créneau horaire (Timeslot).
+Un emploi du temps complet est ainsi représenté par une collection de 247 instances de cet objet. Cette structure est conçue pour la performance pure : chaque mouvement (déplacement simple) ou échange (Swap) ne nécessite qu'une simple mise à jour de pointeurs en mémoire. Cette approche rend les opérations réalisables en une seule instruction (complexité O(1)), permettant au moteur RL-ALNS de tester des milliers de configurations par seconde sans jamais dupliquer d'information inutile.
+2. Détection de Conflits en Temps Constant : Les SlotMaps
+Pour vérifier si un enseignant ou une salle est déjà occupé à un créneau donné , le moteur n'a pas besoin de parcourir la liste des 247 séances.
+Il consulte des tables de hachage construites à la volée : prof\_slots pour les enseignants, room\_slots pour les salles, et sec\_occupancy pour les conflits inter-filières. Cette architecture garantit une vérification instantanée, indépendante du volume de données.
+3. Barrière Mathématique : La Pénalité Big-M
+La fonction de fitness utilise une valeur de pénalité de 1\,000\,000 pour chaque violation de contrainte dure détectée. Cela crée une frontière infranchissable entre les solutions faisables et non-faisables : même mille améliorations de confort ne compensent jamais une seule collision physique entre deux enseignants. L'agent RL est ainsi forcé de stabiliser le score H=0 avant de chercher à améliorer le confort.
+4. Optimisation du Temps de Calcul : Le Mode Turbo
+En phase de recherche de faisabilité, le calcul des pénalités de confort (Gaps, Lunch, Stabilité) est court-circuité. Le moteur n'évalue que les contraintes dures, divisant le temps de calcul par deux lors des itérations critiques. Ce passage automatique entre le mode "Faisabilité" et le mode "Optimisation" est piloté par l'agent RL en fonction de l'état courant du planning.
+--- Section : Heuristique de Construction de la Population Initiale ---
+Le moteur RL-ALNS démarre d'un état structuré grâce à un Constructeur Glouton Intelligent qui génère la base de calcul.
+1. Tri par Priorité (CMs et Sections Critiques)
+Les cours magistraux et les sections complexes (ex: GB-GEG S2) sont placés en premier. Cette priorité permet de réserver les ressources rares (Amphis) dès le début, réduisant ainsi drastiquement les conflits insolubles pour le reste du moteur.
+2. Gestion Spécifique de la Filière GB-GEG : Logique de Partenaires
+Synchronisation de Blocs : Les deux demi-groupes d'un même binôme sont planifiés simultanément dans la même demi-journée.
+Switch de Module : Le constructeur favorise le "bouclage" des modules, garantissant qu'un binôme termine ses deux séances de spécialité sur un bloc de 4h.
+3. Diversité du Pool Initial : Stratégie 80/20
+Pour garantir une recherche efficace, la population initiale est hybridée :
+--- Section : Cœur Algorithmique : Hybridation RL-ALNS et Pilotage de la Performance ---
+* Sous-section : Formalisation des Hyperparamètres du Système *
+Avant d'en analyser les valeurs retenues, il est indispensable de
+formaliser rigoureusement chaque hyperparamètre : définir sa nature mathématique,
+l'équation dans laquelle il intervient et son rôle précis au sein de l'algorithme global.
+Cette démarche garantit une transparence scientifique totale et constitue la base
+d'une calibration raisonnée.
+Le moteur RL-ALNS Fusionné est gouverné par trois familles de paramètres
+interdépendants : les paramètres du Recuit Simulé (SA) qui pilotent la dynamique
+d'exploration thermique, les paramètres de l'Agent Q-Learning (RL) qui régissent
+l'apprentissage de la politique de sélection des opérateurs, et enfin les paramètres
+Évolutionnaires qui gèrent la dynamique de la population.
+A: Paramètres du Recuit Simulé (SA)
+B : Paramètres de l'Agent Q-Learning (RL)
+C — Paramètres Évolutionnaires (Population)
+èse de la Fonction Objectif Lexicographique
+L'ensemble de ces paramètres converge vers une unique boussole de navigation pour le moteur,
+la fonction de fitness lexicographique :
+F(x) \;=\; M    _i=1^12 H_i(x)_Barrière de faisabilité
+\;+\;  _j=1^8 w_j   S_j(x)_Qualité pédagogique
+eq:fitness_complete
+où M = 10^6 garantit qu'une seule violation dure est mathématiquement
+incompensable par n'importe quelle combinaison de gains pédagogiques
+(  x : S(x) < M   F_infaisable   F_admissible).
+Le signal de récompense transmis à l'agent RL est ensuite calculé exclusivement
+en phase admissible (H = 0) à partir de la variation de cette fitness :
+R_t \;=\; F(x_t) - F(x_t+1)50 \; \;  (1 + F^*(x)10\,000 )
+eq:reward
+Le premier terme normalise le gradient, le second est un multiplicateur adaptatif
+qui amplifie la récompense quand le planning est encore loin de l'optimum ,
+puis la réduit progressivement au fur et à mesure de la convergence pour stabiliser
+la Q-Table en fin de run.
+* Sous-section : Pseudocode Complet du Moteur RL-ALNS Fusionné *
+Le pseudocode suivant constitue la description algorithmique intégrale du moteur.
+Il couvre les quatre niveaux d'imbrication : la phase de Curriculum Learning,
+la boucle évolutionnaire principale, le Recuit Simulé piloté par RL,
+et la règle d'apprentissage de Bellman.
+Données FSTG  D
+Planning optimal x^* avec H(x^*)=0 et S(x^*) minimisé
+--- PHASE 0 : Initialisation globale ---
+Initialiser Agent RL : Q(s,a)   0 \;  (s,a),     0,15\;
+Initialiser Population P    \;
+F^*   + \;
+patience\_counter   0\;
+--- PHASE 1 : Curriculum Learning (Préchauffage de l'Agent) ---
+phase   \1, 2, 3\
+D_phase   Sous-instance de D avec  phase3 des sections\;
+P_phase   GenererPopulation(D_phase, N_pop=12)\;
+g   1   12
+Warmup léger : 12 itérations par phase
+EvoluerPopulation(P_phase, agent, N_SA=300)
+D   D_complet Restauration de l'instance globale
+--- PHASE 2 : Optimisation Globale ---
+P   GenererPopulation(D, N_pop) 80\
+F_ init   F(P[0]) Score de référence initial
+g   1   G_ max
+Stratégie dynamique sur   (Annealing de l'exploration RL)
+0,05 Phase finale : exploitation quasi-totale
+0,10 Phase intermédiaire
+Appel de la boucle évolutionnaire
+EvoluerPopulation(P, agent, N_SA)\;
+x_best   P[0]\;
+(L'optimisation se poursuit dans le cadre suivant...)
+Moteur RL-ALNS Fusionné : Procédure Maître (1/2)
+algocf-1
+AlgoLine28
+--- Algorithme 1 (suite) ---
+g   1   G_ max (suite)
+Critère d'arrêt anticipé (Patience)
+F(x_ best) < F^*
+F^*   F(x_best)\;
+x^*   x_best\;
+patience\_counter   0\;
+patience\_counter   patience\_counter + 1\;
+patience  counter   P
+break Arrêt précoce : convergence atteinte
+Moteur RL-ALNS Fusionné : Procédure Maître (2/2)
+écanisme de Renouvellement de la Population
+L'efficacité du moteur repose sur sa capacité à maintenir un équilibre entre l'exploitation des meilleures solutions trouvées et l'exploration de nouvelles zones de l'espace de recherche. La procédure EvoluerPopulation détaille ce cycle de vie où l'élite est peaufinée par un Recuit Simulé intense tandis que les nouveaux individus subissent un traitement plus léger pour préserver la diversité génétique de la population.
+EvoluerPopulationP, agent, N_SA
+Trier P par F croissant\;
+Élitisme : conservation des E meilleures solutions
+new\_gen   P[0..E-1]
+SA Intensif sur l'Élite (E individus)
+i   0   E-1
+Polissage chirurgical : N_SA = 800 itérations
+new\_gen[i]   RecuitSimuléRL(new\_gen[i], agent, N_SA)
+Complétion de la génération (enfants)
+| new\_gen| < N_pop
+Sélectionner p_1     _x F(x) sur un tournoi de 4 individus tirés dans P\;
+enfant   deepcopy(p_1),  F(enfant)   None\;
+U(0,1) < p_m
+Mutation légère pour diversification
+Appliquer op\_random\_shift(enfant)
+SA Light : 25\
+enfant   RecuitSimuléRL (enfant, agent,   N_SA/4   )\;
+Ajouter enfant à new\_gen\;
+P   new\_gen\;
+Procédure d'Évolution de la Population
+Simulé Piloté par RL
+Le point culminant de notre architecture est la procédure RecuitSimuléRL. Elle fusionne la puissance d'exploration du recuit simulé avec la capacité de décision stratégique de l'agent RL, permettant au système d'adapter sa tactique d'optimisation en fonction de l'état réel du planning à chaque seconde.
+Planning x, Agent RL, N_SA itérations
+Planning amélioré x^*_ local
+--- Initialisation du SA ---
+f_curr   F(x)\;
+f^*_local   f_curr,  x^*_local   copy(x)\;
+T    (T_0,\; f_curr   0,05)
+Température dynamique adaptée à l'échelle de la fitness
+U   \i : is\_locked(a_i) = False\
+Séances modifiables (non verrouillées par l'admin)
+t   0   N_SA-1
+--- Perception : Construction du Vecteur d'État ---
+s_t    [\; 1_[H(x)>0],\;\;   S_gaps(x)/ _3  ,\;\;   S_stab(x)/ _6  ,\;\; t/N_SA \; ]\;
+--- Décision : Politique  -Greedy ---
+U(0,1) <
+a_t   U(A)
+Exploration : action aléatoire dans  A = \0,...,11\
+k    CléEtat(s_t)\;
+k   QQ[k]   \a: 0,0 \;  a   A\
+a_t     _a Q[k][a]
+Exploitation : meilleure action connue
+--- Action : Application de l'Opérateur Sélectionné ---
+a_t   \0,...,7\
+(i_saved, s_saved)   ALNS\_OPS[a_t](x, U, D)
+Micro-opérateur ALNS
+a_t = 8(i_s, s_s)   op\_stabilize\_room(x, U, D)
+a_t = 9(i_s, s_s)   op\_compact\_day\_prof(x, U, D)
+a_t = 10(i_s, s_s)   op\_compact\_day\_section(x, U, D)
+(i_s, s_s)    op\_random\_shift(x, U, D)
+a_t=11 : StrategicKick ILS
+(L'apprentissage se terminent dans le cadre suivant...)
+RecuitSimuléRL : Cœur Fusionné SA+RL (1/2)
+algocf-1
+AlgoLine38
+--- Algorithme 3 (suite) ---
+t   0   N_SA-1 (suite)
+--- Évaluation du Voisin ---
+F(x)   None Invalidation du cache de fitness
+f_neigh   F(x)\;
+f_neigh - f_curr\;
+--- Critère d'Acceptation de Metropolis ---
+< 0  ou (T > 0 et U(0,1) < e^-  / T)
+f_curr   f_neigh\;
+--- Signal de Récompense (uniquement si amélioration) ---
+R_t   0,0\;
+R_t   - 50,0    (1 + f^*_ local10\,000 )
+Équation  eq:reward : récompense adaptative
+--- Apprentissage : Mise à Jour de la Q-Table (Règle de Bellman) ---
+s_t+1    [1_[H(x)>0],\;   S_gaps/ _3 ,\;   S_stab/ _6 ,\; (t+1)/N_SA ]\;
+k   CléEtat(s_t),  k'   CléEtat(s_t+1)\;
+k'   QQ[k']   \a: 0,0\
+_TD   R_t +      _a' Q[k'][a'] - Q[k][a_t]\;
+Q[k][a_t]   Q[k][a_t] +      _TD\;
+Sauvegarde du meilleur état local
+f_ curr < f^*_local
+f^*_local   f_curr\;
+x^*_local   copy(x)\;
+Rejet du mouvement : restauration de l'état précédent
+(i, (r_ old, t_old))   zip(i_s, s_s)
+x.r_i   r_old,  x.t_i   t_old\;
+F(x)   f_curr
+Restauration du cache (pas de recalcul)
+--- Refroidissement ---
+T    _cool   T\;
+--- Restauration du meilleur état local trouvé ---
+Restaurer x   x^*_local\;
+F(x)   None\;
+RecuitSimuléRL : Apprentissage et Restauration (2/2)
+* Sous-section : Calibration des Hyperparamètres sur l'Instance FSTG *
+Fort des définitions formelles établies précédemment, nous pouvons maintenant
+justifier rigoureusement les valeurs retenues pour chaque paramètre. Chaque choix résulte
+d'une phase de calibration empirique ciblée sur les spécificités de l'instance FSTG.
+: Paramètres du Recuit Simulé
+Température initiale T_0 =  (50,0;\; f_curr   0,05)
+Un T_0 fixe serait inadapté car la fitness d'un individu peut varier de 10^7 (début,
+conflits massifs) à 10^4 (fin, phase soft). L'approche dynamique garantit que la
+probabilité d'accepter une dégradation de 5\
+quelle que soit l'échelle de la fitness courante.
+Facteur de refroidissement  _cool = 0,99
+Ce taux "lent" garantit une décroissance douce. Sur N_SA=800 itérations,
+la température finale est T_f = T_0   (0,99)^800,
+assurant une transition complète du régime exploratoire au régime déterministe.
+Nombre d'itérations SA N_SA = 800 et N_SA/4 = 200
+Le delta-scoring (O(1)) permet 800 itérations sans surcoût temporel.
+La division par 4 pour les enfants crée une asymétrie délibérée : l'élite est
+peaufinée en profondeur, les enfants sont explorés rapidement.
+: Paramètres de l'Agent Q-Learning
+Taux d'apprentissage   = 0,1
+Avec   = 0,1, l'agent conserve 90\
+Sur l'instance FSTG, un seul opérateur mal appliqué peut donner une récompense négative
+atypique. Un   plus élevé (> 0,3) rendrait la Q-Table instable face à ce bruit
+stochastique inhérent aux opérateurs de recherche locale.
+Facteur d'actualisation   = 0,9
+Ce choix est le plus critique de l'architecture. Sur la FSTG, l'opérateur
+StabilizeRoom n'améliore pas immédiatement le score (récompense R_t faible),
+mais il restructure le planning de sorte que CompactProf devient très
+efficace 5 à 10 itérations plus tard. Avec   = 0,9, la cible TD vaut
+R_t + 0,9   Q^*_futur, permettant à l'agent de valoriser cette
+Seuils de discrétisation  _3 = 500 et  _6 = 1\,000
+Ces valeurs ont été calibrées par analyse de la distribution des scores sur
+l'instance FSTG. En dessous de 500 points de gaps, les variations sont
+imperceptibles pour les étudiants (bruit). Au-delà de 1\,000 points de
+nomadisme, le changement est structural. Ces seuils réduisent l'espace
+d'états à environ 32 états actifs rencontrés durant un run,
+garantissant une convergence rapide de la Q-Table.
+: Paramètres Évolutionnaires
+Taille de population N_pop = 12
+Tests comparatifs menés à 10, 12 et 50 individus. Au-delà de 12, le gain de qualité
+est inférieur à 2\
+N_pop = 12 est le point optimal du rapport qualité/temps sur un Intel i5.
+Élitisme E = 2
+Conserver uniquement les 2 meilleures solutions garantit la monotonie du meilleur
+score (F^* ne régresse jamais) sans sacrifier la diversité génétique nécessaire
+à l'exploration.
+Taux de mutation p_m = 0,35
+Une probabilité de 35\
+légère (op\_random\_shift) avant d'entrer dans le SA. Ceci prévient
+la convergence prématurée de la population vers un seul optimum local.
+Patience P = 15
+Si le meilleur score ne s'améliore pas durant 15 générations consécutives,
+l'algorithme s'arrête. Sur l'instance FSTG, la convergence est généralement
+atteinte entre les générations 40 et 70, ce qui rend P = 15 à la fois
+réactif et sûr contre les arrêts prématurés sur des plateaux temporaires.
+Constante Big-M M = 10^6
+L'ordre de grandeur de S(x) pour un planning admissible se situe entre
+5\,000 et 15\,000. En fixant M = 10^6, une seule violation dure
+ajoute 10^6 à la fitness, soit un facteur 100 fois supérieur au score
+soft maximal. Cette séparation garantit l'infranchissabilité de la barrière
+de faisabilité.
+tab:hyperparams
+tableRécapitulatif complet des hyperparamètres du moteur RL-ALNS et analyse de sensibilité.
+tab:hyperparams_sensitivity
+* Sous-section : Mécanismes de contrôle de la convergence et Mode Turbo *
+Pour garantir un temps d'exécution sous la barre des 10 minutes sur un CPU standard, deux mécanismes d'ingénierie ont été ajoutés :
+Mode Turbo : Tant que le score de conflits durs H est supérieur à 0, le moteur court-circuite l'évaluation des contraintes de confort (Gaps, Lunch). Cela divise le temps de calcul par 2 lors de la phase critique de recherche de faisabilité.
+Patience et Early Stopping : Le moteur utilise une PATIENCE=15. Si aucune amélioration n'est détectée après 15 générations, l'algorithme s'arrête, considérant que l'optimum local est atteint ou que l'agent RL a convergé.
+Taille de Population (pop\_size=12) : Choisi après tests comparatifs. Une population plus large (50+) augmentait le temps de calcul exponentiellement sans apporter d'amélioration significative de la fitness finale.
+--- Section : Synthèse du Chapitre : Un Écosystème de Planification Robuste ---
+La clôture de ce chapitre scelle la transition entre la modélisation mathématique du problème de l'emploi du temps et sa mise en œuvre industrielle pour la FSTG Marrakech. Nous avons bâti un écosystème s'appuyant sur trois piliers technologiques majeurs :
+L'Ingénierie de Donnée comme Fondement : En remplaçant les processus manuels par une chaîne ETL automatisée (Dagster/Polars), nous assurons une "Source de Vérité" exempte d'incohérences. La manipulation des données brutes en structures optimisées permet au moteur d'agir sur une information pure.
+L'Architecture Haute Performance : L'utilisation de représentations atomiques (Assignment) et de détections de conflits en temps constant (O(1)) libère la puissance de calcul nécessaire à l'IA. La barrière mathématique du Big-M garantit, quant à elle, l'absence totale de collisions physiques.
+L'Intelligence Hybride RL-ALNS : Le pilotage stratégique par Reinforcement Learning, renforcé par le Curriculum Learning, offre une flexibilité inédite. Le système n'est plus un simple exécutant de règles, mais un agent capable d'apprendre des spécificités du Tronc Commun pour converger vers l'optimum en un temps record.
+Conclusion
+coldblueE n conclusion, ce troisième chapitre a matérialisé le passage de la théorie algorithmique vers une implémentation industrielle robuste, taillée pour les contraintes réelles . Le pipeline ETL automatisé (Dagster/Polars) garantit l'intégrité de la source de vérité sur laquelle repose l'intégralité du moteur. Les structures de données Assignment et les SlotMaps de détection en O(1) libèrent la puissance de calcul nécessaire à l'intelligence artificielle, tandis que la barrière Big-M assure une séparation stricte entre faisabilité et confort. Le constructeur glouton, renforcé par la logique de partenaires, fournit un point de départ structuré qui réduit drastiquement le travail résiduel du moteur RL-ALNS. Enfin, la calibration précise des paramètres évolutifs, locaux et IA consolide un écosystème complet où chaque composant renforce les autres. Ces fondations techniques étant solidifiées, le chapitre suivant validera leurs performances à travers une analyse expérimentale exhaustive sur l'instance réelle de la FSTG.
+chapter4section0
+Chapitre 4 : Expérimentations et Résultats
+tocchapterChapitre 4 : Expérimentations et Résultats
+[coldblue  ]   Protocole Expérimental \  Métriques
+[coldblue  ]   Analyse Comparative (GA-Sa vs ALNS vs RL)
+[coldblue  ]   Qualité des Solutions \  Performance Turbo
+[coldblue  ]   Validation Métier sur l'Instance FSTG
+coldblue0.6 0.8pt
+Ce chapitre présente la validation scientifique de nos approches. À travers une série d'expérimentations rigoureuses sur l'instance réelle de la FSTG Marrakech, nous comparons les performances de nos différents moteurs d'optimisation. Nous démontrons comment la synergie RL-ALNS permet d'atteindre un état de "Zéro Conflit" en un temps record, tout en maximisant le confort pédagogique des enseignants et des étudiants.
+0.3  coldblue0.6 0.8pt
+--- Section : Protocole Expérimental et Environnement de Test ---
+Pour valider la robustesse de notre solution, nous avons soumis le moteur RL-ALNS à l'épreuve de l'instance la plus saturée. Ce protocole vise à démontrer l'efficience de l'IA face à une explosion combinatoire massive.
+1. Environnement de Calcul:
+L'optimisation a été conduite sur une station de travail standard, simulant les conditions réelles d'utilisation par l'administration universitaire :
+Processeur : Intel(R) Core(TM) i5-1135G7 .
+Stockage : SSD NVMe .
+Couche Système : Architecture x64 avec virtualisation Docker (WSL2) pour l'isolation des micro-services.
+2. L'Instance "Tronc Commun" : Un Défi NP-Difficile Massif
+Le Tronc Commun Semestre 2 est le scénario "Worst-Case" de la FSTG Marrakech. Il impose une pression extrême sur les ressources :
+Volume de Données : 247 séances pédagogiques, 10 sections d'étudiants et 42 modules.
+Complexité Combinatoire : Avec un domaine de 30 créneaux et 29 salles, l'espace de recherche théorique s'élève à (30   29)^247, un nombre dépassant largement les capacités de traitement des algorithmes classiques.
+Goulot d'Étranglement : Les 4 Amphis principaux constituent une ressource rare. Leur saturation, combinée aux séances mutualisées (plusieurs sections dans un amphi), rend la détection de conflit O(1) indispensable.
+3. Benchmarking : Algorithmes Comparés
+Nous mesurons l'évolution des performances à travers trois paliers technologiques : la Baseline (GA-SA), le moteur statistique (ALNS) et notre solution finale (RL-ALNS). Chaque algorithme est soumis aux mêmes conditions initiales : instance identique, population de départ équivalente et limite de générations fixée à 10 , afin de garantir une comparaison équitable et reproductible. La Baseline GA-SA constitue le point de référence mémétique classique, combinant évolution génétique et recuit simulé sans mécanisme d'apprentissage adaptatif. Le moteur ALNS-ILS, enrichi du Bandit UCB1, introduit une sélection statistique des opérateurs mais reste aveugle à la sémantique de l'état courant du planning. Enfin, le moteur RL-ALNS, armé de sa Q-Table pré-entraînée par Curriculum Learning, représente l'architecture la plus sophistiquée, capable d'adapter sa stratégie en fonction du contexte réel de la solution. Cette progression technologique permet d'isoler précisément la valeur ajoutée de chaque couche d'intelligence introduite.
+* Sous-section : Métriques d'Évaluation et Indicateurs de Performance *
+La validation rigoureuse d'un moteur d'optimisation hybride comme
+RL-ALNS nécessite une batterie de métriques couvrant trois dimensions
+complémentaires : la faisabilité, la qualité pédagogique
+et la santé de l'apprentissage IA.
+1. Métriques de Faisabilité (Contraintes Hard)
+2. Métriques de Qualité Pédagogique (Contraintes Soft)
+3. Métriques de Convergence et Santé de l'Agent RL
+C'est ici qu'intervient la spécificité de notre moteur IA. Un agent
+Q-Learning a ses propres indicateurs de bonne santé, distincts de la
+simple qualité de la solution :
+4. Risques d'Over-fitting et Under-fitting de l'Agent
+Ces deux pathologies sont les ennemis silencieux d'un agent RL tabulaire
+sur une instance aussi dense que la FSTG :
+Over-fitting : L'agent mémorise des stratégies
+hyper-spécialisées pour les états rencontrés pendant le Curriculum
+(P1/P2) mais échoue à les généraliser à l'instance complète (P3).
+Symptôme détecté : La Q-Table est riche mais le score Soft
+stagne dès la Phase Globale.
+Remède appliqué : Le mécanisme  -Greedy (10\
+d'exploration) et l'StrategicKick (ILS) injectent
+régulièrement de la nouveauté pour éviter ce piège.
+Under-fitting : L'agent n'a pas assez d'itérations
+pour associer les états critiques à leurs meilleures actions.
+Symptôme détecté : |S_visités| est très petit
+(moins de 50 états distincts) et la TD-Error ne décroît pas.
+Remède appliqué : Le Curriculum Learning garantit
+une exposition répétée aux états fondamentaux (conflits, gaps)
+avant d'aborder la complexité globale,
+``pré-peuplant'' la Q-Table avec une expertise de base.
+--- Section : Analyse des Résultats et Dynamiques de Résolution ---
+Cette section expose la synthèse chiffrée des performances après 10 générations de test sur l'instance réelle de la FSTG Marrakech. Ce tableau permet d'apprécier la capacité du moteur hybride à concilier rapidité de calcul et finesse du réglage pédagogique.
+1. Tableau de Synthèse Multidimensionnelle
+Le comparatif ci-dessous oppose DashTime aux approches classiques sur les dimensions critiques de l'optimisation :
+2. Analyse de la Supériorité du Moteur RL-ALNS
+L'analyse croisée des résultats révèle trois avantages compétitifs majeurs qui
+distinguent structurellement notre architecture des approches classiques.
+Le premier avantage est la performance absolue. Le moteur RL-ALNS atteint
+une fitness moyenne de 9 118,1 points, soit un gain de 55,6\
+baseline GA-SA. Ce résultat traduit la capacité de l'agent à naviguer intelligemment
+dans un espace de recherche de dimension 10^60, là où les méthodes mémétiques
+classiques convergent prématurément vers des minima locaux.
+Le deuxième avantage est la vitesse de faisabilité. Le passage au score
+H = 0 en seulement 52 secondes, contre 452 secondes pour le GA-SA, constitue la
+preuve empirique la plus directe de l'efficacité du Curriculum Learning. L'agent
+ne découvre pas les contraintes de l'instance de FSTG à chaque exécution , il les a
+intériorisées durant les phases de préchauffage et les applique immédiatement
+dès le démarrage de l'optimisation globale.
+Le troisième avantage est la qualité pédagogique. La réduction de la
+pénalité de Gaps à 1 180 points et le taux de respect de la pause déjeuner
+qui améliorent concrètement la qualité de vie des usagers de la FSTG.
+* Sous-section : Fidélité Statistique et Robustesse du Moteur *
+Pour valider scientifiquement la supériorité de notre approche au-delà d'une
+observation ponctuelle, nous avons conduit une étude de répétabilité sur 10
+exécutions indépendantes pour chaque moteur. Cette analyse permet d'évaluer
+la stabilité de chaque algorithme face à la nature stochastique du problème
+de planification.
+L'étude de répétabilité révèle une hiérarchie de performance stable et
+statistiquement significative entre les quatre approches. Trois enseignements
+majeurs se dégagent de cette analyse comparative.
+'instabilité structurelle du GA-SA.
+La variance de 9 424,6 points observée sur le moteur génétique traduit
+une dépendance critique à la population initiale. Le run R4, avec un score
+de 35 698, illustre parfaitement ce phénomène : en l'absence d'un mécanisme
+d'apprentissage capable de capitaliser sur les expériences passées, l'algorithme
+peut converger vers des zones très défavorables de l'espace de recherche.
+Cette imprévisibilité rend le GA-SA inadapté à un déploiement institutionnel
+où la reproductibilité des résultats est une exigence fondamentale.
+robustesse de l'ALNS-ILS.
+Le moteur bandit affiche une variance de 2 544,5 nettement inférieure au
+GA-SA, confirmant que le mécanisme UCB1 stabilise efficacement la trajectoire
+de recherche. Cependant, sa performance moyenne de 12 639,9 marque un plafond
+statistique que la sélection probabiliste d'opérateurs ne parvient pas à
+franchir. Ce plafond s'explique par l'absence de perception sémantique de
+l'état du planning : l'agent bandit réagit aux succès passés sans analyser
+la configuration structurelle actuelle.
+stabilité apprise du RL-ALNS.
+Le moteur fusionné réalise simultanément le meilleur score moyen à 9 118,1
+points et le plus faible écart-type à 1 206,6. Cette double performance
+découle directement du Curriculum Learning : en préchauffant la Q-Table
+sur des sous-instances de complexité croissante, l'agent arrive à chaque
+exécution avec une base de connaissances déjà structurée. La variance
+résiduelle observée entre les runs reflète uniquement les variations
+stochastiques des opérateurs locaux, et non une instabilité fondamentale
+de la politique apprise. Le rapport entre la variance du GA-SA et celle
+du RL-ALNS, d'un facteur 7,8, quantifie précisément le gain de fiabilité
+apporté par l'apprentissage contextuel sur l'instance réelle de la FSTG.
+du Curriculum Learning sur la Performance. Enfin, la confrontation entre le RL-ALNS et sa configuration sans curriculum (RL Sans Curric.) met en lumière un gain de performance net de plus de 2 000 points sur la fitness moyenne. Cette différence de 18,7\
+l'apprentissage progressif n'est pas seulement une aide à la convergence, c'est un catalyseur de qualité. En arrivant sur l'instance complète avec une Q-Table déjà structurée sur les piliers du Tronc Commun, l'agent évite les phases d'errance initiale et parvient à sculpter un emploi du temps plus compact et plus respectueux des contraintes pédagogiques fines.
+* Sous-section : Analyse Approfondie de la Convergence *
+Le graphique ci-dessous, en échelle logarithmique (Log_10), permet de visualiser avec précision l'écart de performance final et la trajectoire de résolution.
+figureDynamique de Convergence (Échelle Log10) : RL-ALNS vs Baselines.
+1. La Convergence Éclair du RL-ALNS
+La distinction la plus frappante entre les trois trajectoires concerne
+les cinq premières générations. Tandis que le GA-SA et l'ALNS-ILS
+démarrent au-dessus de 10^5 et descendent progressivement par
+tâtonnement statistique, le moteur RL-ALNS opère une chute quasi-verticale
+vers la zone admissible en moins de cinq générations. Cette convergence
+éclair est la manifestation directe du Curriculum Learning : l'agent
+arrive à l'optimisation globale avec une Q-Table déjà préchauffée sur
+les patterns de conflits de la FSTG, lui permettant d'atteindre
+H = 0 sans phase d'errance exploratoire.
+2. Les Oscillations Contrôlées : Signature de l'Intelligence
+Entre les générations 5 et 80, la courbe RL-ALNS présente des oscillations
+régulières qui constituent la signature algorithmique de l'équilibre
+exploration-exploitation. Chaque remontée correspond à l'activation d'un
+opérateur de perturbation stratégique par l'agent, qui détecte un plateau
+local et déclenche un Strategic Kick pour explorer une nouvelle
+zone de l'espace de recherche. Chaque descente qui suit traduit
+l'exploitation chirurgicale de la zone nouvellement découverte par les
+opérateurs ALNS spécialisés.
+Ce comportement oscillatoire contrôlé
+contraste fortement avec la descente en marches d'escalier de l'ALNS-ILS,
+qui ne progresse que par sauts discrets lorsque le Bandit UCB1 identifie
+statistiquement un opérateur plus rentable.
+* Sous-section : Validation du Curriculum Learning : L'Expertise par Étapes *
+L'innovation majeure de notre approche, le Curriculum Learning, n'est pas une simple accélération, c'est une stratégie de structuration de l'espace de recherche. Cette section analyse l'impact de ce découpage par phases sur la qualité finale du planning.
+1. Analyse de la Transition entre Phases
+figureÉvolution de la fitness à travers les phases du Curriculum.
+Le graphique révèle quatre phases distinctes. En PP1, la chute
+quasi-verticale de 10^7 vers 10^2 confirme que l'agent sature rapidement
+ses premières règles de placement sur l'instance réduite. Les transitions vers
+PP2 puis PP3 provoquent des pics de pénalité significatifs
+qui reflètent l'exposition à des contraintes de mutualisation nouvelles. Ces
+sursauts ne traduisent pas un échec : le fait que l'agent amorce à chaque fois
+une descente immédiate démontre que les connaissances acquises restent actives
+face à la complexité croissante. La phase finale débute à la génération
+18 et se stabilise vers la génération 80, chaque palier correspondant à
+l'optimisation successive des conflits durs, des Gaps, puis de la pause déjeuner.
+2. Robustesse et Élimination de l'Effet de Ripple
+L'agent développe dès PP1 une intelligence de placement qui sanctuarise
+les ressources critiques. Cette mémoire structurelle reste active en phase
+finale, maintenant H = 0 de manière stable sans réintroduire de collisions.
+Ce découplage progressif entre faisabilité et qualité permet d'atteindre
+la performance moyenne de 9 118,1 points sur l'instance complète
+de la FSTG, inaccessible aux approches sans préchauffage cognitif.
+* Sous-section : Cognition de l'Agent et Stratégies d'Optimisation *
+Au-delà des métriques de fitness, la santé cognitive de l'agent RL constitue
+un indicateur fondamental pour valider que l'apprentissage par renforcement
+produit une politique réelle et non une simple réaction statistique aux
+récompenses passées.
+1. Indicateurs de Santé de l'Agent RL
+Le graphique suivant suit l'acquisition des connaissances au fil des itérations :
+figure Convergence de la TD-Error et Croissance de la Q-Table.
+Le graphique dual révèle deux dynamiques complémentaires qui confirment
+la santé cognitive de l'agent durant les 100 générations de la phase globale.
+La TD-Error démarre avec un pic massif à 1,1   10^8 lors
+des premières générations, reflétant l'écart initial entre les prédictions
+de la Q-Table et la réalité des récompenses obtenues sur l'instance complète. Cette erreur chute brutalement dès la génération 5, confirmant
+que l'agent intègre rapidement les dynamiques fondamentales du problème.
+Les pics résiduels observés aux générations 20 et 42 correspondent à des
+phases de perturbation stratégique où l'agent explore des zones inconnues
+de l'espace de recherche, générant temporairement des prédictions imprécises
+avant de se recalibrer. La stabilisation quasi-totale après la génération 60
+vers une erreur proche de zéro confirme que la politique apprise est mature
+et déterministe.
+La Q-Table présente une dynamique de croissance en deux régimes
+distincts. Entre les générations 0 et 40, la croissance lente de 380 à 415
+états reflète l'exploitation intensive des zones déjà cartographiées par
+le Curriculum Learning. Le saut brutal observé entre les générations 42
+et 55, portant la Q-Table de 415 à 465 états, coïncide précisément avec
+les pics de TD-Error de la même période , La croissance continue jusqu'à 520 états
+en fin de run confirme que l'agent ne souffre pas d'over-fitting sur un
+sous-ensemble restreint de situations, mais construit une cartographie
+décisionnelle progressivement plus riche et généraliste de l'instance FSTG.
+2. Analyse de la Stratégie de Sélection
+figure Stratégie de Sélection ALNS (UCB1) vs RL-ALNS (Q-Learning).
+Le graphique révèle une divergence fondamentale dans le comportement
+décisionnel des deux moteurs face au choix des opérateurs de voisinage.
+Le moteur ALNS statistique concentre près de 45\
+sur KempeChain et 30\
+opérateurs pédagogiques comme LunchFix et CompactProf
+à moins de 20\
+UCB1 : sans perception de l'état courant du planning, l'algorithme
+surexploite les opérateurs structurels qui ont affiché de bonnes
+performances moyennes en phase de réparation des conflits durs, même
+lorsque le planning est admissible et que les contraintes dominantes
+ont changé de nature. Ce phénomène de biais de sélection
+statistique plafonne la capacité de l'ALNS à progresser sur les
+contraintes de confort pédagogique en phase finale.
+En contraste, le moteur RL-ALNS manifeste une
+spécialisation contextuelle précise. L'agent consacre 40\
+appels à CompactProf et 25\
+une inversion complète des priorités par rapport à l'ALNS. Cette
+redistribution est le fruit direct de l'apprentissage par renforcement :
+l'agent a identifié que sur l'instance, les sources
+de pénalité résiduelle les plus compressibles sont les heures creuses
+des enseignants et la violation du créneau de déjeuner. La part
+allouée au Kick ILS passe de 5\
+la capacité de l'agent à déclencher des perturbations stratégiques
+plus fréquemment pour éviter les plateaux locaux. C'est cette
+intelligence contextuelle qui explique l'écart de performance final
+entre les deux approches et légitime le recours à l'apprentissage
+par renforcement comme couche de pilotage méta-heuristique.
+--- Section : Positionnement par rapport à l'État de l'Art ---
+La confrontation de nos résultats avec la littérature internationale
+constitue une étape essentielle pour valider la contribution scientifique
+de cette approche. Cette comparaison requiert cependant une précaution
+méthodologique fondamentale, unanimement reconnue dans la communauté
+du timetabling.
+1. Pourquoi la Comparaison Directe est Structurellement Impossible
+Abdipoor et al. (2023) le formalisent explicitement dans leur survey
+de référence : la performance d'un algorithme de timetabling est
+intrinsèquement liée aux instances utilisées et aux contraintes fixées,
+faisant de chaque problème institutionnel un défi unique dont les
+résultats numériques ne sont pas transférables d'un contexte à l'autre.
+Cette réalité s'applique pleinement à notre travail. Les scores de
+référence de l'ITC-2007, compris entre 35,7 et 89,4 selon les approches,
+sont calculés sur des instances standardisées de taille réduite avec une
+fonction objectif spécifique à la compétition.Notre instance ,
+avec ses 247 séances, 78 enseignants, 29 salles, 7 filières mutualisées
+et 12 contraintes dures spécifiques, constitue un problème structurellement
+distinct dont les scores de fitness ne sont pas comparables à ces références.
+2. Comparaison Qualitative par Famille Algorithmique
+En l'absence de comparaison numérique directe, la littérature préconise
+une analyse qualitative positionnant les résultats par rapport aux familles
+algorithmiques connues. Le tableau ci-dessous synthétise ce positionnement :
+Par rapport aux travaux les plus proches de notre architecture,
+notamment Johnn et al. (2023) qui formalisent le choix d'opérateurs
+ALNS comme un Processus de Décision de Markov avec apprentissage
+par renforcement profond, notre contribution se distingue sur trois
+points précis. Premièrement, nous appliquons cette architecture sur
+une instance réelle de grande taille avec des contraintes institutionnelles
+complexes, là où les travaux existants se limitent aux benchmarks
+standardisés. Deuxièmement, la stratégie de Curriculum Learning que
+nous introduisons permet d'atteindre H = 0 en 52 secondes, une
+performance absente de la littérature sur instances réelles comparables.
+Troisièmement, Aguirre Lam et al. (2025) soulignent que les solutions
+faisables sur instances réelles de grande taille nécessitent en moyenne
+21 minutes avec les approches hybrides actuelles. Notre moteur ramène
+ce délai à 8,2 minutes sur CPU standard, représentant un gain
+opérationnel de 60\
+Conclusion
+coldblueC e
+chapitre a présenté la validation expérimentale complète du
+moteur RL-ALNS sur l'instance réelle de la FSTG
+Marrakech. L'étude de répétabilité sur dix runs indépendants
+a démontré la supériorité statistique de notre architecture
+hybride, avec une fitness moyenne de 9 118,1 et un
+écart-type de 1 206,6, soit une réduction de variance
+d'un facteur 7,8 par rapport à la baseline GA-SA. Le gain
+global de 55,6\
+combiné à l'atteinte de H = 0 en  52 secondes
+grâce au Curriculum Learning, valide les deux hypothèses
+fondamentales de ce travail : la supériorité d'une politique
+contextuelle apprise sur une sélection statistique d'opérateurs,
+et l'efficacité du préchauffage progressif de la Q-Table pour
+dompter la complexité combinatoire du Tronc Commun. L'analyse
+cognitive de l'agent a confirmé que cette performance repose
+sur une spécialisation réelle des choix décisionnels, notamment
+la priorité accordée aux opérateurs CompactProf et
+LunchFix qui ciblent les sources de pénalité
+résiduelle les plus compressibles de l'instance FSTG.
+Enfin, le positionnement par rapport à l'état de l'art
+international a établi que notre contribution dépasse le
+cadre des benchmarks standardisés en apportant une solution
+opérationnelle sur instance réelle, atteignant un temps de
+résolution de 8,2 minutes là où la littérature
+cite une moyenne de 21 minutes pour des instances comparables.
+Ces résultats constituent le fondement scientifique de la
+plateforme DashTime présentée dans le chapitre suivant.
+chapter5section0
+Chapitre 5 : Réalisation Logicielle et Plateforme DashTime
+tocchapterChapitre 5 : Réalisation Logicielle
+[coldblue  ]   Spécifications et Besoins du Système
+[coldblue  ]   Analyse et Conception du Système
+[coldblue  ]   Environnement Technique et Réalisation
+[coldblue  ]   Réalisation et Implémentation Logicielle
+coldblue0.6 0.8pt
+Ce dernier chapitre est dédié à la concrétisation logicielle de nos travaux. Nous y décrivons l'architecture technique de la plateforme DashTime, conçue pour rendre nos algorithmes d'optimisation accessibles aux administrateurs. De la conception des API REST jusqu'à l'interface interactive en temps réel, nous détaillons les choix technologiques qui font de ce système un outil d'aide à la décision complet et intuitif pour la FSTG Marrakech.
+0.3  coldblue0.6 0.8pt
+--- Section : Spécifications et Besoins du Système ---
+La conception de notre interface DashTime répond à une volonté de transformer un moteur d'optimisation complexe en un outil de gestion académique complet. L'analyse des besoins a permis d'identifier les piliers essentiels pour le service de scolarité de la FSTG.
+1. Besoins Fonctionnels:
+Centralisation et Intégrité des Données : Convergence de toutes les ressources (profs, salles, modules) vers une base de données relationnelle unique, garantissant la cohérence et éliminant les erreurs liées aux fichiers Excel disparates.
+Alimentation par Maquettes Stratégiques : Système de saisie et d'importation assistée facilitant l'alimentation du moteur en données brutes via des maquettes structurées.
+Planification Intelligente des Travaux Pratiques :
+Avant tout lancement du solveur, l'administrateur peut sanctuariser
+des créneaux réservés exclusivement aux TP pour chaque groupe,
+générer automatiquement les sous-groupes de TP à partir des groupes
+TD existants selon les modules concernés, et affiner manuellement
+les affectations via un éditeur interactif , garantissant ainsi
+que le moteur RL-ALNS respecte scrupuleusement la logique
+d'alternance et de subdivision propre aux séances pratiques.
+Pilotage du Moteur IA : Interface intuitive pour configurer les paramètres de l'algorithme RL-ALNS et suivre sa convergence en temps réel.
+Visualisation de l'Emploi du Temps : Rendu graphique dynamique permettant une lecture rapide du planning final et de la charge des ressources.
+Traçabilité et Comparaison des Rapports : Capacité de sauvegarder chaque itération de planning et de générer des rapports comparatifs pour analyser l'évolution des scores de fitness et de confort pédagogique.
+2. Besoins Non-Fonctionnels:
+Performance et Asynchronisme :
+Les calculs intensifs (optimisation, import, reporting) s'exécutent
+en Background Tasks FastAPI sans jamais bloquer la navigation.
+Fiabilité et Traçabilité :
+Chaque exécution est journalisée (score, temps, état). En cas d'échec,
+le système renvoie une erreur structurée sans corrompre la base de données.
+Modularité et Extensibilité :
+Le découplage micro-services permet d'ajouter un algorithme, une
+contrainte ou un rapport sans refactorisation du reste du système.
+Isolation et Sécurité :
+Chaque service tourne dans un conteneur Docker isolé. Les données
+sensibles transitent uniquement via canaux internes.
+--- Section : Analyse et Conception du Système ---
+Cette phase constitue le pivot entre la théorie algorithmique et la réalisation logicielle. Nous détaillons ici l'organisation structurelle de DashTime et la démarche de modélisation utilisée pour garantir un système robuste.
+* Sous-section : Architecture de l'Application : L'Approche Micro-services *
+Pour répondre aux exigences de performance liées au calcul intensif de l'IA, nous avons opté pour une architecture distribuée basée sur les micro-services. Cette architecture permet une séparation stricte des responsabilités et garantit la réactivité du système.
+1. Décomposition des Services :
+Frontend (DashTime UI) : Conçu avec Next.js 16, il gère la couche de présentation. Sa force réside dans la gestion d'état réactive (React) et les micro-animations (Framer Motion) qui offrent une expérience premium. Il communique avec le backend via des requêtes REST asynchrones.
+Backend (Médiateur Logiciel) : Propulsé par FastAPI, ce service est responsable de la logique métier. Il joue le rôle de passerelle (Gateway) entre l'interface utilisateur et la base de données PostgreSQL. Il assure également la validation des données importées via les maquettes.
+Moteur IA (Cœur Computationnel) : Le moteur RL-ALNS est isolé dans un environnement de calcul dédié. Cette isolation est critique : elle permet d'allouer 100\
+2. Gestion de l'Asynchronisme et Flux de Données :
+Lorsqu'un administrateur lance une optimisation, le système n'attend pas
+la fin du calcul pour répondre. FastAPI démarre immédiatement un
+Background Task dédié qui isole l'exécution du moteur
+RL-ALNS dans un processus asynchrone indépendant. L'utilisateur
+conserve ainsi une navigation fluide, consultation d'autres plannings,
+gestion des enseignants, modification du référentiel , pendant que le
+moteur travaille en tâche de fond.
+Le cycle de vie d'une requête d'optimisation se déroule en quatre étapes
+distinctes :
+Déclenchement : Le Frontend envoie une requête
+au Backend FastAPI avec les paramètres
+sélectionnés (algorithme, contraintes métier, sanctuarisations TP).
+Isolation : FastAPI instancie le moteur RL-ALNS dans un
+Background Task et retourne immédiatement un identifiant
+de tâche (task\_id) au Frontend, sans attendre le résultat.
+Persistance : À la convergence, le moteur sérialise
+la solution optimale au format JSON et la pousse vers PostgreSQL
+via l'endpoint POST /timetable-results, déclenchant une
+notification dynamique dans l'interface.
+Cette architecture garantit une expérience utilisateur non-bloquante
+quel que soit le temps de calcul. Sur l'instance réelle du Tronc Commun
+de la FSTG, le moteur
+RL-ALNS préchauffé par Curriculum Learning atteint
+systématiquement H = 0 en moins de 52 secondes, et converge
+vers un score soft moyen de 9 118,1 en 8,2 minutes, résultat directement mis à jour dans le module de reporting
+de DashTime.
+* Sous-section : Démarche de conception par UML *
+La démarche de conception par UML (Unified Modeling Language) est une méthode utilisée dans le développement logiciel pour représenter, visualiser et documenter les différentes étapes de conception d'un système. UML est un langage graphique standardisé qui offre des notations et des conventions pour décrire les aspects structurels et comportementaux d'un système.
+Elle facilite la communication entre les acteurs impliqués et permet de définir clairement les objectifs et les contraintes du projet.
+Lors de cette démarche de conception, plusieurs types de diagrammes sont utilisés pour représenter différentes perspectives du système.
+figureLogo UML
+fig:uml_logo
+* Sous-section : Diagramme de Cas d'Utilisation *
+Un cas d'utilisation est une représentation graphique d'une interaction entre un acteur (utilisateur, système externe) et le système pour atteindre un objectif spécifique. Il décrit une séquence d'actions effectuées par l'utilisateur pour accomplir une tâche donnée avec l'aide du système. En d'autres termes, il représente une fonctionnalité ou un scénario d'utilisation de la plateforme .
+des Cas d'Utilisation :
+Gérer le Référentiel : L'administrateur peut créer, modifier ou supprimer les entités fondamentales (Enseignants, Salles, Modules et Filières).
+Importer des Maquettes : Alimentation automatisée de la base de données via des fichiers structurés pour éviter la saisie manuelle.
+Piloter le Moteur d'Optimisation : Configuration des paramètres IA et déclenchement de la résolution RL-ALNS.
+Consulter et Valider le Planning : Visualisation des solutions générées, analyse des conflits résiduels et validation finale du calendrier.
+Analyser les Performances : Accès aux rapports de fitness et aux statistiques de confort pour comparer différentes solutions.
+1 : Gestion des Données et du Référentiel
+Ce premier diagramme couvre les interactions liées à la gestion du référentiel pédagogique et à l'alimentation des données. L'acteur unique est l'Administrateur de Scolarité, qui dispose d'un contrôle total sur les entités fondamentales du système : les enseignants, les salles, les modules et les filières/sections. Ces opérations CRUD (Créer, Lire, Modifier, Supprimer) constituent le socle de données sans lequel le moteur d'optimisation ne peut fonctionner.
+figure Gestion du Référentiel et Alimentation par Maquettes
+fig:use_case_1
+Le second package met en évidence le processus d'alimentation par maquettes : l'administrateur importe un fichier structuré (.xlsx), qui déclenche automatiquement une validation des données. En cas de conflit détecté, le cas Corriger les Conflits est activé en extension  pour guider l'utilisateur vers une résolution ciblée.
+2 : Pilotage du Moteur IA et Analyse des Résultats
+Ce second diagramme illustre le cœur fonctionnel de la plateform : le pilotage intelligent du processus d'optimisation. Avant de lancer un calcul, l'administrateur doit choisir l'algorithme (ALNS, RL-ALNS ou GA-SA) et configurer les contraintes métier (sanctuarisations TP, indisponibilités). Ces deux cas sont inclus  dans le cas "Lancer l'Optimisation", garantissant une configuration complète avant tout démarrage.
+figurePilotage IA, Optimisation et Visualisation
+fig:use_case_2
+Une fois le moteur en marche, l'administrateur suit la convergence en temps réel via les graphiques du tableau de bord. À la fin du processus, il dispose de toutes les fonctionnalités d'analyse : consultation de la grille temporelle, validation officielle du planning, comparaison des rapports de performance et export final.
+* Sous-section : Diagrammes de Séquence *
+Un diagramme de séquence est une représentation graphique montrant l'ordre chronologique des interactions entre les objets d'un système. Il met en évidence comment les objets communiquent entre eux pour accomplir une action spécifique, en utilisant des messages. C'est un outil de modélisation pour analyser et comprendre les scénarios d'exécution et les flux de contrôle.
+Pour la plateforme , nous avons identifié deux scénarios critiques nécessitant une modélisation détaillée :
+1. Synchronisation et Importation des Données via Maquettes
+figure Importation et Validation des Données
+fig:seq_import
+Ce diagramme illustre le flux complexe entre l'interface utilisateur et la persistance. L'utilisateur télécharge une maquette, le Frontend assure une première validation structurelle, puis transmet les données au Backend (FastAPI). Ce dernier réalise une validation métier (conflits d'unicité, intégrité référentielle) avant de persister les données dans PostgreSQL et de notifier l'utilisateur de la réussite de l'opération.
+2. Cycle d'Optimisation IA Asynchrone
+figureDiagramme de Séquence : Cycle d'Optimisation RL-ALNS
+fig:seq_optim
+C'est le processus le plus complexe techniquement. Lorsqu'un utilisateur lance le moteur RL-ALNS, le Frontend initie une requête asynchrone. Le Backend démarre le Moteur IA en tant que tâche de fond (Background Task) pour ne pas bloquer l'API. Pendant que l'IA optimise le planning de la FSTG, le Frontend interroge périodiquement le Backend pour récupérer les statistiques de convergence. Une fois le calcul terminé, le moteur notifie le Backend qui met à jour l'état final du planning.
+* Sous-section : Diagramme de Classes *
+Le diagramme de classe est une représentation graphique qui montre la structure statique d'un système logiciel. Il met en évidence les classes, les attributs et les relations entre les objets, facilitant ainsi la modélisation et la communication. En identifiant les entités clés et leurs connexions, il permet de comprendre et de concevoir la structure d'un système, favorisant la cohérence et la collaboration entre les développeurs et les concepteurs. Le diagramme de classe est un outil essentiel pour visualiser l'organisation interne du système en termes de classes et de leurs associations.
+des Entités Majeures :
+figureDiagramme de Classes
+fig:class_diagram
+des Relations et de l'Architecture du Modèle
+Le diagramme de classes ci-dessus représente l'architecture statique complète de la base de données de DashTime. Le modèle est organisé en cinq couches logiques fortement interconnectées :
+1. Hiérarchie Pédagogique (Department → Filiere → GroupeFiliere)
+En sommet de la hiérarchie, la classe Department (Informatique, Chimie, etc.) regroupe les Filières. Chaque filière est déclinée en GroupeFiliere, unité réelle d'inscription représentant une cohorte semestrielle (ex : GI-S1). Cette relation 1..n garantit que chaque groupe est toujours rattaché à une spécialité précise, imposant ainsi une cohérence structurelle au niveau académique.
+2. Structure des Modules (Module → ModulePart)
+Un Module (ex : "Bases de Données") est toujours rattaché à un Department. Il est décomposé en ModuleParts, qui représentent les composantes pédagogiques : CM (Cours Magistral), TD (Travaux Dirigés) et TP (Travaux Pratiques). Chaque ModulePart spécifie la charge horaire hebdomadaire (weekly\_hours) et le type de salle requis (required\_room\_type), informations directement exploitées par le moteur RL-ALNS lors de l'assignation.
+3. Organisation des Groupes (Section → TDGroup)
+La classe Section modélise un regroupement de plusieurs cohortes pour les cours magistraux partagés (ex : "GP-GI S1" fusionnant GI-S1 et GP-S1). La table d'association SectionGroupes  réalise cette fusion. Les TDGroups représentent les subdivisions en petits groupes pour les séances pratiques, portant l'effectif réel de chaque subdivision.
+4. La Classe Centrale : Assignment
+La classe Assignment est le cœur du modèle. Elle matérialise une séance planifiée en associant obligatoirement : un ModulePart, un Teacher, une Room, un Timeslot et optionnellement une Section (pour les CM). L'attribut is\_locked permet à l'administrateur de figer manuellement certaines séances (Type 1), les rendant intouchables par l'algorithme d'optimisation. C'est ce mécanisme qui permet une hybridation entre la planification manuelle et automatique.
+--- Section : Environnement Technique et Réalisation ---
+Cette section détaille les choix technologiques et les outils utilisés pour transformer nos modèles théoriques en la plateforme opérationnelle DashTime.
+* Sous-section : Écosystème des Frameworks et Logiciels *
+Le développement de DashTime repose sur une pile technologique moderne privilégiant la performance, l'asynchronisme et la qualité de l'expérience utilisateur.
+1. Backend et Traitement de Données (FastAPI / Pandas) :
+FastAPI (Python) : Choisi pour sa rapidité d'exécution et sa gestion native de l'asynchronisme. Il expose les API REST consommées par le frontend et pilote les Background Tasks pour l'IA.
+Pandas \  Dagster \  Polars \  Power Bi : Utilisés pour le "Data Cleaning" et le parsing des maquettes Excel. Pandas permet une manipulation vectorisée des données, garantissant un prétraitement ultra-rapide des contraintes scolaires complexes.
+SQLAlchemy : L'ORM de référence pour synchroniser nos modèles Python avec la base PostgreSQL.
+2. Frontend et Visualisation Premium (Next.js / Framer Motion) :
+Next.js 16 : Framework React permettant un rendu hybride. Il assure une gestion fluide des routes et des états applicatifs (sections, profs, plannings).
+Framer Motion : Bibliothèque d'animation utilisée pour les transitions "Premium" de l'interface, réduisant la charge cognitive lors de la consultation des graphiques de convergence.
+Lucide-React \  Recharts : Pour une iconographie moderne et une visualisation dynamique des statistiques de fitness.
+3. Infrastructure, Versionning et Conteneurisation :
+Git \  GitHub : Le code source de l'ensemble du projet  est versionné avec Git et hébergé sur un dépôt GitHub privé. Cette pratique garantit la traçabilité de chaque modification algorithmique et assure une sauvegarde continue du Project.
+Docker \  Docker Compose : DashTime est entièrement conteneurisé. Chaque service (Frontend, Backend, DB) s'exécute dans un conteneur isolé, garantissant que l'environnement de production est strictement identique à l'environnement de développement.
+--- Section : Réalisation et Implémentation Logicielle ---
+Cette phase constitue l'aboutissement technique de notre travail. Elle matérialise les modèles théoriques et les algorithmes d'optimisation au travers d'une plateforme web robuste, ergonomique et performante baptisée DashTime. Nous détaillons ici les différentes interfaces qui composent le système, en mettant l'accent sur les fonctionnalités offertes à l'administrateur pour le pilotage de la scolarité.
+* Sous-section : Le Tableau de Bord Stratégique *
+La page d'accueil de DashTime fait office de centre de contrôle. Elle a été conçue pour offrir une synthèse immédiate de l'état des ressources et du moteur d'IA.
+és Clés :
+Moniteur d'État en Temps Réel : Un indicateur visuel (Engine Online/Offline) confirme la connectivité avec le serveur de calcul FastAPI.
+Cartes Métriques : Affichage dynamique du nombre total d'enseignants, de salles, de sections et d'unités d'enseignement .
+Accès Rapide : Un menu intuitif permettant de basculer vers les modules de gestion, de lancement IA ou de visualisation du planning final.
+figureInterface du Tableau de Bord
+fig:dashboard_screen
+* Sous-section : Gestion de l'Infrastructure et des Ressources *
+Le module "Données" est le centre névralgique de la plateforme. Il permet de configurer l'ensemble des entités pédagogiques nécessaires à la résolution du problème d'emploi du temps.
+figureInterface de Gestion de l'Infrastructure et des Ressources
+fig:infrastructure_screen
+de Gestion :
+Navigation par Onglets Dynamiques : Une interface fluide permettant de basculer instantanément entre 12 catégories de données (Enseignants, Salles, Filières, Sections, Cohortes, etc.).
+Gestion du Référentiel : Possibilité d'ajouter, modifier ou supprimer chaque enregistrement. L'interface utilise une iconographie Lucide pour une distinction claire des actions.
+Suivi des Indisponibilités : Un algorithme visuel analyse les contraintes de chaque enseignant et affiche un statut clair (Disponible / Créneaux bloqués).
+Filtrage Intelligent : Un moteur de recherche intégré permet de retrouver rapidement un module ou un professeur parmi des centaines d'entrées.
+* Sous-section : Configuration Avancée des Séances et Contraintes *
+1. Pilotage des Affectations :
+L'interface de création d'une séance  permet de définir le périmètre précis d'un cours. L'administrateur lie une partie de module (CM/TD) à un enseignant et à une cible pédagogique (Section ou Groupes TD).
+Le switch "Planification Manuelle" est crucial : il active l'attribut is\_locked, permettant à l'utilisateur de fixer lui-même la salle et le créneau. Ces séances deviennent des "contraintes dures" que le moteur IA ne pourra pas modifier, offrant ainsi une flexibilité totale pour les besoins spécifiques de l'administration .
+figureModal d'Ajout d'une Séance
+figureGrille d'Indisponibilités Professeur
+2. Gestion des Contraintes de Disponibilité
+Pour chaque enseignant, DashTime propose une grille interactive. L'administrateur peut bloquer des créneaux spécifiques (en rouge) d'un simple clic.
+Ces données sont stockées au format JSONB dans PostgreSQL et sont transmises au moteur RL-ALNS. Ce dernier traite ces "Indisponibilités" comme des contraintes inviolables, garantissant que le planning généré respecte scrupuleusement les contraintes personnelles et administratives du corps professoral.
+* Sous-section : Centre d'Optimisation IA et Pilotage des Algorithmes *
+C'est ici que l'intelligence du système est mise en action. La page "Solveurs" permet de configurer les dernières contraintes métier et de déclencher les calculs intensifs.
+du Centre d'Optimisation :
+Vérification de l'Intégrité : Avant tout lancement, le système affiche un résumé des données  pour s'assurer que l'instance est prête à être résolue.
+Matrice de Sanctuarisation des TPs : Une fonctionnalité exclusive permettant de bloquer des demi-journées entières pour des groupes spécifiques. Cette matrice visuelle  garantit que les séances de TP complexes ne sont pas morcelées par l'algorithme.
+Sélection de la Stratégie IA : L'administrateur peut choisir entre trois moteurs d'optimisation : GA-SA (Algorithme Génétique + Recuit Simulé), ILS-ALNS (Recherche Locale Itérative), et RL-ALNS (apprentissage par renforcement, recommandé pour sa supériorité démontrée).
+figureCentre d'Optimisation IA — Configuration et Lancement
+fig:solver_dashboard
+* Sous-section : Visualisation des Résultats et Audit de Qualité *
+Une fois l'optimisation terminée, DashTime expose les résultats via une interface de visualisation avancée intégrant un audit automatique de la qualité du planning.
+Éléments de l'IA Preview :
+Score Global de Fitness : Un indicateur de performance graphique  évaluant la satisfaction globale des contraintes souples.
+Barres de Métriques (KPIs) : Le système décompose le score en quatre axes critiques : La Compacité (absence de trous), le respect de la Pause Déjeuner, le Rythme hebdomadaire et la Pédagogie .
+Navigation Multidimensionnelle  :
+Vue par Cohorte/Section : Permet de vérifier la compacité du planning pour les étudiants.
+Vue par Enseignant : Cruciale pour valider la charge de travail et les déplacements des professeurs.
+Vue par Salle : Optimise l'occupation physique des locaux et évite les gaspillages d'espace.
+Exportation Intelligente : Possibilité d'extraire les emplois du temps finalisés au format Excel professionnel d'un simple clic, prêt pour l'affichage officiel.
+Grille de Planning Interactive :
+Code couleur différenciant les types d'enseignements (CM/TD/TP).
+Infobulles complètes : Nom du module, Enseignant, Salle et Groupe ciblés.
+figureAperçu du Planning Optimisé et Audit des Métriques de Qualité
+fig:preview_screen
+* Sous-section : Édition Manuelle et Détection de Conflits Proactive *
+L'une des innovations majeures de DashTime réside dans son éditeur interactif en "Drag \  Drop" qui permet d'affiner manuellement les solutions produites par l'IA tout en garantissant l'intégrité du planning.
+écanismes de Monitoring Intelligent :
+Explorateur Dynamique  : L'administrateur peut déplacer n'importe quelle séance. Lors du survol d'un créneau, le système colore la cellule pour indiquer la viabilité du déplacement.
+Détection de Conflits en Temps Réel :
+Contour Rouge  : Indique une violation critique (Double emploi enseignant, collision de salle, ou indisponibilité prof). Le système empêche la validation si de tels conflits persistent.
+Contour Orange  : Signale une violation de contrainte souple (ex: non-respect de la pause déjeuner, séance déconseillée le samedi).
+Recalcul du Score en Direct : Chaque modification déclenche un audit instantané des métriques (Compacité, Rythme, Pédagogie), permettant de voir l'impact d'un changement manuel sur la qualité globale.
+figureÉditeur Interactif : Vue Contraintes et Code Couleur
+fig:manual_edit_detail
+* Sous-section : Coordination Pédagogique et Gestion des Filières *
+Afin de décentraliser la collecte des données, DashTime propose une interface dédiée aux coordinateurs de filières. Ce module permet un suivi précis par département .
+és du Dossier de Filière :
+KPIs de Filière : Visualisation immédiate du nombre de modules, de l'effectif total d'étudiants  et du nombre de sections actives.
+Gestion des Maquettes :
+Maquette d'Affectations : Permet de définir les binômes Module-Enseignant.
+Flux de Réception  : Un zone de dépôt intelligente permet au coordinateur d'importer le retour des maquettes remplies, qui sont ensuite auditées par le système avant l'intégration finale dans la base Master.
+Vue par Cohorte : Accès direct aux emplois du temps spécifiques de chaque semestre (S2, S4) pour une vérification locale de la cohérence.
+figureEspace de Coordination Pédagogique , Vue Filière et Maquettes
+fig:department_view
+* Sous-section : Gestion Spécifique des Travaux Pratiques  *
+Les Travaux Pratiques représentent une contrainte complexe due à la subdivision des groupes et à l'alternance des séances. DashTime intègre un module dédié pour automatiser cette planification.
+Métier des TPs :
+Générateur Rapide de Sessions : Permet de diviser les sections en sous-groupes (A/B/C) et de les regrouper par affinité pédagogique pour optimiser l'occupation des laboratoires.
+Affichage Alternance/Quinzaine : Le système gère nativement la fusion visuelle des séances se déroulant une semaine sur deux, simplifiant la lecture de l'emploi du temps final.
+Indicateur de Synergie de Section : Lors du placement manuel d'un TP, l'interface affiche en temps réel les "Groupes Libres" (voir étiquettes bleues). Un créneau est marqué "Section Libre" si l'intégralité des étudiants d'une filière est disponible.
+Sanctuarisation Visuelle : Les zones réservées par l'administrateur apparaisent avec un badge "IDÉAL" pour faciliter le placement rapide sans conflit.
+figureInterface de Planification Interactive des Travaux Pratiques
+fig:tp_management_screen
+* Sous-section : Reporting, Archivage et Versions Master *
+Le module "Rapports" constitue la mémoire du système. Il permet de gérer le cycle de vie des emplois du temps, de la génération brute à la publication officielle.
+des Versions et Certification :
+Historique de Validation : Chaque exécution de l'IA validée par l'administrateur est archivée avec son score de satisfaction  et ses métriques précises.
+Élection du "Master Reference" : L'administrateur peut désigner une version spécifique comme étant la référence officielle ,marquée par une étoile dorée. C'est cette version qui servira de base à la coordination globale.
+Analyse Comparative : L'interface permet de comparer rapidement les performances des différentes sources (GA-SA, ILS-ALNS ou FUSED) pour choisir la solution la plus équilibrée.
+Exportation et Diffusion : Chaque archive dispose d'un accès direct à la visualisation interactive et au bouton d'export Excel, garantissant une diffusion fluide vers les services administratifs.
+figureCentre de Rapports et Gestion de l'Historique des Versions
+fig:reports_screen
+* Sous-section : Statistiques IA et Indicateurs de Performance *
+Le module "Statistiques" fournit une vision synthétique de la qualité des emplois du temps générés ainsi que de l'efficacité des algorithmes d'optimisation. Il permet aux responsables pédagogiques de suivre en temps réel les performances globales du système et d'identifier rapidement les éventuels déséquilibres.
+Clés de Performance (KPI) :
+Intégrité des Contraintes : Mesure le pourcentage de respect des contraintes académiques et organisationnelles imposées lors de la génération.
+Séances Planifiées : Indique le nombre total de séances affectées avec succès dans l'emploi du temps final.
+Satisfaction Pédagogique : Évalue la qualité globale de la planification selon les critères pédagogiques définis par l'établissement.
+Couverture Hebdomadaire : Visualise la répartition des séances sur les différents jours de la semaine afin de détecter les surcharges ou sous-utilisations.
+Volume de Séances par Cohorte : Compare la charge horaire entre les différentes cohortes et niveaux de formation pour garantir un équilibre global.
+Analyse Temps Réel : Les indicateurs sont automatiquement recalculés après chaque exécution afin de fournir un retour immédiat sur la qualité de la solution produite.
+figureTableau de Bord des Indicateurs Clés et Statistiques IA
+fig:stats_dashboard
+* Sous-section : Guide Système et Documentation Intégrée *
+Pour faciliter l'adoption de l'outil, une documentation interactive est directement intégrée dans l'interface, servant de pont entre la théorie algorithmique et l'usage administratif.
+d'Accompagnement :
+Cycle de Vie du Planning : Explication des étapes clés, de l'import des maquettes à la validation du Master.
+Dictionnaire des Contraintes : Liste exhaustive des règles Hard et Soft , H1 à H12 pour les contraintes absolues, S\_GAPS à S\_BLOCK\_SYNERGY pour les critères de confort pédagogique,  pour que l'administrateur comprenne les décisions du moteur IA.
+Aide Tactique : Guide visuel sur l'utilisation du "Panier"  et de l'éditeur interactif pour les ajustements de dernière minute.
+figureCentre de Documentation et Guide Pratique de l'Administrateur
+fig:info_screen
+Conclusion
+coldblueE n conclusion,
+ce cinquième chapitre a concrétisé l'ensemble de nos travaux
+algorithmiques au travers de la plateforme DashTime.
+L'architecture micro-services (FastAPI / Next.js / PostgreSQL),
+conjuguée aux diagrammes UML de conception, garantit une
+séparation claire des responsabilités et une évolutivité à long terme.
+Les interfaces réalisées  du tableau de bord stratégique à l'éditeur
+interactif en drag \  drop , transforment la complexité du moteur
+RL-ALNS en un outil décisionnel accessible aux administrateurs de la
+scolarité. DashTime ne se limite pas à afficher un emploi du temps :
+il offre un écosystème complet de pilotage, d'audit et d'archivage,
+ouvrant la voie à une adoption institutionnelle pérenne au sein de
+l'administration de la FSTG.
+Conclusion Générale
+tocchapterConclusion Générale
+Ce travail de fin d'études porte sur la résolution du problème de planification des emplois du temps universitaires (UCTP) appliqué au contexte spécifique de la Faculté des Sciences et Techniques de Marrakech. L'objectif principal était de répondre à la nécessité critique d'automatiser et d'optimiser l'allocation des ressources académiques face à une hausse inédite de la complexité structurelle, induite par les récentes réformes pédagogiques. Dans un environnement où le volume de données et l'hétérogénéité des contraintes de mutualisation rendent la gestion manuelle obsolète, la conception d'un système intelligent capable de garantir l'intégrité du planning tout en maximisant le confort des usagers est devenue une priorité institutionnelle majeure. Ce projet a ainsi permis de jeter un pont entre les théories de la recherche opérationnelle et les besoins opérationnels du service de scolarité.
+Le travail présenté apporte une solution robuste aux défis posés par l'explosion combinatoire à travers la conception d'une architecture hybride multi-modulaire. Cette approche innove en instaurant une Hyper-heuristique pilotée par l'intelligence artificielle, capable d'orchestrer dynamiquement un ensemble de Métaheuristiques de recherche locale. En fusionnant la puissance de pilotage de l'Apprentissage par Renforcement (Reinforcement Learning) avec la flexibilité d'exploration de la recherche à large voisinage adaptative (ALNS), le système apprend à sélectionner, à chaque étape, la stratégie d'optimisation la plus pertinente. L'originalité du système réside ainsi dans cette capacité à transformer un espace de recherche de dimension 10^60 en une trajectoire de résolution stable et convergente. L'objectif dépassait la simple exécution algorithmique : il s'agissait de produire une hyper-structure capable de s'adapter dynamiquement aux priorités académiques changeantes, garantissant une représentation temporelle précise, robuste et parfaitement industrialisable.
+Les résultats expérimentaux obtenus valident la solidité de l'architecture proposée sur l'instances réelles de la FSTG. Le système démontre une capacité remarquable à certifier un score de conflits nul, même dans des contextes de saturation physique extrême. L'étude des performances confirme que les gains d'optimisation proviennent d'une synergie architecturale profonde entre l'agent apprenant et les opérateurs de réparation stratifiés, dépassant les limites des métaheuristiques mémétiques classiques. Cette stabilité représente un atout décisif pour l'établissement, offrant un outil de décision capable de maintenir une qualité pédagogique constante malgré la volatilité des vœux enseignants et la densité des Tronc Communs.
+L'architecture développée présente plusieurs avantages distinctifs pour la gestion universitaire moderne. Sa conception permet de capturer simultanément les dépendances globales de mutualisation et les spécificités locales des départements, assurant une cohérence intégrale du Master Reference. La robustesse face aux déséquilibres de charge horaire et la sanctuarisation intelligente des créneaux de Travaux Pratiques constituent des points forts significatifs qui renforcent la fiabilité du système. Par ailleurs, la matérialisation de cette recherche à travers la plateforme DashTime offre une médiation humaine essentielle. L'hybridation entre l'automatisation brute et une interface interactive permet aux administrateurs de conserver la maîtrise stratégique finale, favorisant ainsi la confiance des utilisateurs et la traçabilité des décisions automatisées.
+En plus de ses contributions techniques, cette recherche apporte une avancée significative à l'application de l'IA dans l'administration de l'enseignement supérieur. Elle démontre que la performance en matière de planification ne dépend pas uniquement de la puissance de calcul brute, mais de la capacité du modèle à être spécialisé pour une topologie de contraintes précise. L'approche proposée ouvre des perspectives pour le développement de systèmes de gestion académique à la fois performants et hautement interprétables. L'analyse des métriques de satisfaction auditées en temps réel fournit des indications précieuses sur la manière dont les ressources physiques peuvent être optimisées, guidant ainsi la conception de politiques de gestion des locaux plus efficientes à l'avenir.
+Les perspectives d'amélioration et d'extension s'articulent autour d'axes stratégiques ambitieux visant à faire de DashTime une référence nationale. Sur le plan technique, l'optimisation de la complexité computationnelle constitue une priorité, avec pour objectif de réduire le temps de convergence à moins de 5 minutes pour les instances les plus denses. Cette recherche de performance s'accompagnera d'une mutation vers une architecture  intégrant des technologies de pointe telles que les réseaux de neurones sur graphes (GNN) pour une perception topologique des conflits, et l'apprentissage par renforcement multi-agent (MARL) pour décomposer les problématiques par filière. L'intégration de mécanismes de RLHF (Reinforcement Learning from Human Feedback) permettra d'aligner encore plus finement les décisions de l'IA avec l'expertise métier des administrateurs de la scolarité.
+Au-delà de l'optimisation de l'emploi du temps hebdomadaire, l'extension fonctionnelle vers la planification automatisée des sessions d'examens représente un horizon majeur, permettant de mutualiser les représentations sémantiques déjà structurées pour résoudre le défi complexe des surveillances et de l'espacement cognitif. À terme, DashTime ambitionne d'offrir une génération complète et intégrée incluant la gestion de l'alternance des semestres et la certification des versions Master Reference. Sur le plan institutionnel, la validation finale de la plateforme par le décanat ouvrira la voie à son intégration native au sein du système d'information interne de la FST de Marrakech. Cette hybridation entre recherche académique et solution industrielle constitue une preuve de concept solide vers une automatisation intelligente, fluide et durable de l'écosystème académique.
+tocchapterBibliographie
+Even1976
+S. Even, A. Itai, and A. Shamir, On the Complexity of Timetable and Multicommodity Flow Problems,
+SIAM Journal on Computing, 5(4), pp. 691--703, 1976.
+Blum2003
+C. Blum and A. Roli, Metaheuristics in Combinatorial Optimization: Overview and Conceptual Comparison,
+ACM Computing Surveys, 35(3), pp. 268-308, 2003.
+Holland1975
+J. H. Holland, Adaptation in Natural and Artificial Systems,
+University of Michigan Press, 1975.
+Kirkpatrick1983
+S. Kirkpatrick, C. D. Gelatt, and M. P. Vecchi, Optimization by Simulated Annealing,
+Science, Vol. 220, No. 4598, pp. 671--680, 1983.
+Glover1997
+F. Glover and M. Laguna, Tabu Search, Kluwer Academic Publishers, 1997.
+Mladenovic1997
+N. Mladenović and P. Hansen, Variable Neighborhood Search,
+Computers \  Operations Research, 24(11), pp. 1097--1100, 1997.
+Burke2014
+E. K. Burke and G. Kendall, Search Methodologies: Introductory Tutorials in Optimization and Decision Support Techniques,
+Springer, 2014.
+Rossi-Doria2003
+O. Rossi-Doria et al., A comparison of the performance of different metaheuristics on the university course timetabling problem,
+PATAT IV, Springer, 2003.
+Abramson1991
+D. Abramson, Constructing school timetables using simulated annealing: sequential and parallel algorithms,
+Management Science, 1991.
+Dorigo1992
+M. Dorigo, Optimization, Learning and Natural Algorithms,
+Ph.D. thesis, Politecnico di Milano, 1992.
+Glover1986
+F. Glover, Future paths for integer programming and links to artificial intelligence,
+Computers \  Operations Research, 13(5), 1986.
+McCollum2010
+B. McCollum et al., Setting the research agenda in automated timetabling,
+INFORMS Journal on Computing, 22(1), 2010.
+Burke2013
+E. K. Burke et al., Hyper-heuristics: A survey of the state of the art,
+JORS, 64(12), 2013.
+Shaw1998
+P. Shaw, Using constraint programming and local search methods to solve vehicle routing problems,
+Springer LNCS 1520, 1998.
+Ropke2006
+S. Ropke and D. Pisinger, An adaptive large neighborhood search heuristic,
+Transportation Science, 40(4), 2006.
+Kostuch2005
+P. Kostuch, The University Course Timetabling Problem with a Constraint on the Number of Days,
+PATAT, 2005.
+enumiv16
+Auer2002
+P. Auer, et al., Finite-time analysis of the multiarmed bandit problem,
+Machine Learning, 47, 2002.
+Muller2009
+T. Müller, ITC 2007 solver description: a hybrid approach,
+Annals of Operations Research, 172(1), 2009.
+Atsuta2007
+M. Atsuta, K. Nonobe, and T. Ibaraki, ITC-2007 Track 3: An Approach using General CSP Solver,
+Second International Timetabling Competition, 2007--2008.
+LuHao2010
+Z. Lü and J.-K. Hao, Adaptive Tabu Search for course timetabling,
+European Journal of Operational Research, 200(1), pp. 235--244, 2010.
+Geiger2008
+M. J. Geiger, Applying the Threshold Accepting Metaheuristic to Curriculum Based Course Timetabling,
+ITC-2007 solver description, Helmut-Schmidt-Universität Hamburg, 2008.
+ClarkHenzLove2008
+M. Clark, M. Henz, and B. Love, QuikFix: A Repair-based Timetable Solver,
+Proceedings of the 7th International Conference on the Practice and Theory of Automated Timetabling (PATAT 2008), Montreal, 2008.
+Sutton1998
+R. S. Sutton and A. G. Barto, Reinforcement Learning: An Introduction,
+MIT Press, 1998.
+Mnih2015
+V. Mnih et al., Human-level control through deep reinforcement learning,
+Nature, 518, 2015.
+Bengio2009
+Y. Bengio et al., Curriculum learning, ICML, 2009.
+Johnn2023
+S.-N. Johnn, V.-A. Darvariu, J. Handl, and J. Kalcsics, Graph Reinforcement Learning for Operator Selection in the ALNS Metaheuristic,
+Optimization and Learning (OLA 2023), CCIS vol. 1824, Springer, pp. 200--212, 2023.
+Mazyavkina2021
+N. Mazyavkina et al., Reinforcement learning for combinatorial optimization: A survey,
+Computers \  Operations Research, 134, 2021.
+Abdipoor2023
+S. Abdipoor, et al., Meta-heuristic approaches for the University Course Timetabling Problem,
+Intelligent Systems with Applications, vol. 19, 2023.
+AguirreLam2025
+J. Aguirre-Lam, et al., A review of university course timetabling: models, methods, and benchmarks,
+Int. J. Combinatorial Optimization Problems and Informatics, 16(3), 2025.
+x_t,k,l,m,n,p =
+1   si l'affectation est validée
+0   sinon

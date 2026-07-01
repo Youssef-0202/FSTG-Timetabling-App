@@ -1643,3 +1643,5 @@ def emergency_migrate(db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         return {"message": f"Notice/Error: {str(e)}"}
+
+

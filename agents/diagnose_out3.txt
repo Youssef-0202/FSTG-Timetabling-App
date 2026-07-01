@@ -1,0 +1,51 @@
+﻿Collection count: 142
+
+============================================================
+QUERY: C'est quoi la contrainte souple S8 ?
+
+  Dist: 8.8526 | pfe_report_clean.txt chunk 33
+  >> S8 : Respect du D├®jeuner : Le cr├®neau de 12h30 est sanctuaris├® pour la restauration. Son occupation est fortement ├®vit├®e pour garantir une pause physiologique d├®cente et n├®cessaire.
+
+En somme, ces hui
+
+  Dist: 11.5664 | pfe_report_clean.txt chunk 89
+  >> robustesse de l'ALNS-ILS.
+
+Le moteur bandit affiche une variance de 2 544,5 nettement inf├®rieure au
+
+GA-SA, confirmant que le m├®canisme UCB1 stabilise efficacement la trajectoire
+
+de recherche. Cepend
+
+============================================================
+QUERY: Comment fonctionne le Curriculum Learning ?
+
+  Dist: 13.9837 | pfe_report_clean.txt chunk 64
+  >> l'int├®gralit├® du Tronc Commun de la FSTG.
+
+Le Curriculum Learning r├®sout ce d├®fi en entra├«nant l'agent sur une suite de sous-probl├¿mes de complexit├® croissante :
+
+Phase 1 (Micro) : Entra├«nement sur un
+
+  Dist: 14.5226 | pfe_report_clean.txt chunk 91
+  >> ├®clair est la manifestation directe du Curriculum Learning : l'agent
+
+arrive ├á l'optimisation globale avec une Q-Table d├®j├á pr├®chauff├®e sur
+
+les patterns de conflits de la FSTG, lui permettant d'attei
+
+============================================================
+QUERY: Comment importer une maquette de fili├¿re ?
+
+  Dist: 10.0095 | ui_user_guide.md chunk 1
+  >> ---
+
+## ­ƒôÑ 2. Importation des Donn├®es & Maquettes (Mockup Imports)
+*   **Processus d'Importation** : L'administration charge des fichiers de maquettes p├®dagogiques (souvent au format Excel h├®t├®rog├¿ne).
+
+  Dist: 12.3045 | pfe_report_clean.txt chunk 104
+  >> des Cas d'Utilisation :
+
+G├®rer le R├®f├®rentiel : L'administrateur peut cr├®er, modifier ou supprimer les entit├®s fondamentales (Enseignants, Salles, Modules et Fili├¿res).
+
+Importer des Maquettes : Alime

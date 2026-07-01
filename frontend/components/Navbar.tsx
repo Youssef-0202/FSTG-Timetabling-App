@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
     LayoutDashboard, Database, Cpu, CalendarDays,
-    BarChart2, ShieldCheck, Bell, TrendingUp, Info
+    BarChart2, ShieldCheck, TrendingUp, Info,
 } from "lucide-react";
 
 const links = [

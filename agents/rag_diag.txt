@@ -1,0 +1,53 @@
+﻿python : Warning: You are sending unauthenticated requests to the HF Hub. Please set a 
+HF_TOKEN to enable higher rate limits and faster downloads.
+Au caractère Ligne:1 : 25
++ cd _Project_PFE/agents; python diagnose_rag.py 2>&1 | Out-File -FileP ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: You ar...ster downloads.:String) 
+    [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Collection count: 330
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 199/199 [00:00<00:00, 5377.97it/s]
+
+============================================================
+QUERY: C'est quoi la contrainte souple S8 ?
+
+  Dist: 10.3887 | pfe_report_clean.txt chunk 67
+  >> anctuarisÚ pour la restauration. Son occupation est fortement ÚvitÚe pour garantir une pause physiologique dÚcente et nÚcessaire.
+En somme, ces huit leviers d'optimisation  S_1 Ó S_8 permettent Ó notr
+
+  Dist: 11.2221 | pfe_report_clean.txt chunk 190
+  >> t les conditions rÚelles d'utilisation par l'administration universitaire :
+Processeur : Intel(R) Core(TM) i5-1135G7 .
+Stockage : SSD NVMe .
+Couche SystÞme : Architecture x64 avec virtualisation Docke
+
+============================================================
+QUERY: Comment fonctionne le Curriculum Learning ?
+
+  Dist: 11.3307 | pfe_report_clean.txt chunk 140
+  >> le signal de rÚcompense est trop bruitÚ pour permettre une convergence.
+Pour rÚsoudre structurellement ce verrou, nous adoptons le paradigme
+du Curriculum Learning, formalisÚ par Bengio et al. (2009),
+
+  Dist: 12.3288 | pfe_report_clean.txt chunk 98
+  >> ier Ó chaque configuration d'Útat la sÚquence d'opÚrateurs la plus efficace.
+Pour stabiliser cet apprentissage face Ó la complexitÚ du Tronc Commun de la FSTG, nous adoptons le Curriculum Learning. Ce
+
+============================================================
+QUERY: Comment importer une maquette de filiÞre ?
+
+  Dist: 9.4141 | ui_user_guide.md chunk 2
+Traceback (most recent call last):
+  File "C:\Users\HP\OneDrive\Bureau\pfe\_Project_PFE\agents\diagnose_rag.py", line 26, 
+in <module>
+    print(f"  >> {doc[:200]}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4e5' in position 
+86: character maps to <undefined>

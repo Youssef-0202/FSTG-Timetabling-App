@@ -1,0 +1,42 @@
+﻿Collection count: 175
+
+============================================================
+QUERY: C'est quoi la contrainte souple S8 ?
+
+  Dist: 10.4070 | pfe_report_clean.txt chunk 35
+  >> Gestion de la Fatigue : Analyse la charge mentale journali├¿re. Bloquer un module dense en fin de journ├®e est p├®nalis├®, l'algorithme cherchant ├á privil├®gier les cr├®neaux de haute vigilance matinale.
+S8
+
+  Dist: 11.2221 | pfe_report_clean.txt chunk 100
+  >> t les conditions r├®elles d'utilisation par l'administration universitaire :
+Processeur : Intel(R) Core(TM) i5-1135G7 .
+Stockage : SSD NVMe .
+Couche Syst├¿me : Architecture x64 avec virtualisation Docke
+
+============================================================
+QUERY: Comment fonctionne le Curriculum Learning ?
+
+  Dist: 13.4907 | pfe_report_clean.txt chunk 75
+  >> line du Curriculum Learning
+Th├®oriquement, dans un espace de recherche aussi vaste, la probabilit├® de recevoir une r├®compense positive (Reward Shaping) par pur hasard est proche de z├®ro au d├®but de l'
+
+  Dist: 14.0866 | pfe_report_clean.txt chunk 74
+  >> te de t├óches de complexit├® croissante, plut├┤t
+qu'├á la complexit├® maximale d├¿s le d├®part. L'analogie p├®dagogique est
+imm├®diate : de m├¬me qu'un ├®tudiant ma├«trise d'abord l'arithm├®tique avant
+d'aborder l
+
+============================================================
+QUERY: Comment importer une maquette de fili├¿re ?
+
+  Dist: 10.7401 | ui_user_guide.md chunk 1
+  >> ll├®s ne seront **jamais modifi├®s ou d├®plac├®s par le moteur IA (RL-ALNS)** lors des phases d'optimisation ult├®rieures.
+
+---
+
+## ­ƒôÑ 2. Importation des Donn├®es & Maquettes (Mockup Imports)
+*   **Processus
+
+  Dist: 11.9515 | pfe_report_clean.txt chunk 131
+  >> tion sp├®cifique, en utilisant des messages. C'est un outil de mod├®lisation pour analyser et comprendre les sc├®narios d'ex├®cution et les flux de contr├┤le.
+Pour la plateforme , nous avons identifi├® deux

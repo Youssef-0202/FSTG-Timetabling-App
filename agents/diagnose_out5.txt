@@ -1,0 +1,19 @@
+﻿Collection count: 142
+
+============================================================
+QUERY: conmbien des contraintes souple ?
+
+  Dist: 3.4379 | pfe_report_clean.txt chunk 92
+  >> 1. Analyse de la Transition entre Phases  figure├ëvolution de la fitness ├á travers les phases du Curriculum.  Le graphique r├®v├¿le quatre phases distinctes. En PP1, la chute  quasi-verticale de 10^7 vers 10^2 confirme que l'agent sature rapidement  ses
+
+  Dist: 3.5914 | pfe_report_clean.txt chunk 34
+  >> Cette approche lexicographique assure qu'une solution violant une seule contrainte dure sera toujours moins bien class├®e qu'une solution admissible, quel que soit son score de confort. La fitness remplit ainsi trois r├┤les vitaux : quantifier la "dist
+
+  Dist: 4.0611 | pfe_report_clean.txt chunk 98
+  >> sur une sp├®cialisation r├®elle des choix d├®cisionnels, notamment  la priorit├® accord├®e aux op├®rateurs CompactProf et  LunchFix qui ciblent les sources de p├®nalit├®  r├®siduelle les plus compressibles de l'instance FSTG.  Enfin, le positionnement par rap
+
+  Dist: 4.1819 | pfe_report_clean.txt chunk 41
+  >> Cette classification souligne une dichotomie fondamentale dans la gestion du compromis Exploration / Intensification. Tandis que les m├®thodes S-Based (bas├®es sur une solution unique) excellent dans l'intensification et la r├®paration locale minutieuse
+
+  Dist: 4.2278 | pfe_report_clean.txt chunk 40
+  >> * Sous-section : Panoramique des M├®taheuristiques : Taxonomie et Fondements *  Dans le cadre de l'optimisation combinatoire massive, la m├®taheuristique s'impose comme le paradigme dominant. Contrairement ├á une heuristique simple, limit├®e ├á une r├¿gle 

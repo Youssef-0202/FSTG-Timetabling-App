@@ -1,0 +1,55 @@
+﻿Collection count: 142
+
+============================================================
+QUERY: C'est quoi la contrainte souple S1 ?
+
+  Dist: 8.7306 | pfe_report_clean.txt chunk 33
+  >> S8 : Respect du D├®jeuner : Le cr├®neau de 12h30 est sanctuaris├® pour la restauration. Son occupation est fortement ├®vit├®e pour garantir une pause physiologique d├®cente et n├®cessaire.  En somme, ces huit leviers d'optimisation  S_1 ├á S_8 permettent ├á n
+
+  Dist: 9.7889 | pfe_report_clean.txt chunk 92
+  >> 1. Analyse de la Transition entre Phases  figure├ëvolution de la fitness ├á travers les phases du Curriculum.  Le graphique r├®v├¿le quatre phases distinctes. En PP1, la chute  quasi-verticale de 10^7 vers 10^2 confirme que l'agent sature rapidement  ses
+
+  Dist: 10.1291 | pfe_report_clean.txt chunk 32
+  >> S2 : ├ëquilibre Hebdomadaire : L'objectif est d'├®viter les pics de charge hach├®s. Une r├®partition fluide sur la semaine favorise une meilleure assimilation des cours et une vigilance constante des ├®tudiants.  S3 : Usage du Samedi : Afin de pr├®server l
+
+  Dist: 10.5773 | pfe_report_clean.txt chunk 78
+  >> Facteur d'actualisation   = 0,9  Ce choix est le plus critique de l'architecture. Sur la FSTG, l'op├®rateur  StabilizeRoom n'am├®liore pas imm├®diatement le score (r├®compense R_t faible),  mais il restructure le planning de sorte que CompactProf devient
+
+  Dist: 10.5893 | pfe_report_clean.txt chunk 89
+  >> robustesse de l'ALNS-ILS.  Le moteur bandit affiche une variance de 2 544,5 nettement inf├®rieure au  GA-SA, confirmant que le m├®canisme UCB1 stabilise efficacement la trajectoire  de recherche. Cependant, sa performance moyenne de 12 639,9 marque un 
+
+============================================================
+QUERY: C'est quoi la contrainte souple S2 ?
+
+  Dist: 10.8297 | pfe_report_clean.txt chunk 33
+  >> S8 : Respect du D├®jeuner : Le cr├®neau de 12h30 est sanctuaris├® pour la restauration. Son occupation est fortement ├®vit├®e pour garantir une pause physiologique d├®cente et n├®cessaire.  En somme, ces huit leviers d'optimisation  S_1 ├á S_8 permettent ├á n
+
+  Dist: 11.5797 | pfe_report_clean.txt chunk 32
+  >> S2 : ├ëquilibre Hebdomadaire : L'objectif est d'├®viter les pics de charge hach├®s. Une r├®partition fluide sur la semaine favorise une meilleure assimilation des cours et une vigilance constante des ├®tudiants.  S3 : Usage du Samedi : Afin de pr├®server l
+
+  Dist: 11.6171 | pfe_report_clean.txt chunk 92
+  >> 1. Analyse de la Transition entre Phases  figure├ëvolution de la fitness ├á travers les phases du Curriculum.  Le graphique r├®v├¿le quatre phases distinctes. En PP1, la chute  quasi-verticale de 10^7 vers 10^2 confirme que l'agent sature rapidement  ses
+
+  Dist: 11.9745 | pfe_report_clean.txt chunk 41
+  >> Cette classification souligne une dichotomie fondamentale dans la gestion du compromis Exploration / Intensification. Tandis que les m├®thodes S-Based (bas├®es sur une solution unique) excellent dans l'intensification et la r├®paration locale minutieuse
+
+  Dist: 12.8729 | pfe_report_clean.txt chunk 89
+  >> robustesse de l'ALNS-ILS.  Le moteur bandit affiche une variance de 2 544,5 nettement inf├®rieure au  GA-SA, confirmant que le m├®canisme UCB1 stabilise efficacement la trajectoire  de recherche. Cependant, sa performance moyenne de 12 639,9 marque un 
+
+============================================================
+QUERY: C'est quoi la contrainte souple S8 ?
+
+  Dist: 8.8526 | pfe_report_clean.txt chunk 33
+  >> S8 : Respect du D├®jeuner : Le cr├®neau de 12h30 est sanctuaris├® pour la restauration. Son occupation est fortement ├®vit├®e pour garantir une pause physiologique d├®cente et n├®cessaire.  En somme, ces huit leviers d'optimisation  S_1 ├á S_8 permettent ├á n
+
+  Dist: 11.5664 | pfe_report_clean.txt chunk 89
+  >> robustesse de l'ALNS-ILS.  Le moteur bandit affiche une variance de 2 544,5 nettement inf├®rieure au  GA-SA, confirmant que le m├®canisme UCB1 stabilise efficacement la trajectoire  de recherche. Cependant, sa performance moyenne de 12 639,9 marque un 
+
+  Dist: 11.9712 | pfe_report_clean.txt chunk 32
+  >> S2 : ├ëquilibre Hebdomadaire : L'objectif est d'├®viter les pics de charge hach├®s. Une r├®partition fluide sur la semaine favorise une meilleure assimilation des cours et une vigilance constante des ├®tudiants.  S3 : Usage du Samedi : Afin de pr├®server l
+
+  Dist: 12.0491 | pfe_report_clean.txt chunk 78
+  >> Facteur d'actualisation   = 0,9  Ce choix est le plus critique de l'architecture. Sur la FSTG, l'op├®rateur  StabilizeRoom n'am├®liore pas imm├®diatement le score (r├®compense R_t faible),  mais il restructure le planning de sorte que CompactProf devient
+
+  Dist: 12.3751 | pfe_report_clean.txt chunk 66
+  >> Conclusion  coldblueE n conclusion, ce chapitre a trac├® une trajectoire algorithmique rigoureuse, des m├®taheuristiques classiques vers l'intelligence contextuelle hybride. Chaque approche ├®tudi├®e  GA-SA, ILS-ALNS et RL-Controller  a servi de tremplin
